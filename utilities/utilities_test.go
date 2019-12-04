@@ -2,6 +2,14 @@ package utilities
 
 import "testing"
 
+func TestStringToInts(t *testing.T) {
+	var input = "0,3,0,1,-3"
+	var actual = []int{0, 3, 0, 1, -3}
+	expected := StringToInts(input)
+	if !testEq(actual, expected) {
+		t.Fatalf("failed")
+	}
+}
 func TestStringsToInts(t *testing.T) {
 	var input = []string{"0", "3", "0", "1", "-3"}
 	var actual = []int{0, 3, 0, 1, -3}
