@@ -3,8 +3,8 @@ package common
 import "fmt"
 
 type IntcodeProgram struct {
-	Input      int
-	Output     int
+	Input      []int
+	Output     []int
 	NewOutput  bool
 	Program    []int
 	CurrentPtr int
@@ -20,6 +20,9 @@ type OpCode struct {
 
 func (p *IntcodeProgram) Run(print bool) int {
 	p.PrintMsgs = print
+	if p.Output == nil {
+		p.Output = make([]int, 0)
+	}
 	for p.CurrentPtr = 0; p.CurrentPtr < len(p.Program); {
 		oc := p.GetOpCode()
 		i1, i2, i3 := p.GetInputs(oc)
@@ -141,7 +144,10 @@ func (p *IntcodeProgram) GetInputs(oc OpCode) (int, int, int) {
 		i1 = p.Program[p.CurrentPtr+1]
 		i2 = p.Program[p.CurrentPtr+2]
 	case 99:
-		return p.Output, -1, -1
+		if p.Output == nil || len(p.Output) == 0 {
+			return 0, -1, -1
+		}
+		return p.Output[0], -1, -1
 	default:
 		fmt.Println("Error reading inputs of ", oc)
 		panic("bad input")
@@ -184,7 +190,12 @@ func (p *IntcodeProgram) StoreInput(i1 int) {
 	if p.PrintMsgs {
 		fmt.Println("saving input ", p.Input, "to position", i1)
 	}
-	p.Program[i1] = p.Input
+	p.Program[i1] = p.Input[0]
+	if len(p.Input) > 1 {
+		p.Input = p.Input[1:]
+	} else {
+		p.Input = nil
+	}
 }
 
 func (p *IntcodeProgram) StoreOutput(oc OpCode, i1 int) {
@@ -194,7 +205,10 @@ func (p *IntcodeProgram) StoreOutput(oc OpCode, i1 int) {
 	if p.PrintMsgs {
 		fmt.Println("saving output ", i1)
 	}
-	p.Output = i1
+	if p.Output == nil {
+		p.Output = make([]int, 0)
+	}
+	p.Output = append(p.Output, i1)
 	p.NewOutput = true
 }
 
@@ -217,7 +231,7 @@ func (p *IntcodeProgram) JumpIf(condition bool, oc OpCode, i1, i2 int) {
 
 	if (i1 != 0) == condition {
 		p.CurrentPtr = i2
-		fmt.Println("jumping....ptr at", i2)
+		//fmt.Println("jumping....ptr at", i2)
 		p.JumpFlag = true
 	}
 }

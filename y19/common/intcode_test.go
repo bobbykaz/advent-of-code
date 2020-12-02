@@ -59,7 +59,7 @@ func TestImmediateModeAdd2(t *testing.T) {
 func TestInput(t *testing.T) {
 	input := "3,2,100"
 	intcodes := utilities.StringToInts(input)
-	prog := IntcodeProgram{Program: intcodes, CurrentPtr: 0, Input: 99}
+	prog := IntcodeProgram{Program: intcodes, CurrentPtr: 0, Input: []int{99}}
 	prog.Run(true)
 	if 99 != prog.Program[2] {
 		t.Fatalf("failed")
@@ -71,7 +71,7 @@ func TestOutput(t *testing.T) {
 	intcodes := utilities.StringToInts(input)
 	prog := IntcodeProgram{Program: intcodes, CurrentPtr: 0}
 	prog.Run(true)
-	if 99 != prog.Output {
+	if 99 != prog.Output[0] {
 		t.Fatalf("failed")
 	}
 
@@ -199,7 +199,7 @@ func TestJumpTrue_Jumps(t *testing.T) {
 	intcodes := utilities.StringToInts(input)
 	prog := IntcodeProgram{Program: intcodes, CurrentPtr: 0}
 	prog.Run(true)
-	if 77 != prog.Output {
+	if 77 != prog.Output[0] {
 		t.Fatalf("failed")
 	}
 }
@@ -209,7 +209,7 @@ func TestJumpTrue_NoJump(t *testing.T) {
 	intcodes := utilities.StringToInts(input)
 	prog := IntcodeProgram{Program: intcodes, CurrentPtr: 0}
 	prog.Run(true)
-	if 77 != prog.Output {
+	if 77 != prog.Output[0] {
 		t.Fatalf("failed")
 	}
 }
@@ -219,7 +219,7 @@ func TestJumpFalse_Jumps(t *testing.T) {
 	intcodes := utilities.StringToInts(input)
 	prog := IntcodeProgram{Program: intcodes, CurrentPtr: 0}
 	prog.Run(true)
-	if 77 != prog.Output {
+	if 77 != prog.Output[0] {
 		t.Fatalf("failed")
 	}
 }
@@ -229,7 +229,7 @@ func TestJumpFalse_NoJump(t *testing.T) {
 	intcodes := utilities.StringToInts(input)
 	prog := IntcodeProgram{Program: intcodes, CurrentPtr: 0}
 	prog.Run(true)
-	if 77 != prog.Output {
+	if 77 != prog.Output[0] {
 		t.Fatalf("failed")
 	}
 }
@@ -237,9 +237,9 @@ func TestJumpFalse_NoJump(t *testing.T) {
 func TestComps1(t *testing.T) {
 	input := "3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99"
 	intcodes := utilities.StringToInts(input)
-	prog := IntcodeProgram{Program: intcodes, CurrentPtr: 0, Input: 7}
+	prog := IntcodeProgram{Program: intcodes, CurrentPtr: 0, Input: []int{7}}
 	prog.Run(true)
-	if 999 != prog.Output {
+	if 999 != prog.Output[0] {
 		t.Fatalf("failed")
 	}
 }
@@ -247,9 +247,9 @@ func TestComps1(t *testing.T) {
 func TestComps2(t *testing.T) {
 	input := "3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99"
 	intcodes := utilities.StringToInts(input)
-	prog := IntcodeProgram{Program: intcodes, CurrentPtr: 0, Input: 8}
+	prog := IntcodeProgram{Program: intcodes, CurrentPtr: 0, Input: []int{8}}
 	prog.Run(true)
-	if 1000 != prog.Output {
+	if 1000 != prog.Output[0] {
 		t.Fatalf("failed")
 	}
 }
@@ -257,9 +257,9 @@ func TestComps2(t *testing.T) {
 func TestComps3(t *testing.T) {
 	input := "3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99"
 	intcodes := utilities.StringToInts(input)
-	prog := IntcodeProgram{Program: intcodes, CurrentPtr: 0, Input: 9}
+	prog := IntcodeProgram{Program: intcodes, CurrentPtr: 0, Input: []int{9}}
 	prog.Run(true)
-	if 1001 != prog.Output {
+	if 1001 != prog.Output[0] {
 		t.Fatalf("failed")
 	}
 }
@@ -267,9 +267,9 @@ func TestComps3(t *testing.T) {
 func TestJump1(t *testing.T) {
 	input := "3,12,6,12,15,1,13,14,13,4,13,99,-1,0,1,9"
 	intcodes := utilities.StringToInts(input)
-	prog := IntcodeProgram{Program: intcodes, CurrentPtr: 0, Input: 0}
+	prog := IntcodeProgram{Program: intcodes, CurrentPtr: 0, Input: []int{0}}
 	prog.Run(true)
-	if 0 != prog.Output {
+	if 0 != prog.Output[0] {
 		t.Fatalf("failed")
 	}
 }
@@ -277,9 +277,9 @@ func TestJump1(t *testing.T) {
 func TestJump2(t *testing.T) {
 	input := "3,12,6,12,15,1,13,14,13,4,13,99,-1,0,1,9"
 	intcodes := utilities.StringToInts(input)
-	prog := IntcodeProgram{Program: intcodes, CurrentPtr: 0, Input: 7}
+	prog := IntcodeProgram{Program: intcodes, CurrentPtr: 0, Input: []int{7}}
 	prog.Run(true)
-	if 1 != prog.Output {
+	if 1 != prog.Output[0] {
 		t.Fatalf("failed")
 	}
 }
@@ -287,9 +287,9 @@ func TestJump2(t *testing.T) {
 func TestJump3(t *testing.T) {
 	input := "3,3,1105,-1,9,1101,0,0,12,4,12,99,1"
 	intcodes := utilities.StringToInts(input)
-	prog := IntcodeProgram{Program: intcodes, CurrentPtr: 0, Input: 0}
+	prog := IntcodeProgram{Program: intcodes, CurrentPtr: 0, Input: []int{0}}
 	prog.Run(true)
-	if 0 != prog.Output {
+	if 0 != prog.Output[0] {
 		t.Fatalf("failed")
 	}
 }
@@ -297,9 +297,9 @@ func TestJump3(t *testing.T) {
 func TestJump4(t *testing.T) {
 	input := "3,3,1105,-1,9,1101,0,0,12,4,12,99,1"
 	intcodes := utilities.StringToInts(input)
-	prog := IntcodeProgram{Program: intcodes, CurrentPtr: 0, Input: 7}
+	prog := IntcodeProgram{Program: intcodes, CurrentPtr: 0, Input: []int{7}}
 	prog.Run(true)
-	if 1 != prog.Output {
+	if 1 != prog.Output[0] {
 		t.Fatalf("failed")
 	}
 }
