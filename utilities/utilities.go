@@ -54,6 +54,19 @@ func IntsToString(input []int) string {
 	return s
 }
 
+//Split is a fancy split for multiple separators, processed left to right
+func Split(str string, pts ...string) []string {
+	output := make([]string, 0)
+	current := str
+	for i := 0; i < len(pts); i++ {
+		tmp := strings.SplitN(current, pts[i], 2)
+		output = append(output, tmp[0])
+		current = tmp[1]
+	}
+	output = append(output, current)
+	return output
+}
+
 //ParseCoord parses an X,Y style coordinate and also removes the beginning and end strings provided, and trims spaces everywhere
 func ParseCoord(coordStr, beginning, separator, end string) (int, int, error) {
 	trimmed := strings.TrimSpace(coordStr)
