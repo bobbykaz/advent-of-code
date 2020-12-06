@@ -18,6 +18,26 @@ func ReadFileIntoLines(filename string) []string {
 	return lines
 }
 
+func GroupLinesByLineSeparator(lines []string, separator string) [][]string {
+	groups := make([][]string, 0)
+	group := make([]string, 0)
+	for _, s := range lines {
+		if s == separator {
+			groups = append(groups, group)
+			group = make([]string, 0)
+		} else {
+			group = append(group, s)
+		}
+	}
+
+	//final group
+	if len(group) > 0 {
+		groups = append(groups, group)
+	}
+
+	return groups
+}
+
 func StringToInts(str string) []int {
 	ints := strings.Split(str, ",")
 	var output = make([]int, len(ints))

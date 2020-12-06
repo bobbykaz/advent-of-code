@@ -7,17 +7,7 @@ import (
 func Part1() int {
 	input := utilities.ReadFileIntoLines("input/y20d6.txt")
 
-	groups := make([]string, 0)
-	group := ""
-	for _, s := range input {
-		if s == "" {
-			groups = append(groups, group)
-			group = ""
-		} else {
-			group = group + s
-		}
-	}
-	groups = append(groups, group)
+	groups := utilities.GroupLinesByLineSeparator(input, "")
 
 	sum := 0
 	for _, g := range groups {
@@ -27,23 +17,9 @@ func Part1() int {
 	return sum
 }
 
-func groupQs(group string) int {
+func groupAnswers(g []string) map[rune]int {
 	dict := make(map[rune]int)
-	for _, c := range group {
-		dict[c] = 1
-	}
-
-	sum := 0
-	for _, v := range dict {
-		sum += v
-	}
-
-	return sum
-}
-
-func groupQs2(group []string) int {
-	dict := make(map[rune]int)
-	for _, s := range group {
+	for _, s := range g {
 		for _, c := range s {
 			_, exists := dict[c]
 			if exists {
@@ -53,6 +29,18 @@ func groupQs2(group []string) int {
 			}
 		}
 	}
+
+	return dict
+}
+
+func groupQs(group []string) int {
+	dict := groupAnswers(group)
+
+	return len(dict)
+}
+
+func groupQs2(group []string) int {
+	dict := groupAnswers(group)
 
 	sum := 0
 	for _, v := range dict {
@@ -67,17 +55,7 @@ func groupQs2(group []string) int {
 func Part2() int {
 	input := utilities.ReadFileIntoLines("input/y20d6.txt")
 
-	groups := make([][]string, 0)
-	group := make([]string, 0)
-	for _, s := range input {
-		if s == "" {
-			groups = append(groups, group)
-			group = make([]string, 0)
-		} else {
-			group = append(group, s)
-		}
-	}
-	groups = append(groups, group)
+	groups := utilities.GroupLinesByLineSeparator(input, "")
 
 	sum := 0
 	for _, g := range groups {
