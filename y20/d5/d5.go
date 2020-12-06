@@ -2,8 +2,9 @@ package d5
 
 import (
 	"fmt"
-	"math"
 	"sort"
+	"strconv"
+	"strings"
 
 	"github.com/bobbykaz/advent-of-code/utilities"
 )
@@ -14,6 +15,7 @@ func Part1() int {
 	max := 0
 	for _, s := range input {
 		id := SeatID(s)
+
 		if id > max {
 			max = id
 		}
@@ -23,34 +25,16 @@ func Part1() int {
 }
 
 func SeatID(str string) int {
-	rowID := 0
-	for i := 0; i < 7; i++ {
-		pw := int(math.Pow(2, float64(6-i)))
-		switch rune(str[i]) {
-		case 'F':
-			rowID += 0
-		case 'B':
-			rowID += pw
-		default:
-			panic("uh oh")
-		}
+	s := strings.ReplaceAll(str, "F", "0")
+	s = strings.ReplaceAll(s, "B", "1")
+	s = strings.ReplaceAll(s, "L", "0")
+	s = strings.ReplaceAll(s, "R", "1")
+	i, err := strconv.ParseInt(s, 2, 32)
+	if err != nil {
+		fmt.Println("error parsing", err)
+		return -1
 	}
-	col := 0
-	for i := 0; i < 3; i++ {
-		pw := int(math.Pow(2, float64(2-i)))
-		switch rune(str[7+i]) {
-		case 'L':
-			col += 0
-		case 'R':
-			col += pw
-		default:
-			panic("uh oh")
-		}
-	}
-
-	seatID := rowID*8 + col
-	//fmt.Println(str, "row", rowID, "col", col, "ID", seatID)
-	return seatID
+	return int(i)
 }
 
 func Part2() int {
