@@ -5,12 +5,12 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/bobbykaz/aoc2018/utilities"
+	"github.com/bobbykaz/advent-of-code/utilities"
 )
 
 func Part1_2() {
 	fmt.Println("Parsing...")
-	input := utilities.ReadFileIntoLines("input/input3.txt")
+	input := utilities.ReadFileIntoLines("input/y18d3.txt")
 	fabric := make([][]int, 1000)
 	fmt.Println("Setup...")
 	for i := 0; i < 1000; i++ {

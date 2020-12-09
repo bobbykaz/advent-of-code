@@ -5,12 +5,12 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/bobbykaz/aoc2018/utilities"
+	"github.com/bobbykaz/advent-of-code/utilities"
 )
 
 func Solve() {
 	fmt.Println("starting d6.")
-	input := utilities.ReadFileIntoLines("input/input5.txt")
+	input := utilities.ReadFileIntoLines("input/y18d5.txt")
 	runes := []rune(input[0])
 	runes = annihilate(runes)
 	final := string(runes)

@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/bobbykaz/aoc2018/utilities"
+	"github.com/bobbykaz/advent-of-code/utilities"
 )
 
 func Part1() {
 	fmt.Println("test")
-	input := utilities.ReadFileIntoLines("input/input13.txt")
+	input := utilities.ReadFileIntoLines("input/y18d13.txt")
 	grid := make([][]rune, len(input))
 
 	fmt.Println("parsing grid")

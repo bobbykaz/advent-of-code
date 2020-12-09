@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/bobbykaz/aoc2018/utilities"
+	"github.com/bobbykaz/advent-of-code/utilities"
 )
 
 type gameboard struct {
@@ -36,7 +36,7 @@ type pos struct {
 
 func Part1() {
 	fmt.Println("Day 15")
-	playGame("input/input15.txt", true, 19)
+	playGame("input/y18d15.txt", true, 19)
 }
 
 func playGame(filename string, printBoard bool, elfPower int) int {

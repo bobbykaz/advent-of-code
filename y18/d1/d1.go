@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/bobbykaz/aoc2018/utilities"
+	"github.com/bobbykaz/advent-of-code/utilities"
 )
 
 func Part1() int {
-	input := utilities.ReadFileIntoLines("input/input1.txt")
+	input := utilities.ReadFileIntoLines("input/y18d1.txt")
 	freq := 0
 	for i := 0; i < len(input); i++ {
 		output, err := processLine(input[i])
@@ -25,7 +25,7 @@ func Part1() int {
 }
 
 func Part2() int {
-	input := utilities.ReadFileIntoLines("input/input1.txt")
+	input := utilities.ReadFileIntoLines("input/y18d1.txt")
 	intSet := make(map[int]bool)
 	freq := 0
 	for i := 0; true; i++ {

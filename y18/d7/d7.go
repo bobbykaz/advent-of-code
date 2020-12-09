@@ -5,11 +5,11 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/bobbykaz/aoc2018/utilities"
+	"github.com/bobbykaz/advent-of-code/utilities"
 )
 
 func Part1() {
-	input := utilities.ReadFileIntoLines("input/input7.txt")
+	input := utilities.ReadFileIntoLines("input/y18d7.txt")
 	nodeMap := make(map[string]*node, len(input))
 	for i := 0; i < len(input); i++ {
 		parent, child := process(input[i])

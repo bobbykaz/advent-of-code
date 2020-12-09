@@ -3,11 +3,11 @@ package d2
 import (
 	"fmt"
 
-	"github.com/bobbykaz/aoc2018/utilities"
+	"github.com/bobbykaz/advent-of-code/utilities"
 )
 
 func Part1() {
-	input := utilities.ReadFileIntoLines("input/input2.txt")
+	input := utilities.ReadFileIntoLines("input/y18d2.txt")
 	twos, threes := 0, 0
 	for i := 0; i < len(input); i++ {
 		v1, v2 := checkId(input[i])
@@ -26,7 +26,7 @@ func Part1() {
 }
 
 func Part2() {
-	input := utilities.ReadFileIntoLines("input/input2.txt")
+	input := utilities.ReadFileIntoLines("input/y18d2.txt")
 	for i := 0; i < len(input); i++ {
 		first := input[i]
 		for j := 0; j < len(input); j++ {

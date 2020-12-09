@@ -5,11 +5,11 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/bobbykaz/aoc2018/utilities"
+	"github.com/bobbykaz/advent-of-code/utilities"
 )
 
 func Part1() {
-	input := utilities.ReadFileIntoLines("input/input4.txt")
+	input := utilities.ReadFileIntoLines("input/y18d4.txt")
 	sort.Strings(input)
 	gws := make([]guardWatch, len(input))
 	fmt.Println("making schedules.....")

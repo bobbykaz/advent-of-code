@@ -5,11 +5,11 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/bobbykaz/aoc2018/utilities"
+	"github.com/bobbykaz/advent-of-code/utilities"
 )
 
 func Part1() {
-	input := utilities.ReadFileIntoLines("input/input10.txt")
+	input := utilities.ReadFileIntoLines("input/y18d10.txt")
 
 	particles := make([]*particle, 0)
 	for i := 0; i < len(input); i++ {

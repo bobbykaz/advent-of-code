@@ -6,11 +6,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/bobbykaz/aoc2018/utilities"
+	"github.com/bobbykaz/advent-of-code/utilities"
 )
 
 func Part1() {
-	input := utilities.ReadFileIntoLines("input/input6.txt")
+	input := utilities.ReadFileIntoLines("input/y18d6.txt")
 	sort.Strings(input)
 	points := make([]point, 0, len(input))
 	fmt.Println("Made ", len(input), " points")

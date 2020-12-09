@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bobbykaz/aoc2018/utilities"
+	"github.com/bobbykaz/advent-of-code/utilities"
 )
 
 func Part1() {
-	input := utilities.ReadFileIntoLines("input/input8.txt")
+	input := utilities.ReadFileIntoLines("input/y18d8.txt")
 	strs := strings.Split(input[0], " ")
 	nodeInfo := utilities.StringsToInts(strs)
 	fmt.Println("Made ", len(nodeInfo), " pieces of node data")

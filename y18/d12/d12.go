@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bobbykaz/aoc2018/utilities"
+	"github.com/bobbykaz/advent-of-code/utilities"
 )
 
 func Part1() {
@@ -27,7 +27,7 @@ func Part1() {
 		plants = append(plants, 0)
 	}
 
-	input := utilities.ReadFileIntoLines("input/input12.txt")
+	input := utilities.ReadFileIntoLines("input/y18d12.txt")
 	laws := generateLaws(input)
 
 	for gen := 1; gen < 500; gen++ {
