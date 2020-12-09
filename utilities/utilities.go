@@ -65,6 +65,45 @@ func StringsToInts(strs []string) []int {
 	return output
 }
 
+func StringsToInts64(strs []string) []int64 {
+	var output = make([]int64, len(strs))
+	for i, s := range strs {
+		temp, err := strconv.ParseInt(s, 10, 64)
+		if err != nil {
+			panic(err)
+		}
+		output[i] = temp
+	}
+
+	return output
+}
+
+func FindMinMax(ints []int) (int, int) {
+	min, max := ints[0], ints[0]
+	for _, v := range ints {
+		if v > max {
+			max = v
+		}
+		if v < min {
+			min = v
+		}
+	}
+	return min, max
+}
+
+func FindMinMax64(ints []int64) (int64, int64) {
+	min, max := ints[0], ints[0]
+	for _, v := range ints {
+		if v > max {
+			max = v
+		}
+		if v < min {
+			min = v
+		}
+	}
+	return min, max
+}
+
 func IntsToString(input []int) string {
 	var s string = fmt.Sprintf("%d", input[0])
 	for _, item := range input[1:] {
