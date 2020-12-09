@@ -1,2 +1,4 @@
 # advent-of-code
-Collection of Advent Of Code solutions in golang from 2019 and on. Will eventually port 2018 into this repo.
+Collection of my Advent Of Code solutions in golang from 2018 and on.
+
+Visit https://adventofcode.com/ to play yourself.
