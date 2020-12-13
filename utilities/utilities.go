@@ -5,6 +5,7 @@ import "strconv"
 import "io/ioutil"
 import "fmt"
 
+//ReadFileIntoLines reads a text file into lines. Assumes LF line ending, will ignore a single blank line at the end of the file.
 func ReadFileIntoLines(filename string) []string {
 	b, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -18,6 +19,7 @@ func ReadFileIntoLines(filename string) []string {
 	return lines
 }
 
+//GroupLinesByLineSeparator parses an input file of text lines into blocks based on a specific line separator
 func GroupLinesByLineSeparator(lines []string, separator string) [][]string {
 	groups := make([][]string, 0)
 	group := make([]string, 0)
@@ -38,6 +40,7 @@ func GroupLinesByLineSeparator(lines []string, separator string) [][]string {
 	return groups
 }
 
+//StringToInts parses a comma-separated string of ints
 func StringToInts(str string) []int {
 	ints := strings.Split(str, ",")
 	var output = make([]int, len(ints))
@@ -52,6 +55,7 @@ func StringToInts(str string) []int {
 	return output
 }
 
+//StringsToInts parses a slice of input into ints
 func StringsToInts(strs []string) []int {
 	var output = make([]int, len(strs))
 	for i, s := range strs {
@@ -65,6 +69,7 @@ func StringsToInts(strs []string) []int {
 	return output
 }
 
+//StringsToInts64 parses a slice of input into int64s
 func StringsToInts64(strs []string) []int64 {
 	var output = make([]int64, len(strs))
 	for i, s := range strs {
@@ -78,6 +83,7 @@ func StringsToInts64(strs []string) []int64 {
 	return output
 }
 
+//FindMinMax returns the min and max of a int slice
 func FindMinMax(ints []int) (int, int) {
 	min, max := ints[0], ints[0]
 	for _, v := range ints {
@@ -91,6 +97,7 @@ func FindMinMax(ints []int) (int, int) {
 	return min, max
 }
 
+//FindMinMax64 returns the min and max of a int64 slice
 func FindMinMax64(ints []int64) (int64, int64) {
 	min, max := ints[0], ints[0]
 	for _, v := range ints {
@@ -104,6 +111,75 @@ func FindMinMax64(ints []int64) (int64, int64) {
 	return min, max
 }
 
+//GCD finds the Greatest Common Denominator of a set of ints
+func GCD(ints []int) int {
+	if len(ints) < 2 {
+		panic("GCD needs at least 2 inputs")
+	}
+	if len(ints) == 2 {
+		a, b := ints[0], ints[1]
+		for b != 0 {
+			t := b
+			b = a % b
+			a = t
+		}
+		return a
+	} else {
+		subGCD := GCD(ints[1:])
+		return GCD([]int{subGCD, ints[0]})
+	}
+}
+
+//GCD64 finds the Greatest Common Denominator of a set of 64 bit ints
+func GCD64(ints []int64) int64 {
+	if len(ints) < 2 {
+		panic("GCD64 needs at least 2 inputs")
+	}
+	if len(ints) == 2 {
+		a, b := ints[0], ints[1]
+		for b != 0 {
+			t := b
+			b = a % b
+			a = t
+		}
+		return a
+	} else {
+		subGCD := GCD64(ints[1:])
+		return GCD64([]int64{subGCD, ints[0]})
+	}
+}
+
+//LCM finds the Least Common Multiple of a set of ints
+func LCM(ints []int) int {
+	if len(ints) < 2 {
+		panic("LCM needs at least 2 inputs")
+	}
+	if len(ints) == 2 {
+		a, b := ints[0], ints[1]
+		gcd := GCD([]int{a, b})
+		return a * b / gcd
+	} else {
+		subLCM := LCM(ints[1:])
+		return GCD([]int{subLCM, ints[0]})
+	}
+}
+
+//LCM64 finds the Least Common Multiple of a set of 64 bit ints
+func LCM64(ints []int64) int64 {
+	if len(ints) < 2 {
+		panic("LCM64 needs at least 2 inputs")
+	}
+	if len(ints) == 2 {
+		a, b := ints[0], ints[1]
+		gcd := GCD64([]int64{a, b})
+		return a * b / gcd
+	} else {
+		subLCM := LCM64(ints[1:])
+		return GCD64([]int64{subLCM, ints[0]})
+	}
+}
+
+//IntsToString returns a comma-separated string of the input
 func IntsToString(input []int) string {
 	var s string = fmt.Sprintf("%d", input[0])
 	for _, item := range input[1:] {
