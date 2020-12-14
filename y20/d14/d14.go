@@ -8,7 +8,7 @@ import (
 	"github.com/bobbykaz/advent-of-code/utilities"
 )
 
-var inputFile = "input/y20d14.txt"
+var inputFile = "input/y20/d14.txt"
 
 func Run() int {
 	input := utilities.ReadFileIntoLines(inputFile)

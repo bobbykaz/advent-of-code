@@ -20,7 +20,7 @@ type passport struct {
 }
 
 func Part1() int {
-	input := utilities.ReadFileIntoLines("input/y20d4.txt")
+	input := utilities.ReadFileIntoLines("input/y20/d4.txt")
 	passports := make([]passport, 0)
 	pp := passport{}
 	for _, s := range input {
@@ -185,7 +185,7 @@ func eyeCheck(s string) bool {
 }
 
 func Part2() int {
-	input := utilities.ReadFileIntoLines("input/y20d4.txt")
+	input := utilities.ReadFileIntoLines("input/y20/d4.txt")
 	passports := make([]passport, 0)
 	pp := passport{}
 	for _, s := range input {

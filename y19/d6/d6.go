@@ -8,7 +8,7 @@ import (
 )
 
 func Part1() int {
-	orbits := utilities.ReadFileIntoLines("input/y19d6.txt")
+	orbits := utilities.ReadFileIntoLines("input/y19/d6.txt")
 	orbitMap := make(map[string]*Node)
 	orbitMap["COM"] = &Node{Name: "COM", Parent: nil, Depth: 0}
 	for _, s := range orbits {

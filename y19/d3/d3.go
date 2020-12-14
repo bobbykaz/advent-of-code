@@ -10,7 +10,7 @@ import (
 )
 
 func Part1() int {
-	input := utilities.ReadFileIntoLines("input/y19d3.txt")
+	input := utilities.ReadFileIntoLines("input/y19/d3.txt")
 	print := false
 	wire1 := strings.Split(input[0], ",")
 	wire2 := strings.Split(input[1], ",")

@@ -8,7 +8,7 @@ import (
 )
 
 func Part1() int {
-	input := utilities.ReadFileIntoLines("input/y20d2.txt")
+	input := utilities.ReadFileIntoLines("input/y20/d2.txt")
 	good := 0
 	for i := 0; i < len(input); i++ {
 		parts := utilities.Split(input[i], "-", " ", ":")
@@ -48,7 +48,7 @@ func isValidPwd2(min int, max int, letter rune, pwd string) bool {
 }
 
 func Part2() int {
-	input := utilities.ReadFileIntoLines("input/y20d2.txt")
+	input := utilities.ReadFileIntoLines("input/y20/d2.txt")
 	good := 0
 	for i := 0; i < len(input); i++ {
 		parts := utilities.Split(input[i], "-", " ", ":")

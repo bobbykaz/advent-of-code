@@ -10,7 +10,7 @@ import (
 )
 
 func Part1() int {
-	input := utilities.ReadFileIntoLines("input/y20d5.txt")
+	input := utilities.ReadFileIntoLines("input/y20/d5.txt")
 
 	max := 0
 	for _, s := range input {
@@ -38,7 +38,7 @@ func SeatID(str string) int {
 }
 
 func Part2() int {
-	input := utilities.ReadFileIntoLines("input/y20d5.txt")
+	input := utilities.ReadFileIntoLines("input/y20/d5.txt")
 
 	seats := make([]int, 0)
 	for _, s := range input {

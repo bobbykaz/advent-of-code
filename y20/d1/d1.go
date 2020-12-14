@@ -8,7 +8,7 @@ import (
 )
 
 func Part1() int {
-	input := utilities.ReadFileIntoLines("input/y20d1.txt")
+	input := utilities.ReadFileIntoLines("input/y20/d1.txt")
 	numbers := utilities.StringsToInts(input)
 	fmt.Println(bruteForceDuo(numbers))
 	fmt.Println(scanDuo(numbers))
@@ -52,7 +52,7 @@ func bruteForceDuo(numbers []int) int {
 }
 
 func Part2() int {
-	input := utilities.ReadFileIntoLines("input/y20d1.txt")
+	input := utilities.ReadFileIntoLines("input/y20/d1.txt")
 	numbers := utilities.StringsToInts(input)
 	for i := 0; i < len(numbers); i++ {
 		for j := 0; j < len(numbers); j++ {

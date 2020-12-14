@@ -7,7 +7,7 @@ import (
 )
 
 func Part1() int {
-	input := utilities.ReadFileIntoLines("input/y20d3.txt")
+	input := utilities.ReadFileIntoLines("input/y20/d3.txt")
 
 	return TreesOnPath(1, 3, input)
 }
@@ -30,7 +30,7 @@ func TreesOnPath(rmod int, cmod int, input []string) int {
 }
 
 func Part2() int {
-	input := utilities.ReadFileIntoLines("input/y20d3.txt")
+	input := utilities.ReadFileIntoLines("input/y20/d3.txt")
 	s1 := TreesOnPath(1, 1, input)
 	s2 := TreesOnPath(1, 3, input)
 	s3 := TreesOnPath(1, 5, input)

@@ -7,7 +7,7 @@ import (
 )
 
 func Part1() int {
-	input := utilities.ReadFileIntoLines("input/y19d1.txt")
+	input := utilities.ReadFileIntoLines("input/y19/d1.txt")
 	modules := utilities.StringsToInts(input)
 	mass := 0
 	for i := 0; i < len(modules); i++ {
@@ -21,7 +21,7 @@ func Part1() int {
 }
 
 func Part2() int {
-	input := utilities.ReadFileIntoLines("input/y19d1.txt")
+	input := utilities.ReadFileIntoLines("input/y19/d1.txt")
 	modules := utilities.StringsToInts(input)
 	mass := 0
 	for i := 0; i < len(modules); i++ {

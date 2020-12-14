@@ -5,7 +5,7 @@ import (
 )
 
 func Part1() int {
-	input := utilities.ReadFileIntoLines("input/y20d6.txt")
+	input := utilities.ReadFileIntoLines("input/y20/d6.txt")
 
 	groups := utilities.GroupLinesByLineSeparator(input, "")
 
@@ -53,7 +53,7 @@ func groupQs2(group []string) int {
 }
 
 func Part2() int {
-	input := utilities.ReadFileIntoLines("input/y20d6.txt")
+	input := utilities.ReadFileIntoLines("input/y20/d6.txt")
 
 	groups := utilities.GroupLinesByLineSeparator(input, "")
 

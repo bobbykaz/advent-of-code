@@ -8,7 +8,7 @@ import (
 	"github.com/bobbykaz/advent-of-code/utilities"
 )
 
-var inputFile = "input/y20d7.txt"
+var inputFile = "input/y20/d7.txt"
 
 type bagNode struct {
 	Color    string

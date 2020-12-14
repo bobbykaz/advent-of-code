@@ -8,7 +8,7 @@ import (
 )
 
 func Part1() int {
-	input := utilities.ReadFileIntoLines("input/y19d2.txt")
+	input := utilities.ReadFileIntoLines("input/y19/d2.txt")
 	intcodes := utilities.StringToInts(input[0])
 	fmt.Println("total intcodes found", len(intcodes))
 	intcodes[1] = 12
@@ -20,7 +20,7 @@ func Part1() int {
 }
 
 func Part2() int {
-	input := utilities.ReadFileIntoLines("input/y19d2.txt")
+	input := utilities.ReadFileIntoLines("input/y19/d2.txt")
 	intcodes := utilities.StringToInts(input[0])
 	fmt.Println("total intcodes found", len(intcodes))
 	for noun := 0; noun < 100; noun++ {

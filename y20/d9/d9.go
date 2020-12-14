@@ -6,7 +6,7 @@ import (
 	"github.com/bobbykaz/advent-of-code/utilities"
 )
 
-var inputFile = "input/y20d9.txt"
+var inputFile = "input/y20/d9.txt"
 
 func Run() int64 {
 	input := utilities.ReadFileIntoLines(inputFile)
