@@ -19,6 +19,16 @@ func TestStringsToInts(t *testing.T) {
 	}
 }
 
+func TestIntersect(t *testing.T) {
+	var a = []int{1, 2, 3}
+	var b = []int{7, 3, 2}
+	var actual = []int{2, 3}
+	expected := Intersect(a, b)
+	if !testEq(actual, expected) {
+		t.Fatalf("failed")
+	}
+}
+
 func TestIntsToString(t *testing.T) {
 	var expected = "0,3,0,1,-3"
 	var input = []int{0, 3, 0, 1, -3}

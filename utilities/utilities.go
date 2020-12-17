@@ -1,9 +1,12 @@
 package utilities
 
-import "strings"
-import "strconv"
-import "io/ioutil"
-import "fmt"
+import (
+	"fmt"
+	"io/ioutil"
+	"sort"
+	"strconv"
+	"strings"
+)
 
 //ReadFileIntoLines reads a text file into lines. Assumes LF line ending, will ignore a single blank line at the end of the file.
 func ReadFileIntoLines(filename string) []string {
@@ -268,4 +271,26 @@ func ParseTimeStyleString(time string) (int, int, error) {
 	}
 
 	return h, m, nil
+}
+
+//Intersect returns the intersection of two int-slices
+func Intersect(a, b []int) []int {
+	sort.Ints(a)
+	sort.Ints(b)
+	ac, bc := 0, 0
+	r := make([]int, 0)
+	for ac < len(a) && bc < len(b) {
+		av, bv := a[ac], b[bc]
+		if av == bv {
+			r = append(r, av)
+			ac++
+			bc++
+		} else if av < bv {
+			ac++
+		} else {
+			bc++
+		}
+	}
+
+	return r
 }
