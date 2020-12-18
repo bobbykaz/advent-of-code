@@ -3,13 +3,16 @@ package common
 import "fmt"
 
 type IntcodeProgram struct {
-	Input      []int
-	Output     []int
-	NewOutput  bool
-	Program    []int
-	CurrentPtr int
-	PrintMsgs  bool
-	JumpFlag   bool
+	Input        []int
+	Output       []int
+	NewOutput    bool
+	Program      []int
+	CurrentPtr   int
+	PrintMsgs    bool
+	JumpFlag     bool
+	HALTED       bool
+	ReturnOutput bool
+	Resume       bool
 }
 type OpCode struct {
 	Code   int
@@ -20,10 +23,22 @@ type OpCode struct {
 
 func (p *IntcodeProgram) Run(print bool) int {
 	p.PrintMsgs = print
+	p.HALTED = false
 	if p.Output == nil {
 		p.Output = make([]int, 0)
 	}
-	for p.CurrentPtr = 0; p.CurrentPtr < len(p.Program); {
+
+	if !p.Resume {
+		p.CurrentPtr = 0
+	}
+
+	for p.CurrentPtr < len(p.Program) {
+		if p.ReturnOutput && len(p.Output) > 0 {
+			out := p.Output[0]
+			p.Output = p.Output[1:]
+			return out
+		}
+
 		oc := p.GetOpCode()
 		i1, i2, i3 := p.GetInputs(oc)
 		opCode := oc.Code
@@ -65,6 +80,7 @@ func (p *IntcodeProgram) Run(print bool) int {
 				}
 				p.Print()
 			}
+			p.HALTED = true
 			return p.Program[0]
 		default:
 			fmt.Println("Error at pos", p.CurrentPtr, "opcode", opCode)
