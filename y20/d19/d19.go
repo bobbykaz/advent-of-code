@@ -19,18 +19,47 @@ func Run() int {
 	valid := 0
 	for li, s := range groups[1] {
 		rule := rules[0]
-		i := 0
-		b := false
-		b, i = rule.Validate(s, i)
-		tooShort := i != len(s)
+		for x := 1; x < len(s); x++ {
+			for y := 1; 2*y < len(s); y++ {
+				permuteMap(x, y, &rules)
+				i := 0
+				b := false
+				b, i = rule.Validate(s, i)
+				tooShort := i != len(s)
 
-		if b && !tooShort {
-			valid++
+				if b && !tooShort {
+					valid++
+					fmt.Printf("%d: %s -> Valid? %v  Too short? %v@%d/%d ; Permutation %d-%d, Final: %v\n", li, s, b, tooShort, i, len(s), x, y, b && !tooShort)
+					x = len(s)
+					y = len(s)
+				}
+				//fmt.Printf("%d: %s -> Valid? %v  Too short? %v@%d/%d ; Permutation %d-%d, Final: %v\n", li, s, b, tooShort, i, len(s), x, y, b && !tooShort)
+			}
 		}
-		fmt.Printf("%d: %s -> Valid? %v  Too short? %v ; Final: %v\n", li, s, b, tooShort, b && !tooShort)
 	}
 
 	return valid
+}
+
+func permuteMap(i, j int, rules *map[int]rule) {
+	r8 := comboRule{Rules: rules}
+	r8.Is = make([]int, 0)
+	for x := 0; x < i; x++ {
+		r8.Is = append(r8.Is, 42)
+	}
+
+	(*rules)[8] = r8
+
+	r11 := comboRule{Rules: rules}
+	r11.Is = make([]int, 0)
+	for x := 0; x < j; x++ {
+		r11.Is = append(r11.Is, 42)
+	}
+	for x := 0; x < j; x++ {
+		r11.Is = append(r11.Is, 31)
+	}
+
+	(*rules)[8] = r8
 }
 
 type rule interface {
@@ -54,13 +83,17 @@ func (r baseRule) Validate(str string, pos int) (bool, int) {
 		if pos+1 < len(str) {
 			fmt.Printf("%s", str[pos+1:])
 		}
-		fmt.Printf(" == %c\n", r.C)
 	}
 	if rune(str[pos]) == r.C {
+		if Print {
+			fmt.Printf(" == %c ; %d/%d\n", r.C, pos, len(str))
+		}
 		return true, pos + 1
 	}
-
-	return false, -1
+	if Print {
+		fmt.Printf(" != %c ; %d/%d\n", r.C, pos, len(str))
+	}
+	return false, pos
 }
 
 type orRule struct {
@@ -73,21 +106,27 @@ func (r orRule) Validate(str string, pos int) (bool, int) {
 	if pos >= len(str) {
 		return false, len(str)
 	}
+
+	spacer := ""
+	for i := 0; i < pos; i++ {
+		spacer = spacer + " "
+	}
+
 	if Print {
-		spacer := "   "
-		for i := 0; i < pos; i++ {
-			spacer = spacer + " "
-		}
-		fmt.Printf("%sOR: [%c]", spacer, str[pos])
+		fmt.Printf("%sOR   : [%c]", spacer, str[pos])
 		if pos+1 < len(str) {
 			fmt.Printf("%s", str[pos+1:])
 		}
-		fmt.Printf(" => %v\n", r)
+		fmt.Printf(" => %v (%d)\n", r, pos)
+		fmt.Printf("%s P1 - %v\n", spacer, r.IR1)
 	}
 
 	b1, p1 := true, pos
 	for _, i := range r.IR1 {
 		rN, _ := (*(r.Rules))[i]
+		if Print && p1 >= len(str) {
+			fmt.Printf("%sFAILED OR@%d - P1 limit reached before checking %d \n", spacer, pos, i)
+		}
 		b1, p1 = rN.Validate(str, p1)
 		if !b1 {
 			break
@@ -98,9 +137,15 @@ func (r orRule) Validate(str string, pos int) (bool, int) {
 		return b1, p1
 	}
 
+	if Print {
+		fmt.Printf("%s P2 - %v\n", spacer, r.IR2)
+	}
 	b2, p2 := true, pos
 	for _, i := range r.IR2 {
 		rN, _ := (*(r.Rules))[i]
+		if Print && p2 >= len(str) {
+			fmt.Printf("%sFAILED OR@%d - P2 limit reached before checking %d \n", spacer, pos, i)
+		}
 		b2, p2 = rN.Validate(str, p2)
 		if !b2 {
 			break
@@ -109,6 +154,10 @@ func (r orRule) Validate(str string, pos int) (bool, int) {
 
 	if b2 {
 		return b2, p2
+	}
+
+	if Print {
+		fmt.Printf("%sFAILED OR@%d - %v\n", spacer, pos, r)
 	}
 
 	return false, pos
@@ -123,24 +172,29 @@ func (r comboRule) Validate(str string, pos int) (bool, int) {
 	if pos >= len(str) {
 		return false, len(str)
 	}
-
+	spacer := ""
+	for i := 0; i < pos; i++ {
+		spacer = spacer + " "
+	}
 	if Print {
-		spacer := ""
-		for i := 0; i < pos; i++ {
-			spacer = spacer + " "
-		}
 		fmt.Printf("%sCombo: [%c]", spacer, str[pos])
 		if pos+1 < len(str) {
 			fmt.Printf("%s", str[pos+1:])
 		}
-		fmt.Printf(" => %v\n", r)
+		fmt.Printf(" => %v (%d)\n", r, pos)
 	}
 	b, p := true, pos
 	for _, i := range r.Is {
 		rN, _ := (*(r.Rules))[i]
+		if Print && p >= len(str) {
+			fmt.Printf("%sFAILED COMBO@%d - limit reached before checking %d \n", spacer, pos, i)
+		}
 		b, p = rN.Validate(str, p)
 		if !b {
-			return false, -1
+			if Print {
+				fmt.Printf("%sFAILED COMBO@%d - %v\n", spacer, pos, r)
+			}
+			return false, pos
 		}
 	}
 
