@@ -86,6 +86,21 @@ func StringsToInts64(strs []string) []int64 {
 	return output
 }
 
+//IntSliceEqual compares two int slices
+func IntSliceEqual(a, b []int) bool {
+	if len(a) != len(b) {
+		return false
+	}
+
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
 //FindMinMax returns the min and max of a int slice
 func FindMinMax(ints []int) (int, int) {
 	min, max := ints[0], ints[0]

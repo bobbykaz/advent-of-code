@@ -30,6 +30,61 @@ func StringsToGrid(input []string) Grid {
 	return g
 }
 
+//RotateGrid rotates the grid by 90 degrees * 'rotations' clockwise
+func (g *Grid) RotateGrid(rotations int) {
+	if g.Height != g.Width {
+		panic("Didnt implement for non-square grids")
+	}
+
+	for x := 0; x < rotations; x++ {
+		ng := make([][]rune, g.Width)
+		for i := range ng {
+			ng[i] = make([]rune, g.Width)
+			copy(ng[i], g.G[i])
+		}
+
+		for i := 0; i < g.Height; i++ {
+			for j := 0; j < g.Width; j++ {
+				ng[j][g.Height-i-1] = g.G[i][j]
+			}
+		}
+
+		g.G = ng
+	}
+}
+
+func (g *Grid) FlipGridHorizontal() {
+	ng := make([][]rune, g.Width)
+	for i := range ng {
+		ng[i] = make([]rune, g.Width)
+		copy(ng[i], g.G[i])
+	}
+
+	for i := 0; i < g.Height; i++ {
+		for j := 0; j < g.Width; j++ {
+			ng[i][g.Width-j-1] = g.G[i][j]
+		}
+	}
+
+	g.G = ng
+}
+
+func (g *Grid) FlipGridVertical() {
+	ng := make([][]rune, g.Width)
+	for i := range ng {
+		ng[i] = make([]rune, g.Width)
+		copy(ng[i], g.G[i])
+	}
+
+	for i := 0; i < g.Height; i++ {
+		for j := 0; j < g.Width; j++ {
+			ng[g.Height-1-i][j] = g.G[i][j]
+		}
+	}
+
+	g.G = ng
+}
+
 func (g *Grid) Adjacent(r, c int) []rune {
 	adj := make([]rune, 0)
 	for i := r - 1; i < r+2; i++ {
@@ -122,6 +177,38 @@ func (g *Grid) LineOfSight(r, c int, ignore []rune) []GridCell {
 	return los
 }
 
+type Edge uint8
+
+const (
+	GridEdgeUp Edge = iota
+	GridEdgeDown
+	GridEdgeLeft
+	GridEdgeRight
+)
+
+func (g *Grid) GetEdge(e Edge) []rune {
+	switch e {
+	case GridEdgeUp:
+		return g.G[0]
+	case GridEdgeDown:
+		return g.G[g.Height-1]
+	case GridEdgeLeft:
+		l := make([]rune, g.Height)
+		for i := 0; i < len(l); i++ {
+			l[i] = g.G[i][0]
+		}
+		return l
+	case GridEdgeRight:
+		r := make([]rune, g.Height)
+		for i := 0; i < len(r); i++ {
+			r[i] = g.G[i][g.Width-1]
+		}
+		return r
+	}
+
+	panic("specified invalid edge for Grid")
+}
+
 func RuneInSlice(r rune, rs []rune) bool {
 	for _, v := range rs {
 		if v == r {
@@ -129,6 +216,20 @@ func RuneInSlice(r rune, rs []rune) bool {
 		}
 	}
 	return false
+}
+
+func RuneSliceEqual(a, b []rune) bool {
+	if len(a) != len(b) {
+		return false
+	}
+
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+
+	return true
 }
 
 //Equals returns true if two Grids are identical (same values in same cells)
