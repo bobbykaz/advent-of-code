@@ -30,70 +30,27 @@ func Run() int {
 	}
 
 	iter := 1
-	anySolve := true
+	tileQueue := make([]*tile, 0)
+	//for _, v := range tileMap {
+	//	tileQueue = append(tileQueue, v)
+	//	break
+	//}
+
+	tileQueue = append(tileQueue, tileMap[3557])
+
 	fmt.Println("Basic swapping")
 	//========================
-	for !mapSolved(tileMap) && anySolve {
-		anySolve = false
-		for _, v := range tileMap {
-			for _, v2 := range tileMap {
-				if v.ID != v2.ID {
-					b := compareAndMatchTiles(v, v2)
-					if b {
-						anySolve = b
-					}
-				}
-			}
-		}
-		fmt.Println("flipping")
-		for _, v := range tileMap {
-			if !v.isSolved() {
-				if v.unSolvedEdges() > 1 {
-					anyflip := v.basicFlipIfNeeded()
-					if anyflip {
-						break
-					}
-				}
-			}
-		}
+	for !mapSolved(tileMap) && len(tileQueue) > 0 {
+		next := tileQueue[0]
+		tileQueue = tileQueue[1:]
+		newTiles := compareAndTransformOthertiles(next, &tileMap)
+		tileQueue = append(tileQueue, newTiles...)
 
-		fmt.Println("Re-comparing", iter)
+		fmt.Println("Next loop", iter)
 		iter++
 	}
 
-	fmt.Println("Swap pairs")
-
-	anySolve = true
-	for !mapSolved(tileMap) && anySolve {
-		fmt.Println("Flip Special!")
-		for _, v := range tileMap {
-			if !v.isSolved() {
-				if v.unSolvedEdges() > 1 {
-					anyflip := v.complexFlipIfNeeded()
-					if anyflip {
-						break
-					}
-				}
-			}
-		}
-
-		anySolve = false
-		for _, v := range tileMap {
-			for _, v2 := range tileMap {
-				if v.ID != v2.ID {
-					b := compareAndMatchTiles(v, v2)
-					if b {
-						anySolve = b
-					}
-				}
-			}
-		}
-
-		fmt.Println("Re-comparing", iter)
-		iter++
-	}
-
-	//
+	//end result
 	p := int64(1)
 	for _, v := range tileMap {
 
@@ -119,109 +76,97 @@ func mapSolved(tileMap map[int]*tile) bool {
 	return twoPlus == 4
 }
 
-func compareAndMatchTiles(t1 *tile, t2 *tile) bool {
-	anyChange := false
+func compareAndTransformOthertiles(t *tile, tileMap *map[int]*tile) []*tile {
+	log("Checking tile %d \n", t.ID)
+	next := make([]*tile, 0)
+	for _, v := range *tileMap {
+		log(".. comparing to %d\n", v.ID)
+		Print = false
+		mf, md := checkAllRotations(t, v)
+
+		if !mf && v.unSolvedEdges() == 4 {
+			//log(".. flipping Horizontal\n")
+			v.FlipHoriz()
+			mf, md = checkAllRotations(t, v)
+		}
+
+		if !mf && v.unSolvedEdges() == 4 {
+			//log(".. flipping Vertical\n")
+			v.FlipVert()
+			mf, md = checkAllRotations(t, v)
+		}
+
+		if !mf && v.unSolvedEdges() == 4 {
+			//log(".. unflipping Horizontal\n")
+			v.FlipHoriz()
+			mf, md = checkAllRotations(t, v)
+		}
+		Print = true
+		if mf {
+			next = append(next, v)
+			log(". match found with edge %d\n", md)
+		}
+	}
+	return next
+}
+
+func checkAllRotations(t1, t2 *tile) (bool, utilities.Edge) {
+	count := 0
+	mf, md := compareAndMatchTile(t1, t2)
+	for !mf && count != 3 && t2.unSolvedEdges() == 4 {
+		t2.G.RotateGrid(1)
+		mf, md = compareAndMatchTile(t1, t2)
+		count++
+	}
+	return mf, md
+}
+
+func compareAndMatchTile(t1, t2 *tile) (bool, utilities.Edge) {
 	if t1.Up == nil {
 		e1 := t1.G.GetEdge(utilities.GridEdgeUp)
-
-		c1 := t2.G.GetEdge(utilities.GridEdgeUp)
-		c2 := t2.G.GetEdge(utilities.GridEdgeDown)
-		c3 := t2.G.GetEdge(utilities.GridEdgeLeft)
-		c4 := t2.G.GetEdge(utilities.GridEdgeRight)
+		c1 := t2.G.GetEdge(utilities.GridEdgeDown)
+		log("Comparing Up: %d -> %d\n", t1.ID, t2.ID)
 		if utilities.RuneSliceEqual(e1, c1) {
-			t1.Up = t2
-			t2.Up = t1
-			anyChange = true
-		} else if utilities.RuneSliceEqual(e1, c2) {
+			log("Match\n")
 			t1.Up = t2
 			t2.Down = t1
-			anyChange = true
-		} else if utilities.RuneSliceEqual(e1, c3) {
-			t1.Up = t2
-			t2.Left = t1
-			anyChange = true
-		} else if utilities.RuneSliceEqual(e1, c4) {
-			t1.Up = t2
-			t2.Right = t1
-			anyChange = true
+			return true, utilities.GridEdgeUp
 		}
 	}
 
 	if t1.Down == nil {
 		e1 := t1.G.GetEdge(utilities.GridEdgeDown)
 		c1 := t2.G.GetEdge(utilities.GridEdgeUp)
-		c2 := t2.G.GetEdge(utilities.GridEdgeDown)
-		c3 := t2.G.GetEdge(utilities.GridEdgeLeft)
-		c4 := t2.G.GetEdge(utilities.GridEdgeRight)
+		log("Comparing Down: %d -> %d\n", t1.ID, t2.ID)
 		if utilities.RuneSliceEqual(e1, c1) {
 			t1.Down = t2
 			t2.Up = t1
-			anyChange = true
-		} else if utilities.RuneSliceEqual(e1, c2) {
-			t1.Down = t2
-			t2.Down = t1
-			anyChange = true
-		} else if utilities.RuneSliceEqual(e1, c3) {
-			t1.Down = t2
-			t2.Left = t1
-			anyChange = true
-		} else if utilities.RuneSliceEqual(e1, c4) {
-			t1.Down = t2
-			t2.Right = t1
-			anyChange = true
+			return true, utilities.GridEdgeDown
 		}
 	}
 
 	if t1.Left == nil {
 		e1 := t1.G.GetEdge(utilities.GridEdgeLeft)
-		c1 := t2.G.GetEdge(utilities.GridEdgeUp)
-		c2 := t2.G.GetEdge(utilities.GridEdgeDown)
-		c3 := t2.G.GetEdge(utilities.GridEdgeLeft)
-		c4 := t2.G.GetEdge(utilities.GridEdgeRight)
+		c1 := t2.G.GetEdge(utilities.GridEdgeRight)
+		log("Comparing Left: %d -> %d\n", t1.ID, t2.ID)
 		if utilities.RuneSliceEqual(e1, c1) {
 			t1.Left = t2
-			t2.Up = t1
-			anyChange = true
-		} else if utilities.RuneSliceEqual(e1, c2) {
-			t1.Left = t2
-			t2.Down = t1
-			anyChange = true
-		} else if utilities.RuneSliceEqual(e1, c3) {
-			t1.Left = t2
-			t2.Left = t1
-			anyChange = true
-		} else if utilities.RuneSliceEqual(e1, c4) {
-			t1.Left = t2
 			t2.Right = t1
-			anyChange = true
+			return true, utilities.GridEdgeLeft
 		}
 	}
 
 	if t1.Right == nil {
+		log("Comparing Right: %d -> %d\n", t1.ID, t2.ID)
 		e1 := t1.G.GetEdge(utilities.GridEdgeRight)
-		c1 := t2.G.GetEdge(utilities.GridEdgeUp)
-		c2 := t2.G.GetEdge(utilities.GridEdgeDown)
-		c3 := t2.G.GetEdge(utilities.GridEdgeLeft)
-		c4 := t2.G.GetEdge(utilities.GridEdgeRight)
+		c1 := t2.G.GetEdge(utilities.GridEdgeLeft)
 		if utilities.RuneSliceEqual(e1, c1) {
 			t1.Right = t2
-			t2.Up = t1
-			anyChange = true
-		} else if utilities.RuneSliceEqual(e1, c2) {
-			t1.Right = t2
-			t2.Down = t1
-			anyChange = true
-		} else if utilities.RuneSliceEqual(e1, c3) {
-			t1.Right = t2
 			t2.Left = t1
-			anyChange = true
-		} else if utilities.RuneSliceEqual(e1, c4) {
-			t1.Right = t2
-			t2.Right = t1
-			anyChange = true
+			return true, utilities.GridEdgeRight
 		}
 	}
-	return anyChange
+	return false, utilities.GridEdgeRight
 }
 
 func (t *tile) unSolvedEdges() int {
@@ -248,61 +193,9 @@ func (t *tile) isSolved() bool {
 	return (t.Up != nil && t.Down != nil && t.Left != nil && t.Right != nil)
 }
 
-func (t *tile) basicFlipIfNeeded() bool {
-	anyflip := false
-	t.print()
-	if t.Up == nil && t.Down == nil {
-		t.FlipHoriz()
-		anyflip = true
-	}
-
-	if t.Left == nil && t.Right == nil {
-		t.FlipVert()
-		anyflip = true
-	}
-
-	return anyflip
-}
-
-func (t *tile) complexFlipIfNeeded() bool {
-	anyflip := false
-	t.print()
-	other := (*tile)(nil)
-
-	if t.Up != nil && t.Up.unSolvedEdges() > 1 {
-		other = t.Up
-		t.FlipVert()
-		anyflip = true
-	} else if t.Down != nil && t.Down.unSolvedEdges() > 1 {
-		other = t.Down
-		t.FlipVert()
-		anyflip = true
-	} else if t.Left != nil && t.Left.unSolvedEdges() > 1 {
-		other = t.Left
-		t.FlipHoriz()
-		anyflip = true
-	} else if t.Right != nil && t.Right.unSolvedEdges() > 1 {
-		other = t.Right
-		t.FlipHoriz()
-		anyflip = true
-	}
-
-	if anyflip {
-		log("Other: ")
-		other.print()
-		if other.Up == t || other.Down == t {
-			other.FlipVert()
-		} else {
-			other.FlipHoriz()
-		}
-	}
-
-	return anyflip
-}
-
 func (t *tile) FlipHoriz() {
 	t.G.FlipGridHorizontal()
-	log("...Flipping H\n")
+	//log("...Flipping H\n")
 	tmp := t.Left
 	t.Left = t.Right
 	t.Right = tmp
@@ -310,7 +203,7 @@ func (t *tile) FlipHoriz() {
 
 func (t *tile) FlipVert() {
 	t.G.FlipGridVertical()
-	fmt.Println("...Flipping V")
+	//fmt.Println("...Flipping V")
 	tmp := t.Down
 	t.Down = t.Up
 	t.Up = tmp

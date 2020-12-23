@@ -133,3 +133,42 @@ func Test_GetEdge_Right(t *testing.T) {
 		t.Fatalf("failed, %v, %v", expected, actual)
 	}
 }
+
+func Test_Rotate_1(t *testing.T) {
+	var input = []string{"1234", "5678", "90AB", "CDEF"}
+	g := StringsToGrid(input)
+	var ei = []string{"C951", "D062", "EA73", "FB84"}
+	ag := StringsToGrid(ei)
+
+	g.RotateGrid(1)
+
+	if !(g.Equals(&ag, false)) {
+		t.Fatalf("failed, %v, %v", g, ag)
+	}
+}
+
+func Test_Rotate_2(t *testing.T) {
+	var input = []string{"1234", "5678", "90AB", "CDEF"}
+	g := StringsToGrid(input)
+	var ei = []string{"FEDC", "BA09", "8765", "4321"}
+	ag := StringsToGrid(ei)
+
+	g.RotateGrid(2)
+
+	if !(g.Equals(&ag, false)) {
+		t.Fatalf("failed\n Actual:%v\n, Expected: %v\n", g, ag)
+	}
+}
+
+func Test_Rotate_3(t *testing.T) {
+	var input = []string{"1234", "5678", "90AB", "CDEF"}
+	g := StringsToGrid(input)
+	var ei = []string{"48BF", "37AE", "260D", "159C"}
+	ag := StringsToGrid(ei)
+
+	g.RotateGrid(3)
+
+	if !(g.Equals(&ag, false)) {
+		t.Fatalf("failed\n Actual:%v\n, Expected: %v\n", g, ag)
+	}
+}
