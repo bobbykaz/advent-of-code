@@ -30,6 +30,95 @@ func StringsToGrid(input []string) Grid {
 	return g
 }
 
+func GetCompositeGrid(gs [][]Grid, skipShells int, print bool) Grid {
+	w, h := gs[0][0].Width, gs[0][0].Height
+	l := len(gs[0])
+	for i := range gs {
+		if len(gs[i]) != l {
+			panic("uneven number of grids in composite row")
+		}
+		for j := range gs[i] {
+			if gs[i][j].Height != h {
+				panic(fmt.Sprintf("grid %d %d has uneven height", i, j))
+			}
+			if gs[i][j].Width != w {
+				panic(fmt.Sprintf("grid %d %d has uneven height", i, j))
+			}
+		}
+	}
+
+	w = w - 2*skipShells
+	h = h - 2*skipShells
+	if w <= 0 || h <= 0 {
+		panic(fmt.Sprintf("grids of %d x %d cannot lose %d shells", w, h, skipShells))
+	}
+
+	if print {
+		fmt.Printf("New Grid will be %d x %d\n", w, h)
+		fmt.Printf("Input Grids per row: %d\n", l)
+		fmt.Printf("Input Grid-rows: %d\n", len(gs))
+	}
+
+	g := Grid{G: make([][]rune, h*len(gs)), Width: w * l, Height: h * len(gs)}
+
+	for a := range gs {
+		//row of tiles
+		tileRow := gs[a]
+		for i := 0; i < h; i++ {
+			//one row of cells at a time
+			rowCoord := a*h + i
+			g.G[rowCoord] = make([]rune, w*l)
+			for b := range tileRow {
+				t := tileRow[b]
+				for j := 0; j < w; j++ {
+					colCoord := b*w + j
+					g.G[rowCoord][colCoord] = t.G[i+skipShells][j+skipShells]
+				}
+			}
+		}
+	}
+
+	return g
+}
+
+func (g *Grid) FindAndReplaceSubGrid(sg Grid, replace, ignore rune) bool {
+	anyFound := false
+	for i := 0; i < g.Height-sg.Height; i++ {
+		for j := 0; j < g.Width-sg.Width; j++ {
+			found := true
+			for si := 0; si < sg.Height; si++ {
+				for sj := 0; sj < sg.Height; sj++ {
+					target := g.G[i+si][j+sj]
+					match := sg.G[si][sj]
+					if match != ignore {
+						if target != match {
+							found = false
+							si = sg.Height
+							sj = sg.Width
+						}
+					}
+				}
+			}
+			if found {
+				anyFound = true
+				for si := 0; si < sg.Height; si++ {
+					for sj := 0; sj < sg.Height; sj++ {
+						target := g.G[i+si][j+sj]
+						match := sg.G[si][sj]
+						if match != ignore {
+							if target == match {
+								g.G[i+si][j+sj] = replace
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return anyFound
+}
+
 //RotateGrid rotates the grid by 90 degrees * 'rotations' clockwise
 func (g *Grid) RotateGrid(rotations int) {
 	if g.Height != g.Width {

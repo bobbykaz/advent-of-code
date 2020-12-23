@@ -31,11 +31,6 @@ func Run() int {
 
 	iter := 1
 	tileQueue := make([]*tile, 0)
-	//for _, v := range tileMap {
-	//	tileQueue = append(tileQueue, v)
-	//	break
-	//}
-
 	tileQueue = append(tileQueue, tileMap[3557])
 
 	fmt.Println("Basic swapping")
@@ -62,7 +57,62 @@ func Run() int {
 	}
 
 	fmt.Println("Total:", p)
+
+	upperLeft := tileMap[3931]
+	tiles := getSolvedTileGrid(upperLeft)
+	fmt.Println(len(tiles))
+	image := getCompositeGrid(tiles)
+	image.Print()
+
+	monsterStr := []string{"                  # ",
+		"#    ##    ##    ###",
+		" #  #  #  #  #  #   "}
+
+	monster := utilities.StringsToGrid(monsterStr)
+	found := image.FindAndReplaceSubGrid(monster, 'O', ' ')
+	if found {
+		image.Print()
+	} else {
+		fmt.Println("Not found")
+	}
 	return -1
+}
+
+func getCompositeGrid(tiles [][]*tile) utilities.Grid {
+	gs := make([][]utilities.Grid, len(tiles))
+	for i := range tiles {
+		gs[i] = make([]utilities.Grid, len(tiles[i]))
+		for j := range tiles[i] {
+			gs[i][j] = tiles[i][j].G
+		}
+	}
+
+	return utilities.GetCompositeGrid(gs, 1, false)
+}
+
+func getSolvedTileGrid(upperLeft *tile) [][]*tile {
+	tiles := make([][]*tile, 0)
+	n := upperLeft
+	r := 0
+	for n.Down != nil {
+		tiles = append(tiles, make([]*tile, 0))
+		tiles[r] = append(tiles[r], n)
+		log("Row %d : Tile %d\n ", r, n.ID)
+		r++
+		n = n.Down
+	}
+
+	for i := range tiles {
+		t := tiles[i][0]
+		for t.Right != nil {
+			tiles[i] = append(tiles[i], t.Right)
+			log("- %d -", t.ID)
+			t = t.Right
+		}
+		log("\n")
+	}
+
+	return tiles
 }
 
 func mapSolved(tileMap map[int]*tile) bool {
@@ -80,8 +130,8 @@ func compareAndTransformOthertiles(t *tile, tileMap *map[int]*tile) []*tile {
 	log("Checking tile %d \n", t.ID)
 	next := make([]*tile, 0)
 	for _, v := range *tileMap {
-		log(".. comparing to %d\n", v.ID)
 		Print = false
+		log(".. comparing to %d\n", v.ID)
 		mf, md := checkAllRotations(t, v)
 
 		if !mf && v.unSolvedEdges() == 4 {
@@ -104,7 +154,7 @@ func compareAndTransformOthertiles(t *tile, tileMap *map[int]*tile) []*tile {
 		Print = true
 		if mf {
 			next = append(next, v)
-			log(". match found with edge %d\n", md)
+			log(". match found with tile %d edge %d\n", v.ID, md)
 		}
 	}
 	return next

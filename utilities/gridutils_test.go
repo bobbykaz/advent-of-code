@@ -172,3 +172,46 @@ func Test_Rotate_3(t *testing.T) {
 		t.Fatalf("failed\n Actual:%v\n, Expected: %v\n", g, ag)
 	}
 }
+
+func Test_GetCompositeGrid_1(t *testing.T) {
+	var input = []string{"1234", "5678", "90AB", "CDEF"}
+	ag := StringsToGrid(input)
+
+	ng := GetCompositeGrid([][]Grid{[]Grid{ag}}, 1, false)
+
+	var ei = []string{"67", "0A"}
+	eg := StringsToGrid(ei)
+
+	if !(ng.Equals(&eg, false)) {
+		t.Fatalf("failed\n Actual:%v\n, Expected: %v\n", ng, eg)
+	}
+}
+func Test_GetCompositeGrid_2(t *testing.T) {
+	var input = []string{"123", "456", "789"}
+	ag := StringsToGrid(input)
+
+	gs := [][]Grid{[]Grid{ag, ag}, []Grid{ag, ag}}
+	ng := GetCompositeGrid(gs, 1, false)
+
+	var ei = []string{"55", "55"}
+	eg := StringsToGrid(ei)
+
+	if !(ng.Equals(&eg, false)) {
+		t.Fatalf("failed\n Actual:%v\n, Expected: %v\n", ng, eg)
+	}
+}
+
+func Test_GetCompositeGrid_3(t *testing.T) {
+	var input = []string{"123", "456", "789"}
+	ag := StringsToGrid(input)
+
+	gs := [][]Grid{[]Grid{ag, ag}, []Grid{ag, ag}}
+	ng := GetCompositeGrid(gs, 0, false)
+
+	var ei = []string{"123123", "456456", "789789", "123123", "456456", "789789"}
+	eg := StringsToGrid(ei)
+
+	if !(ng.Equals(&eg, false)) {
+		t.Fatalf("failed\n Actual:%v\n, Expected: %v\n", ng, eg)
+	}
+}
