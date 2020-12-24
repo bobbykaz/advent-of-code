@@ -12,7 +12,7 @@ var Print = true
 
 func Run() int {
 	input := utilities.ReadFileIntoLines(inputFile)
-	log("%d", len(input))
+	log("%d\n", len(input))
 	return -1
 }
 

@@ -309,3 +309,40 @@ func Intersect(a, b []int) []int {
 
 	return r
 }
+
+//IntersectString returns the intersection of two string-slices
+func IntersectString(a, b []string) []string {
+	sort.Strings(a)
+	sort.Strings(b)
+	ac, bc := 0, 0
+	r := make([]string, 0)
+	for ac < len(a) && bc < len(b) {
+		av, bv := a[ac], b[bc]
+		if av == bv {
+			r = append(r, av)
+			ac++
+			bc++
+		} else if av < bv {
+			ac++
+		} else {
+			bc++
+		}
+	}
+
+	return r
+}
+
+func DedupeStrings(a []string) []string {
+	sort.Strings(a)
+	r := make([]string, 0)
+	prev := a[0]
+	r = append(r, prev)
+	for i := 0; i < len(a); i++ {
+		if a[i] != prev {
+			prev = a[i]
+			r = append(r, prev)
+		}
+	}
+
+	return r
+}
