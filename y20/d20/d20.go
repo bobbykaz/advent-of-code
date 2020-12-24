@@ -57,25 +57,43 @@ func Run() int {
 	}
 
 	fmt.Println("Total:", p)
+	fmt.Println("Total tiles:", len(tileMap))
 
 	upperLeft := tileMap[3931]
 	tiles := getSolvedTileGrid(upperLeft)
 	fmt.Println(len(tiles))
 	image := getCompositeGrid(tiles)
 	image.Print()
-
-	monsterStr := []string{"                  # ",
+	fmt.Println("==================================")
+	monsterStr := []string{
+		"                  # ",
 		"#    ##    ##    ###",
 		" #  #  #  #  #  #   "}
 
 	monster := utilities.StringsToGrid(monsterStr)
 	found := image.FindAndReplaceSubGrid(monster, 'O', ' ')
-	if found {
-		image.Print()
-	} else {
+	rot := 0
+	for !found && rot < 3 {
+		image.RotateGrid(1)
+		found = image.FindAndReplaceSubGrid(monster, 'O', ' ')
+		rot++
+	}
+
+	if !found {
 		fmt.Println("Not found")
 	}
-	return -1
+	image.Print()
+	count := 0
+	for _, r := range image.G {
+		for _, c := range r {
+			if c == '#' {
+				count++
+			}
+		}
+	}
+	fmt.Println("Storminess", count)
+
+	return count
 }
 
 func getCompositeGrid(tiles [][]*tile) utilities.Grid {
@@ -87,7 +105,7 @@ func getCompositeGrid(tiles [][]*tile) utilities.Grid {
 		}
 	}
 
-	return utilities.GetCompositeGrid(gs, 1, false)
+	return utilities.GetCompositeGrid(gs, 1, true)
 }
 
 func getSolvedTileGrid(upperLeft *tile) [][]*tile {
@@ -101,6 +119,8 @@ func getSolvedTileGrid(upperLeft *tile) [][]*tile {
 		r++
 		n = n.Down
 	}
+	tiles = append(tiles, make([]*tile, 0))
+	tiles[r] = append(tiles[r], n)
 
 	for i := range tiles {
 		t := tiles[i][0]

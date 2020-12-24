@@ -83,32 +83,32 @@ func GetCompositeGrid(gs [][]Grid, skipShells int, print bool) Grid {
 
 func (g *Grid) FindAndReplaceSubGrid(sg Grid, replace, ignore rune) bool {
 	anyFound := false
-	for i := 0; i < g.Height-sg.Height; i++ {
-		for j := 0; j < g.Width-sg.Width; j++ {
+	for i := 0; i < g.Height+1-sg.Height; i++ {
+		for j := 0; j < g.Width+1-sg.Width; j++ {
 			found := true
+			//fmt.Printf("Testing %d,%d\n", i, j)
 			for si := 0; si < sg.Height; si++ {
-				for sj := 0; sj < sg.Height; sj++ {
+				for sj := 0; sj < sg.Width; sj++ {
 					target := g.G[i+si][j+sj]
 					match := sg.G[si][sj]
-					if match != ignore {
-						if target != match {
-							found = false
-							si = sg.Height
-							sj = sg.Width
-						}
+					//fmt.Printf("...Row %d Col %d Target (%c) Match (%c)\n", i+si, j+sj, target, match)
+					if match != ignore && target != match {
+						//fmt.Printf(".Err at Row %d Col %d Target (%c) != Match (%c)\n", i+si, j+sj, target, match)
+						found = false
+						si = sg.Height
+						sj = sg.Width
 					}
 				}
 			}
 			if found {
 				anyFound = true
+				//fmt.Printf("..replacingRow %d Col %d\n", i, j)
 				for si := 0; si < sg.Height; si++ {
-					for sj := 0; sj < sg.Height; sj++ {
+					for sj := 0; sj < sg.Width; sj++ {
 						target := g.G[i+si][j+sj]
 						match := sg.G[si][sj]
-						if match != ignore {
-							if target == match {
-								g.G[i+si][j+sj] = replace
-							}
+						if match != ignore && target == match {
+							g.G[i+si][j+sj] = replace
 						}
 					}
 				}
@@ -122,7 +122,7 @@ func (g *Grid) FindAndReplaceSubGrid(sg Grid, replace, ignore rune) bool {
 //RotateGrid rotates the grid by 90 degrees * 'rotations' clockwise
 func (g *Grid) RotateGrid(rotations int) {
 	if g.Height != g.Width {
-		panic("Didnt implement for non-square grids")
+		panic(fmt.Sprintf("Didnt implement for non-square grids: (%d x %d)", g.Height, g.Width))
 	}
 
 	for x := 0; x < rotations; x++ {

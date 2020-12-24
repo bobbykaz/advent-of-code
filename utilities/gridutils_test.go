@@ -215,3 +215,102 @@ func Test_GetCompositeGrid_3(t *testing.T) {
 		t.Fatalf("failed\n Actual:%v\n, Expected: %v\n", ng, eg)
 	}
 }
+
+func Test_FindSubGrid_1(t *testing.T) {
+	var input = []string{".....", "...x.", "..x.x", "...x.", "....."}
+	ag := StringsToGrid(input)
+
+	var search = []string{" x ", "x x", " x "}
+	sg := StringsToGrid(search)
+	out := ag.FindAndReplaceSubGrid(sg, 'o', ' ')
+
+	var ei = []string{".....", "...o.", "..o.o", "...o.", "....."}
+	eg := StringsToGrid(ei)
+
+	if !out {
+		t.Fatalf("failed to match \n Actual:%v\n, Expected: %v\n", ag, eg)
+	}
+
+	if !(ag.Equals(&eg, false)) {
+		t.Fatalf("replace failed\n Actual:%v\n, Expected: %v\n", ag, eg)
+	}
+}
+
+func Test_FindSubGrid_2(t *testing.T) {
+	var input = []string{
+		"...#.",
+		"..###"}
+	ag := StringsToGrid(input)
+
+	var search = []string{" # ", "###"}
+	sg := StringsToGrid(search)
+	out := ag.FindAndReplaceSubGrid(sg, '0', ' ')
+
+	var ei = []string{
+		"...0.",
+		"..000"}
+	eg := StringsToGrid(ei)
+
+	if !out {
+		t.Fatalf("failed to match \n Actual:%v\n, Expected: %v\n", ag, eg)
+	}
+
+	if !(ag.Equals(&eg, false)) {
+		ag.Print()
+		eg.Print()
+		t.Fatalf("replace failed\n Actual:\n")
+	}
+}
+
+func Test_FindSubGrid_3(t *testing.T) {
+	var input = []string{
+		"..........",
+		".##..##.#.",
+		"..########",
+		"..###...#.",
+		".........."}
+	ag := StringsToGrid(input)
+
+	var search = []string{" # ", "###"}
+	sg := StringsToGrid(search)
+	out := ag.FindAndReplaceSubGrid(sg, '0', ' ')
+
+	var ei = []string{
+		"..........",
+		".##..0#.0.",
+		"..#0000000",
+		"..000...#.",
+		".........."}
+	eg := StringsToGrid(ei)
+
+	if !out {
+		t.Fatalf("failed to match \n Actual:%v\n, Expected: %v\n", ag, eg)
+	}
+
+	if !(ag.Equals(&eg, false)) {
+		ag.Print()
+		eg.Print()
+		t.Fatalf("replace failed\n Actual:\n")
+	}
+}
+
+func Test_FindSubGrid_4(t *testing.T) {
+	var input = []string{
+		"..#...#.#..#...#...#.##.....#.##.#.......#....#..#.......#..............#...#....##...#..#.#....",
+		"....#.........#..##.....#.#...#...........#.#..#......#..#.....#....##.#....#.#...#..##.....#..#",
+		"..##..#.#.##...#...#..#....##..#....#..#.........#...................##.##.#...............##.#.",
+		"...........#.............#...#.#.#....#......#.........##....#.#...#.#.##..#.............#.#...."}
+	ag := StringsToGrid(input)
+
+	var search = []string{
+		"                  # ",
+		"#    ##    ##    ###",
+		" #  #  #  #  #  #   "}
+	sg := StringsToGrid(search)
+	out := ag.FindAndReplaceSubGrid(sg, '0', ' ')
+
+	if out {
+		ag.Print()
+		t.Fatalf("Found a match when nothing expected\n")
+	}
+}
