@@ -1,4 +1,4 @@
-package dx
+package d25
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"github.com/bobbykaz/advent-of-code/utilities"
 )
 
-var inputFile = "input/y20/dx.txt"
+var inputFile = "input/y20/d25.txt"
 
 var Print = true
 
