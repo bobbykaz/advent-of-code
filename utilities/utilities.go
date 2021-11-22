@@ -15,6 +15,7 @@ func ReadFileIntoLines(filename string) []string {
 		panic(err)
 	}
 	file := string(b)
+	file = strings.ReplaceAll(file, "\r", "")
 	lines := strings.Split(file, "\n")
 	if lines[len(lines)-1] == "" {
 		lines = lines[:(len(lines) - 1)]
