@@ -2,49 +2,48 @@ package d1
 
 import (
 	"fmt"
-	"sort"
 
 	"github.com/bobbykaz/advent-of-code/utilities"
 )
 
 func Part1() int {
-	input := utilities.ReadFileIntoLines("input/y21/d1.txt")
-	numbers := utilities.StringsToInts(input)
-	fmt.Println(bruteForceDuo(numbers))
-	fmt.Println(scanDuo(numbers))
-	return -1
-}
+	lines := utilities.ReadFileIntoLines("input/y21/d1.txt")
+	numbers := utilities.StringsToInts(lines)
 
-func scanDuo(numbers []int) int {
-	sort.Ints(numbers)
-	first, last := 0, len(numbers)-1
-	for first < last {
-		sum := numbers[first] + numbers[last]
-		if sum == 2020 {
-			fmt.Printf("Scan: %d + %d = 2020; multiplied: %d\n", numbers[first], numbers[last], (numbers[first] * numbers[last]))
-			return (numbers[first] * numbers[last])
+	prev := numbers[0]
+	next := 0
+	incs := 0
+	for i := 1; i < len(numbers); i++ {
+		next = numbers[i]
+		if next > prev {
+			incs++
 		}
+		prev = next
+	}
 
-		if sum < 2020 {
-			first++
-		} else {
-			last--
+	Part2(numbers)
+	return incs
+}
+
+func Part2(nums []int) int {
+
+	p1 := nums[0]
+	p2 := nums[1]
+	p3 := nums[2]
+	psum := p1 + p2 + p3
+	incs := 0
+	p1 = p2
+	p2 = p3
+	for i := 3; i < len(nums); i++ {
+		p3 = nums[i]
+		sum := p1 + p2 + p3
+		if sum > psum {
+			incs++
 		}
+		p1 = p2
+		p2 = p3
+		psum = sum
 	}
-	fmt.Println("Scan failed")
-	return -1
-}
-
-func bruteForceDuo(numbers []int) int {
-
-	return -1
-}
-
-func Part2() int {
-	input := utilities.ReadFileIntoLines("input/y21/d1.txt")
-	numbers := utilities.StringsToInts(input)
-	for i := 0; i < len(numbers); i++ {
-		println(numbers[i])
-	}
-	return -1
+	fmt.Println("part 2 output:", incs)
+	return incs
 }
