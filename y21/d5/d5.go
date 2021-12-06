@@ -69,8 +69,3 @@ func Run() int {
 	}
 	return count
 }
-
-func part2(lines []string) int {
-
-	return 0
-}
