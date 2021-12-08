@@ -87,6 +87,26 @@ func StringsToInts64(strs []string) []int64 {
 	return output
 }
 
+//StringContainsAllRunes returns true only if all of rs is found in str
+func StringContainsAllRunes(str string, rs []rune) bool {
+	for i := 0; i < len(rs); i++ {
+		if !strings.ContainsRune(str, rs[i]) {
+			return false
+		}
+	}
+	return true
+}
+
+//StringContainsAnyRune returns true if any one of rs is found in str
+func StringContainsAnyRune(str string, rs []rune) bool {
+	for i := 0; i < len(rs); i++ {
+		if strings.ContainsRune(str, rs[i]) {
+			return true
+		}
+	}
+	return false
+}
+
 //IntSliceEqual compares two int slices
 func IntSliceEqual(a, b []int) bool {
 	if len(a) != len(b) {
