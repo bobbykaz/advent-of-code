@@ -2,6 +2,12 @@ package utilities
 
 import "fmt"
 
+type NGrid struct {
+	G      [][]int
+	Width  int
+	Height int
+}
+
 type Grid struct {
 	G      [][]rune
 	Width  int
@@ -21,6 +27,22 @@ func StringsToGrid(input []string) Grid {
 		g.G[i] = make([]rune, len(input[i]))
 		for j := 0; j < len(input[i]); j++ {
 			g.G[i][j] = rune(input[i][j])
+		}
+	}
+
+	g.Height = len(input)
+	g.Width = len(input[0])
+
+	return g
+}
+
+func StringsToNGrid(input []string) NGrid {
+	g := NGrid{}
+	g.G = make([][]int, len(input))
+	for i := 0; i < len(input); i++ {
+		g.G[i] = make([]int, len(input[i]))
+		for j := 0; j < len(input[i]); j++ {
+			g.G[i][j] = int(input[i][j] - byte('0'))
 		}
 	}
 
