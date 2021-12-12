@@ -107,6 +107,27 @@ func StringContainsAnyRune(str string, rs []rune) bool {
 	return false
 }
 
+//StringSliceContains returns true str is found in strs
+func StringSliceContains(str string, strs []string) bool {
+	for i := 0; i < len(strs); i++ {
+		if str == strs[i] {
+			return true
+		}
+	}
+	return false
+}
+
+//StringSliceCountInstances counts the number of occurrences of str in strs
+func StringSliceCountInstances(str string, strs []string) int {
+	sum := 0
+	for i := 0; i < len(strs); i++ {
+		if str == strs[i] {
+			sum++
+		}
+	}
+	return sum
+}
+
 //IntSliceEqual compares two int slices
 func IntSliceEqual(a, b []int) bool {
 	if len(a) != len(b) {
