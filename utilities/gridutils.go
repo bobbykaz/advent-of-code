@@ -103,6 +103,51 @@ func GetCompositeGrid(gs [][]Grid, skipShells int, print bool) Grid {
 	return g
 }
 
+func GetCompositeNGrid(gs [][]NGrid, print bool) NGrid {
+	w, h := gs[0][0].Width, gs[0][0].Height
+	l := len(gs[0])
+	for i := range gs {
+		if len(gs[i]) != l {
+			panic("uneven number of grids in composite row")
+		}
+		for j := range gs[i] {
+			if gs[i][j].Height != h {
+				panic(fmt.Sprintf("grid %d %d has uneven height", i, j))
+			}
+			if gs[i][j].Width != w {
+				panic(fmt.Sprintf("grid %d %d has uneven height", i, j))
+			}
+		}
+	}
+
+	if print {
+		fmt.Printf("New Grid will be %d x %d\n", w, h)
+		fmt.Printf("Input Grids per row: %d\n", l)
+		fmt.Printf("Input Grid-rows: %d\n", len(gs))
+	}
+
+	g := NGrid{G: make([][]int, h*len(gs)), Width: w * l, Height: h * len(gs)}
+
+	for a := range gs {
+		//row of tiles
+		tileRow := gs[a]
+		for i := 0; i < h; i++ {
+			//one row of cells at a time
+			rowCoord := a*h + i
+			g.G[rowCoord] = make([]int, w*l)
+			for b := range tileRow {
+				t := tileRow[b]
+				for j := 0; j < w; j++ {
+					colCoord := b*w + j
+					g.G[rowCoord][colCoord] = t.G[i][j]
+				}
+			}
+		}
+	}
+
+	return g
+}
+
 func (g *Grid) FindAndReplaceSubGrid(sg Grid, replace, ignore rune) bool {
 	anyFound := false
 	for i := 0; i < g.Height+1-sg.Height; i++ {
