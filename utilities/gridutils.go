@@ -147,6 +147,26 @@ func GetCompositeNGrid(gs [][]NGrid, print bool) NGrid {
 
 	return g
 }
+func PadGrid(g Grid, init rune, padding int) Grid {
+	h := g.Height + 2*padding
+	w := g.Width + 2*padding
+	ng := Grid{G: make([][]rune, h), Width: w, Height: h}
+
+	for r := 0; r < ng.Height; r++ {
+		ng.G[r] = make([]rune, ng.Width)
+		for c := 0; c < ng.Width; c++ {
+			ng.G[r][c] = init
+		}
+	}
+
+	for r := 0; r < g.Height; r++ {
+		for c := 0; c < g.Width; c++ {
+			ng.G[padding+r][padding+c] = g.G[r][c]
+		}
+	}
+
+	return ng
+}
 
 func (g *Grid) FindAndReplaceSubGrid(sg Grid, replace, ignore rune) bool {
 	anyFound := false
