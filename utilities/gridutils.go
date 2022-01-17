@@ -147,6 +147,10 @@ func GetCompositeNGrid(gs [][]NGrid, print bool) NGrid {
 
 	return g
 }
+func CopyGrid(g Grid) Grid {
+	return PadGrid(g, '.', 0)
+}
+
 func PadGrid(g Grid, init rune, padding int) Grid {
 	h := g.Height + 2*padding
 	w := g.Width + 2*padding

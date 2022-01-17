@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 
-	"github.com/bobbykaz/advent-of-code/y21/d20"
+	"github.com/bobbykaz/advent-of-code/y21/d25"
 )
 
 func main() {
-	output := d20.Run()
+	output := d25.Run()
 	fmt.Println("Output: ", output)
 }

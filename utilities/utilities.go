@@ -3,6 +3,7 @@ package utilities
 import (
 	"fmt"
 	"io/ioutil"
+	"math"
 	"sort"
 	"strconv"
 	"strings"
@@ -387,4 +388,8 @@ func DedupeStrings(a []string) []string {
 	}
 
 	return r
+}
+
+func ManhattenDistance(x1, y1, x2, y2 int) int {
+	return int(math.Abs(float64(x1-x2)) + math.Abs(float64(y1-y2)))
 }
