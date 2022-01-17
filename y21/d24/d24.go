@@ -9,7 +9,7 @@ import (
 )
 
 func RunHandCoded() int {
-	for i := int64(9); i >= 1; i-- {
+	for i := int64(1); i <= 9; i++ {
 		fmt.Println("First digit", i)
 		result, answer := lit1(i)
 		if result {
@@ -328,7 +328,7 @@ func lit1(w int64) (bool, string) {
 	y *= x
 	// add z y
 	z += y
-	for i := int64(9); i >= 1; i-- {
+	for i := int64(1); i <= 9; i++ {
 		//fmt.Println(".second digit", i)
 		found, s := lit2(i, z)
 		if found {
@@ -369,7 +369,7 @@ func lit2(w, z int64) (bool, string) {
 	y *= x
 	// add z y
 	z += y
-	for i := int64(9); i >= 1; i-- {
+	for i := int64(1); i <= 9; i++ {
 		//fmt.Println("..3rd digit", i)
 		found, s := lit3(i, z)
 		if found {
@@ -411,7 +411,7 @@ func lit3(w, z int64) (bool, string) {
 	y *= x
 	//add z y
 	z += y
-	for i := int64(9); i >= 1; i-- {
+	for i := int64(1); i <= 9; i++ {
 		//fmt.Println("...4th digit", i)
 		found, s := lit4(i, z)
 		if found {
@@ -455,7 +455,7 @@ func lit4(w, z int64) (bool, string) {
 	y *= x
 	// add z y
 	z += y
-	for i := int64(9); i >= 1; i-- {
+	for i := int64(1); i <= 9; i++ {
 		found, s := lit5(i, z)
 		if found {
 			fmt.Println("Success", i, s, "initZ:", initZ, "z:", z)
@@ -495,7 +495,7 @@ func lit5(w, z int64) (bool, string) {
 	y *= x
 	// add z y
 	z += y
-	for i := int64(9); i >= 1; i-- {
+	for i := int64(1); i <= 9; i++ {
 		found, s := lit6(i, z)
 		if found {
 			fmt.Println("Success", i, s, "initZ:", initZ, "z:", z)
@@ -539,7 +539,7 @@ func lit6(w, z int64) (bool, string) {
 	y *= x
 	// add z y
 	z += y
-	for i := int64(9); i >= 1; i-- {
+	for i := int64(1); i <= 9; i++ {
 		found, s := lit7(i, z)
 		if found {
 			fmt.Println("Success", i, s, "initZ:", initZ, "z:", z)
@@ -579,7 +579,7 @@ func lit7(w, z int64) (bool, string) {
 	y *= x
 	// add z y
 	z += y
-	for i := int64(9); i >= 1; i-- {
+	for i := int64(1); i <= 9; i++ {
 		found, s := lit8(i, z)
 		if found {
 			fmt.Println("Success", i, s, "initZ:", initZ, "z:", z)
@@ -623,7 +623,7 @@ func lit8(w, z int64) (bool, string) {
 	y *= x
 	// add z y
 	z += y
-	for i := int64(9); i >= 1; i-- {
+	for i := int64(1); i <= 9; i++ {
 		found, s := lit9(i, z)
 		if found {
 			fmt.Println("Success", i, s, "initZ:", initZ, "z:", z)
@@ -663,7 +663,7 @@ func lit9(w, z int64) (bool, string) {
 	y *= x
 	// add z y
 	z += y
-	for i := int64(9); i >= 1; i-- {
+	for i := int64(1); i <= 9; i++ {
 		found, s := lit10(i, z)
 		if found {
 			fmt.Println("Success", i, s, "initZ:", initZ, "z:", z)
@@ -703,7 +703,7 @@ func lit10(w, z int64) (bool, string) {
 	y *= x
 	// add z y
 	z += y
-	for i := int64(9); i >= 1; i-- {
+	for i := int64(1); i <= 9; i++ {
 		found, s := lit11(i, z)
 		if found {
 			fmt.Println("Success", i, s, "initZ:", initZ, "z:", z)
@@ -747,7 +747,7 @@ func lit11(w, z int64) (bool, string) {
 	y *= x
 	// add z y
 	z += y
-	for i := int64(9); i >= 1; i-- {
+	for i := int64(1); i <= 9; i++ {
 		found, s := lit12(i, z)
 		if found {
 			fmt.Println("Success", i, s, "initZ:", initZ, "z:", z)
@@ -791,7 +791,7 @@ func lit12(w, z int64) (bool, string) {
 	y *= x
 	// add z y
 	z += y
-	for i := int64(9); i >= 1; i-- {
+	for i := int64(1); i <= 9; i++ {
 		found, s := lit13(i, z)
 		if found {
 			fmt.Println("Success", i, s, "initZ:", initZ, "z:", z)
@@ -835,7 +835,7 @@ func lit13(w, z int64) (bool, string) {
 	y *= x
 	// add z y
 	z += y // z + y must be less than 26!
-	for i := int64(9); i >= 1; i-- {
+	for i := int64(1); i <= 9; i++ {
 		found, s := lit14(i, z)
 		if found {
 			fmt.Println("Success", i, s, "initZ:", initZ, "z:", z)
