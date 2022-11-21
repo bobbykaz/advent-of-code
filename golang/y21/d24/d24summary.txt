@@ -1,0 +1,76 @@
+1
+    z = input + 14
+
+2 GROWS
+    z *= 26
+    z += input + 8
+
+3 GROWS
+    z *= 26
+    z += input + 5
+
+4 SHRINKS or NEITHER
+    z /= 26
+    if z % 26 == input, 
+        z unchanged
+    else
+        z *= 26
+        z += input + 4
+5 GROWS
+    z *= 26
+    z += input + 10
+
+6 SHRINKS or NEITHER
+    z /= 26
+    if (z % 26) - 13 == input, 
+        z unchanged
+    else
+        z *= 26
+        z += input + 13
+7 GROWS
+    z *= 26
+    z += input  + 16
+
+8 SHRINKS or NEITHER
+    z /= 26
+    if(z % 26) - 9 == input
+        z unchanged
+    else
+        z *= 26
+        z += input + 5
+9 GROWS
+    z *= 26
+    z += input + 6
+
+10 GROWS
+    z *= 26
+    z += input + 13
+
+11 SHRINKS or NEITHER
+    z /= 26
+    if (z % 26 - 14) == input 
+        z unchanged
+    else
+        z *= 26
+        z += input + 6
+12 SHRINKS or NEITHER
+    z /= 26
+    if (z % 26 - 3) == input 
+        z unchanged
+    else
+        z *= 26
+        z += input + 7
+
+13 SHRINKS or NEITHER
+    z /= 26
+    if (z % 26 - 2) == input 
+        z unchanged
+    else
+        z *= 26
+        z += input + 13
+        
+14 SHRINKS or FAILS
+    z /= 26 
+    // z must be less than 26
+    w must be (z%26) - 14
+    w 1-9 means z => 15 - 23
