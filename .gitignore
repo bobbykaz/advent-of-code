@@ -15,3 +15,6 @@
 input/*
 #A-o-C output
 output/*
+
+#
+rust/target
