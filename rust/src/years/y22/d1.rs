@@ -1,33 +1,36 @@
 use crate::utilities::read_file_into_lines;
-use crate::utilities::convert_lines_to_ints;
 
 pub fn run() {
     let lines = read_file_into_lines("../input/y22/d1.txt");
-    let nums = convert_lines_to_ints(&lines);
-    pt1(&nums);
-    pt2(&nums);
+    
+    pt1(&lines);
 }
 
-pub fn pt1(nums: &Vec<i32>) {
-    let mut count = 0;
+pub fn pt1(lines: &Vec<String>) {
+    let mut max_elf = 0;
+    let mut cur_elf = 0;
 
-    for i in 1..nums.len() {
-        if nums[i] > nums[i-1] {
-            count+=1;
+    let mut all_elves: Vec<i32> = Vec::new();
+
+    for i in 0..lines.len() {
+        if lines[i] == String::from("") {
+            println!("Completed elf: {cur_elf}");
+            all_elves.push(cur_elf);
+            if cur_elf > max_elf {
+                max_elf = cur_elf;
+                println!("new max! : {max_elf}");
+            }
+            cur_elf = 0;
+        } else {
+            let cal: i32 = lines[i].parse().expect("wasnt a number: {lines[i]}!");
+            println!("   adding {cal} to {cur_elf}");
+            cur_elf += cal;
         }
     }
 
-    println!("Number of increasing values: {count}")
-}
-
-pub fn pt2(nums: &Vec<i32>) {
-    let mut sums: Vec<i32> = Vec::new();
-    
-    for i in 2..nums.len() {
-        let sum = nums[i] + nums[i-1] + nums[i-2];
-        sums.push(sum)
-    }
-    
-    println!("Part 2:");
-    pt1(&sums);
+    println!("Max Elf: {max_elf}");
+    all_elves.sort();
+    all_elves.reverse();
+    let total_iter: i32 = all_elves.iter().take(3).sum();
+    println!("total: {total_iter}");
 }
