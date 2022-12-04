@@ -1,4 +1,4 @@
-pub mod utilities;
+pub mod util;
 pub mod years;
 
 fn main() {

@@ -1,4 +1,4 @@
-use crate::utilities::read_file_into_lines;
+use crate::util::read_file_into_lines;
 
 pub fn run() {
     let lines = read_file_into_lines("../input/y22/d1.txt");

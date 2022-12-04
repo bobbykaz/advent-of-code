@@ -1,4 +1,4 @@
-use crate::utilities::read_file_into_lines;
+use crate::util::{read_file_into_lines, self};
 
 pub fn run() {
     let lines = read_file_into_lines("../input/y22/d4.txt");
@@ -29,14 +29,10 @@ pub fn pt1(lines: &Vec<String>) -> u32 {
 }
 
 pub fn parse_line(line: &String) -> (i32, i32, i32, i32) {
-    let secs: Vec<&str> = line.split(',').collect();
-    let s1: Vec<&str> = secs[0].split('-').collect();
-    let s2: Vec<&str> = secs[1].split('-').collect();
-    let l1: i32 = s1[0].parse().expect("couldnt parse first lower bound");
-    let h1: i32 = s1[1].parse().expect("couldnt parse first upper bound");
-    let l2: i32 = s2[0].parse().expect("couldnt parse 2nd lower bound");
-    let h2: i32 = s2[1].parse().expect("couldnt parse 2ndS upper bound");
-    (l1, h1, l2, h2)
+    let parsed = util::string_split_multi(line, ["-",",","-"].to_vec());
+    let i = util::strings_to_ints(&parsed);
+
+    (i[0], i[1], i[2], i[3])
 }
 
 pub fn pt2(lines: &Vec<String>) -> u32 {

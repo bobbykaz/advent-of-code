@@ -1,9 +1,9 @@
-use crate::utilities::read_file_into_lines;
-use crate::utilities::convert_lines_to_ints;
+use crate::util::read_file_into_lines;
+use crate::util::strings_to_ints;
 
 pub fn run() {
     let lines = read_file_into_lines("../input/y21/d1.txt");
-    let nums = convert_lines_to_ints(&lines);
+    let nums = strings_to_ints(&lines);
     pt1(&nums);
     pt2(&nums);
 }
