@@ -1,14 +1,35 @@
 use std::{fs};
 
-pub fn read_file_into_lines(filepath: &str) -> Vec<String> {
-    println!("In file {}", filepath);
-
+fn read_file_to_string(filepath: &str) -> String {
     let contents = fs::read_to_string(filepath)
         .expect("Could not read file {filepath}");
 
-    let trimmed_contents = contents.replace("\r\n", "\n");
+    contents.replace("\r\n", "\n")
+}
 
-    let mut vec_rslt: Vec<String> = trimmed_contents.split("\n")
+pub fn read_file_into_lines(filepath: &str) -> Vec<String> {
+    read_file_into_chunks(filepath, "\n")
+}
+
+pub fn read_string_into_lines(text: &String) -> Vec<String> {
+    let mut vec_rslt: Vec<String> = text.split("\n")
+    .map(|x|x.to_string())
+    .collect();
+
+    match vec_rslt.last() {
+        Some(str) if str == "" => {
+            vec_rslt.remove(vec_rslt.len() -1);
+            vec_rslt
+        }
+        _ => 
+            vec_rslt
+    }
+}
+
+pub fn read_file_into_chunks(filepath: &str, chunk_separator: &str) -> Vec<String> {
+    let trimmed_contents = read_file_to_string(filepath);
+
+    let mut vec_rslt: Vec<String> = trimmed_contents.split(chunk_separator)
     .map(|x|x.to_string())
     .collect();
 
