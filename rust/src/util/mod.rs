@@ -1,5 +1,7 @@
 use std::{fs};
 
+pub mod grid;
+
 fn read_file_to_string(filepath: &str) -> String {
     let contents = fs::read_to_string(filepath)
         .expect("Could not read file {filepath}");
