@@ -65,6 +65,48 @@ use std::fmt::Display;
     }
  }
 
+pub fn cardinal_neighbors<T:Copy>(g: &Grid<T>, r: usize, c:usize) -> Vec<GridCell<T>> {
+    let mut rslt: Vec<GridCell<T>> = vec![];
+    //L
+    if c > 0 {
+        let cell = GridCell{
+            v: g.g[r][c-1],
+            row: r,
+            col: c-1
+        };
+        rslt.push(cell);
+    }
+    //U
+    if r > 0 {
+        let cell = GridCell{
+            v: g.g[r-1][c],
+            row: r-1,
+            col: c
+        };
+        rslt.push(cell);
+    }
+    //R
+    if c < (g.width - 1) {
+        let cell = GridCell{
+            v: g.g[r][c+1],
+            row: r,
+            col: c+1
+        };
+        rslt.push(cell);
+    }
+    //D
+    if r < (g.height - 1) {
+        let cell = GridCell{
+            v: g.g[r+1][c],
+            row: r+1,
+            col: c
+        };
+        rslt.push(cell);
+    }
+
+    rslt
+}
+
  pub fn print_grid<T:Display>(g: &Grid<T>) {
     for row in &g.g {
         for i in row {

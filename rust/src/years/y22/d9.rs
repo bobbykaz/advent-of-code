@@ -50,7 +50,7 @@ pub fn p2() {
     for l in lines {
         println!("{l}");
         let (d,v) = parse_line(l);
-        for i in 0..v {
+        for _ in 0..v {
             //move the head, and if the next seg moves, repeat down the line
             //println!("...{i}");
 
