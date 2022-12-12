@@ -39,7 +39,7 @@ pub fn p1() {
 }
 
 pub fn p2() {
-    let lines = util::read_file_into_lines("../input/y22/d9s.txt"); 
+    let lines = util::read_file_into_lines("../input/y22/d9.txt"); 
     let mut rope: Vec<Pos> = vec![];
     for _ in 0..10 {
         rope.push(Pos {x:0,y:0})
@@ -52,15 +52,15 @@ pub fn p2() {
         let (d,v) = parse_line(l);
         for i in 0..v {
             //move the head, and if the next seg moves, repeat down the line
-            println!("...{i}");
-            let mut prev_seg = rope[0].clone();
-            rope[0] = prev_seg.move_in(&d);
+            //println!("...{i}");
+
+            rope[0] = rope[0].move_in(&d);
+            
             for r in 1..rope.len() {
                 if !rope[r-1].neighbors(&rope[r]) {
-                    println!("...moving segment {r}");
-                    let next_seg = rope[r].clone();
-                    rope[r] = prev_seg;
-                    prev_seg = next_seg;
+                    //println!("...moving segment {r}");
+                    rope[r] = rope[r].move_to(&rope[r-1]);
+                    
                     if r == (rope.len() - 1) {
                         let k = rope[r].to_string();
                         match visits.get(&k) {
@@ -72,7 +72,7 @@ pub fn p2() {
                         };
                     }
                 } else {
-                    println!("...stopping at {r}");
+                    //println!("...stopping at {r}");
                     break;
                 }
             }
