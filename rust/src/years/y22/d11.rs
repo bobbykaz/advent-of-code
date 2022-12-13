@@ -1,24 +1,35 @@
 pub fn run() {
-    p1();
+    sim(false);
+    sim(true);
 }
 
-pub fn p1() {
+pub fn sim(is_p2:bool) {
     let mut monkeys = get_monkeys();
     let mut monk_interactions = vec![0,0,0,0,0,0,0,0];
 
-    for r in 0..1000 {
-        println!("starting round {r}");
+    let bound: usize = if is_p2 {10000} else {20};
+
+    let mut all_factors = monkeys[0].test;
+    for i in 1..monkeys.len() {
+        all_factors *= monkeys[i].test
+    }
+
+    for _ in 0..bound {
+        //println!("starting round {r}");
         for m in 0..monkeys.len() {
             for _ in 0..monkeys[m].items.len() {
                 let item = monkeys[m].items.remove(0);
-                let worry = match monkeys[m].op {
+                let mut worry = match monkeys[m].op {
                     MnkOp::Add(x) => item + x,
                     MnkOp::Mul(x) => item * x,
-                    //MnkOp::Div(x) => item / x,
                     MnkOp::Sq => item * item
                 };
 
-                //worry /= 3;
+                if is_p2 {
+                    worry %= all_factors;
+                } else {
+                    worry /= 3;
+                }
 
                 if worry % monkeys[m].test == 0 {
                     let target = monkeys[m].true_target;
@@ -34,7 +45,7 @@ pub fn p1() {
 
     monk_interactions.sort();
     println!("total interactions: {monk_interactions:?}");
-    let mb = monk_interactions[0] * monk_interactions[1];
+    let mb:i64 = monk_interactions[6] * monk_interactions[7];
     println!("monkey business: {mb}");
 }
 
@@ -123,7 +134,6 @@ struct Monkey {
 
 enum MnkOp {
     Add(i64),
-    //Div(i64),
     Mul(i64),
     Sq
 }
