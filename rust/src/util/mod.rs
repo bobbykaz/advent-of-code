@@ -51,6 +51,12 @@ pub fn strings_to_ints(lines: &Vec<String>) -> Vec<i32> {
     .collect()
 }
 
+pub fn string_to_ints(l: &String, delim: &str) -> Vec<i32> {
+    l.split(delim).into_iter()
+    .map(|x| x.parse().expect("failed to parse {x} into i32"))
+    .collect()
+}
+
 pub fn string_split_multi(line: &String, splits: Vec<&str>) -> Vec<String> {
     let mut rslt: Vec<String> = Vec::new();
     let mut remaining = line.clone();

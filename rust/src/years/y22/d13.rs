@@ -1,12 +1,8 @@
-use std::{vec, cmp::Ordering, ops::Index};
+use std::{vec, cmp::Ordering};
 
 use crate::util;
 
 pub fn run() {
-    p1();
-}
-
-pub fn p1() {
     let chunks = util::read_file_into_chunks("../input/y22/d13.txt", "\n\n");
     let mut in_order: Vec<usize> = vec![]; 
     let mut all_nodes: Vec<Node> = vec![];
