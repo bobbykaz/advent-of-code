@@ -3,6 +3,7 @@ use std::cmp::{min, max};
 use crate::util;
 
 pub fn run() {
+    p1();
     p2();
 }
 
@@ -10,10 +11,10 @@ fn p1() {
     let lines = util::read_file_into_lines("../input/y22/d15s.txt");
     let sens: Vec<Sensor> = lines.into_iter().map(|x|parse_line(&x)).collect();
 
-    let minX = sens.iter().map(|s|min(s.pos.x, s.cb.x)).min().expect("must have min value")-10000000;
-    let maxX = sens.iter().map(|s|max(s.pos.x, s.cb.x)).max().expect("must have max value")+10000000;
+    let min_x = sens.iter().map(|s|min(s.pos.x, s.cb.x)).min().expect("must have min value")-10000000;
+    let max_x = sens.iter().map(|s|max(s.pos.x, s.cb.x)).max().expect("must have max value")+10000000;
     let mut impossible:u64 = 0;
-    for x in minX..(maxX+1) {
+    for x in min_x..(max_x+1) {
         let this = Pos{x,y:2000000}; //2000000 or 10
         let mut is_beacon = false;
         let mut is_sensor = false;
@@ -52,7 +53,8 @@ fn p2() {
                 y: s.pos.y + i
             };
             if point_is_beacon(&this, &sens, bound) {
-                println!("Freq : {}",(this.x * 4000000 + this.y))
+                println!("Freq : {}",(this.x * 4000000 + this.y));
+                return ();
             }
         }
         // top to right
@@ -63,7 +65,8 @@ fn p2() {
                 y: uby - i
             };
             if point_is_beacon(&this, &sens, bound) {
-                println!("Freq : {}",(this.x * 4000000 + this.y))
+                println!("Freq : {}",(this.x * 4000000 + this.y));
+                return ();
             }
         }
         // right to bottom
@@ -74,7 +77,8 @@ fn p2() {
                 y: s.pos.y - i
             };
             if point_is_beacon(&this, &sens, bound) {
-                println!("Freq : {}",(this.x * 4000000 + this.y))
+                println!("Freq : {}",(this.x * 4000000 + this.y));
+                return ();
             }
         }
         // bottom to left
@@ -85,7 +89,8 @@ fn p2() {
                 y: lby + i
             };
             if point_is_beacon(&this, &sens, bound) {
-                println!("Freq : {}",(this.x * 4000000 + this.y))
+                println!("Freq : {}",(this.x * 4000000 + this.y));
+                return ();
             }
         }
         println!("checked {s:?} {lbx}-{ubx}, {lby}-{uby}");
