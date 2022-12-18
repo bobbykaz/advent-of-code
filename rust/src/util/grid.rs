@@ -115,3 +115,12 @@ pub fn cardinal_neighbors<T:Copy>(g: &Grid<T>, r: usize, c:usize) -> Vec<GridCel
         println!("");
     }
  }
+
+ pub fn print_grid_flip_y<T:Display>(g: &Grid<T>, stop_after: usize) {
+    for i in (0..stop_after).rev() {
+        for i in &g.g[i] {
+            print!("{i} ");
+        }
+        println!("");
+    }
+ }

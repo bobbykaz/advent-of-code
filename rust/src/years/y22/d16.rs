@@ -13,7 +13,6 @@ pub fn run() {
     let mut vs = VS { av: all_valves, vm: vmap};
     vs = compress_valve_map(vs);
     print_valves(&vs);
-    return;
     dfs(&vs);
 }
 
