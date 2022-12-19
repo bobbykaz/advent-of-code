@@ -2,5 +2,5 @@ pub mod util;
 pub mod years;
 
 fn main() {
-    years::y22::d17::run()
+    years::y22::d19::run()
 }

@@ -5,19 +5,27 @@ use crate::util;
 pub fn run() {
     let lines = util::read_file_into_lines("../input/y22/d16.txt");
     let all_valves: Vec<Valve> = lines.iter().map(|l|parse_valve(l)).collect();
+
+    let non_empty_valve_idx: Vec<usize> = (0..all_valves.len()).filter(|v|all_valves[*v].fr != 0).collect();
     let mut vmap: HashMap<String,usize> = HashMap::new();
     for i in 0..all_valves.len() {
         vmap.insert(all_valves[i].key.clone(), i);
     }
 
+    let shortest_dist_grid: Vec<Vec<usize>> = vec![];
+    
+
     let mut vs = VS { av: all_valves, vm: vmap};
-    vs = compress_valve_map(vs);
+
     print_valves(&vs);
     dfs(&vs);
 }
 
+
+
 //remove all the un-openable valves
-fn compress_valve_map(mut vs: VS) -> VS {
+// something is amiss here, the final map doesnt quite end up making sense
+pub fn compress_valve_map(mut vs: VS) -> VS {
 
     //find all no-flow valves
     let no_flow_valves: Vec<String> = vs.av.iter().filter(|v| v.fr == 0 && v.key != String::from("AA")).map(|v|v.key.clone()).collect();
@@ -167,7 +175,7 @@ fn parse_valve(l:&String) -> Valve {
 }
 
 
-struct VS {
+pub struct VS {
     av: Vec<Valve>,
     vm: HashMap<String,usize>
 }
@@ -209,7 +217,7 @@ impl VS{
     }
 }
 
-struct Path {
+pub struct Path {
     dist: u32,
     key: String
 }
@@ -226,7 +234,7 @@ impl Path {
     }
 }
 
-struct Valve {
+pub struct Valve {
     key: String,
     fr: u32,
     next: Vec<Path>
