@@ -7,7 +7,7 @@ pub fn run() {
     p2();
 }
 
-fn p1() {
+pub fn p1() {
     let lines = util::read_file_into_lines("../input/y22/d19.txt");
     let bps: Vec<Blueprint> = lines.iter().map(|l|parse_bp(l)).collect();
     let quality:u32 = bps.iter()

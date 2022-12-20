@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fmt};
+use std::{collections::{HashMap, HashSet, VecDeque}, fmt};
 
 use crate::util;
 
@@ -21,7 +21,11 @@ pub fn run() {
     dfs(&vs);
 }
 
-
+fn shortest_path(vs:&VS, from_i:usize, to_i:usize) -> u32 {
+    let seen: HashSet<String> = HashSet::new();
+    let queue: VecDeque<(usize,u32)> = VecDeque::new();
+    0
+}
 
 //remove all the un-openable valves
 // something is amiss here, the final map doesnt quite end up making sense
