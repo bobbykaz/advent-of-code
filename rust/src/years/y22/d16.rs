@@ -12,7 +12,20 @@ pub fn run() {
         vmap.insert(all_valves[i].key.clone(), i);
     }
 
-    let shortest_dist_grid: Vec<Vec<usize>> = vec![];
+    let mut shortest_dist_grid: Vec<Vec<usize>> = vec![];
+    for n in 0..all_valves.len() {
+        shortest_dist_grid.push(vec![]);
+        if non_empty_valve_idx.contains(&n) {
+            for to in 0..all_valves.len() {
+                if non_empty_valve_idx.contains(&to) {
+
+                } else {
+                    shortest_dist_grid[n].push(99);
+                }
+            }
+        }
+
+    }
     
 
     let mut vs = VS { av: all_valves, vm: vmap};
