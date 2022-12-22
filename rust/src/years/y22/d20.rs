@@ -1,3 +1,5 @@
+use std::usize;
+
 use crate::util::{self, strings_to_ints};
 
 pub fn run() {
@@ -5,7 +7,7 @@ pub fn run() {
 }
 
 pub fn p1() {
-    let lines = util::read_file_into_lines("../input/y22/d20s.txt");
+    let lines = util::read_file_into_lines("../input/y22/d20.txt");
     let nums = strings_to_ints(&lines);
     let mut nums_with_i: Vec<(i64,usize)> = Vec::new();
     let mut zero_index = 0;
@@ -105,23 +107,31 @@ fn mix(mut v: Vec<(i64,usize)>, idx: usize) -> Vec<(i64,usize)> {
     return v;
 }
 
-// 0 , 1, 2, 3, 4, 5
+// [0, 1, 2, -5, 4, 5, 6, 7 ,8, 9] =>
+//        ^--- 6 goes here (2 moves left) - insert at index 3
+//                           ^----- -5 swaps to here (8 moves right?) insert at index 8?
+fn swap_test(mut nums:Vec<i32>, i: usize) -> Vec<i32> {
+    let target: i32 = nums[i];
+    let amt =  (i as i32 + target).rem_euclid(nums.len() as i32) as usize;
+    println!("========");
+    println!("{nums:?} ...");
+    nums.remove(i);
+    nums.insert(amt, target);
+    println!("swapped {i} with {amt}");
+    println!("...{nums:?}");
+    return nums;
+}
+
 fn mix_2(mut v: Vec<(i64,usize)>, idx: usize) -> Vec<(i64,usize)> {
     let start = v[idx].0;
     if start < 0 {
         let delta = (idx as i64 + start).abs() % v.len() as i64; 
-        let mut to_idx = v.len() - (delta as usize);
-        if to_idx > idx {
-            to_idx -= 1;
-        }
+        let mut to_idx = v.len() - (delta as usize) - 1;
         let item = v.remove(idx);
         //println!("removed {} at {}, inserted to {}", item.0, idx, to_idx);
         v.insert(to_idx, item);
     } else if start > 0 {
-        let mut to_idx = (idx as i64 + start) % v.len() as i64; 
-        if (to_idx as usize) < idx {
-            to_idx += 1;
-        }
+        let to_idx = (idx as i64 + start) % v.len() as i64; 
         let item = v.remove(idx);
         //println!("removed {} at {}, inserted to {}", item.0, idx, to_idx);
         v.insert(to_idx as usize, item);
@@ -139,3 +149,20 @@ fn index_of(target_idx:usize, v:&Vec<(i64,usize)>) -> usize {
 
     panic!("target {} not in list!", target_idx);
 }
+/* 
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn larger_can_hold_smaller() {
+        let larger = Rectangle {
+            width: 8,
+            height: 7,
+        };
+        let smaller = Rectangle {
+            width: 5,
+            height: 1,
+        };
+
+        assert!(larger.can_hold(&smaller));
+    }
+}*/

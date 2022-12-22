@@ -27,6 +27,25 @@ use std::fmt::Display;
     }
  }
 
+ pub fn strings_to_padded_char_grid(input: &Vec<String>, pad: char) -> Grid<char> {
+    let h = input.len();
+    let w = input.iter().map(|s|s.len()).max().expect("must have at least one row");
+
+    let mut grslt: Vec<Vec<char>> = Vec::new();
+    for l in input {
+        let mut row: Vec<char> = l.chars().collect();
+        while row.len() < w {
+            row.push(pad);
+        }
+        grslt.push(row);
+    }
+    Grid {
+        g: grslt,
+        height: h,
+        width: w
+    }
+ }
+
  pub fn strings_to_n10_grid(input: &Vec<String>) -> Grid<i32> {
     let h = input.len();
     let w = input[0].chars().count();
