@@ -1,10 +1,15 @@
-use std::{collections::{HashMap, HashSet, VecDeque}, fmt};
+use std::{collections::{HashMap, HashSet, VecDeque}, fmt, simd::u32x4};
 
 use crate::util;
 
 pub fn run() {
     let lines = util::read_file_into_lines("../input/y22/d16.txt");
-    let all_valves: Vec<Valve> = lines.iter().map(|l|parse_valve(l)).collect();
+
+    let mut all_valves: Vec<Valve> = vec![];
+    for i in 0..lines.len() {
+        let v = parse_valve(&lines[i], i);
+        all_valves.push(v);
+    }
 
     let non_empty_valve_idx: Vec<usize> = (0..all_valves.len()).filter(|v|all_valves[*v].fr != 0).collect();
     let mut vmap: HashMap<String,usize> = HashMap::new();
@@ -12,13 +17,19 @@ pub fn run() {
         vmap.insert(all_valves[i].key.clone(), i);
     }
 
-    let mut shortest_dist_grid: Vec<Vec<usize>> = vec![];
-    for n in 0..all_valves.len() {
+    println!("Non empty valves: {:?}", non_empty_valve_idx);
+
+    let vs = VS { av: all_valves, vm: vmap};
+
+    let mut shortest_dist_grid: Vec<Vec<u32>> = vec![];
+    for n in 0..vs.av.len() {
         shortest_dist_grid.push(vec![]);
         if non_empty_valve_idx.contains(&n) {
-            for to in 0..all_valves.len() {
+            for to in 0..vs.av.len() {
                 if non_empty_valve_idx.contains(&to) {
-
+                    let dist_to = shortest_path(&vs, n, to);
+                    shortest_dist_grid[n].push(dist_to);
+                    println!("Shortest path from {} to {} is {}", n, to, dist_to);
                 } else {
                     shortest_dist_grid[n].push(99);
                 }
@@ -26,19 +37,43 @@ pub fn run() {
         }
 
     }
-    
-
-    let mut vs = VS { av: all_valves, vm: vmap};
 
     print_valves(&vs);
+    return;
     dfs(&vs);
 }
 
 fn shortest_path(vs:&VS, from_i:usize, to_i:usize) -> u32 {
-    let seen: HashSet<String> = HashSet::new();
-    let queue: VecDeque<(usize,u32)> = VecDeque::new();
-    0
+    let mut seen: HashSet<usize> = HashSet::new();
+    let mut queue: VecDeque<(usize,u32)> = VecDeque::new();
+
+    seen.insert(from_i);
+    queue.push_back((from_i,0));
+
+    while queue.len() > 0 {
+        let (current_idx, current_dist) = queue.pop_front().expect("queue must have an item");
+        
+        if current_idx == to_i {
+            return current_dist;
+        }
+        
+        let next_keys: Vec<String> = vs.av[current_idx].next.iter()
+                        .map(|p| p.key.clone())
+                        .collect();
+        let next_idx: Vec<usize> = next_keys.iter()
+                        .map(|k| vs.find(k).idx)
+                        .collect();
+        for idx in next_idx {
+            if !seen.contains(&idx) {
+                seen.insert(idx);
+                queue.push_back((idx,current_dist+1));
+            }
+        }
+    }
+
+    panic!("Could not find path from {} to {}",from_i, to_i);
 }
+
 
 //remove all the un-openable valves
 // something is amiss here, the final map doesnt quite end up making sense
@@ -124,6 +159,11 @@ fn print_valves(vs: &VS) {
     }
 }
 
+fn p1_dyn(vs: &VS, sp: &Vec<Vec<u32>>) -> u32 {
+    let start = vs.find(&String::from("AA"));
+    0
+}
+
 fn dfs(vs: &VS) {
     let start = vs.find(&String::from("AA"));
     let result = dfs_r(vs, start, &PS{time:30, cr:0, total:0}, &String::new());
@@ -176,7 +216,7 @@ fn dfs_r(vs: &VS, current:&Valve, ps: &PS, seen: &String) -> u32 {
 
 
 //Valve OJ has flow rate=0; tunnels lead to valves EW, IG
-fn parse_valve(l:&String) -> Valve {
+fn parse_valve(l:&String, idx:usize) -> Valve {
     let pts = util::string_split_multi(l, vec!["Valve "," has flow rate=","; "]);
     let key = pts[1].clone();
     let fr: u32 = pts[2].parse().expect("flow rate not a number");
@@ -188,7 +228,7 @@ fn parse_valve(l:&String) -> Valve {
         let pts2 = util::string_split_multi(&pts[3], vec![" leads to valve "]);
         vec![Path{dist:1, key:pts2[1].clone()}]
     };
-    return Valve { key, fr, next};
+    return Valve { idx, key, fr, next};
 }
 
 
@@ -252,6 +292,7 @@ impl Path {
 }
 
 pub struct Valve {
+    idx: usize,
     key: String,
     fr: u32,
     next: Vec<Path>
@@ -268,6 +309,7 @@ impl Valve {
 
     fn clone(&self) -> Valve {
         Valve { 
+            idx: self.idx,
             key: self.key.clone(), 
             fr: self.fr,
             next: self.next.iter().map(|p|p.clone()).collect() 
