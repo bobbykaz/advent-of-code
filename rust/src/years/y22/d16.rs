@@ -2,6 +2,9 @@ use std::{collections::{HashMap, HashSet, VecDeque}, fmt};
 
 use crate::util;
 
+// Check git history for a failed attempt at enumerating all paths of the tree (not just useful valves)
+// and a failed attempt at recursively compressing the map of valves to get shortests paths, as opposed to the BFS done here
+
 pub fn run() {
     let lines = util::read_file_into_lines("../input/y22/d16.txt");
 
@@ -86,6 +89,16 @@ fn print_valves(vs: &VS) {
 }
 
 fn p1_dyn(vs: &VS, sp: &Vec<Vec<u32>>, target_valve_idxs:&Vec<usize>) -> u32 {
+    let start = vs.find(&String::from("AA"));
+    let start_ps = PS{time:30, cr:0, total:0};
+
+    let max = p1_dyn_r(vs, sp, target_valve_idxs, start.idx, start_ps);
+    println!("Max pressure:{max}");
+    0
+}
+
+fn p2_dyn(vs: &VS, sp: &Vec<Vec<u32>>, target_valve_idxs:&Vec<usize>) -> u32 {
+    // split target valves into 2 groups, get the max of each sub group, combine them, and iterate through all permutations of them
     let start = vs.find(&String::from("AA"));
     let start_ps = PS{time:30, cr:0, total:0};
 

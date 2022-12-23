@@ -84,6 +84,20 @@ use std::fmt::Display;
     }
  }
 
+ pub fn pad_grid<T:Copy>(g: Grid<T>, pad_item: T, padding: usize) -> Grid<T> {
+    let h = g.height + 2*padding;
+	let w = g.width + 2*padding;
+    let mut ng = new(w, h, pad_item);
+
+    for r in 0..g.height {
+        for c in 0..g.width {
+            ng.g[padding+r][padding+c] = g.g[r][c];
+        }
+    }
+
+    return ng;
+ }
+
 pub fn cardinal_neighbors<T:Copy>(g: &Grid<T>, r: usize, c:usize) -> Vec<GridCell<T>> {
     let mut rslt: Vec<GridCell<T>> = vec![];
     //L
@@ -138,7 +152,7 @@ pub fn cardinal_neighbors<T:Copy>(g: &Grid<T>, r: usize, c:usize) -> Vec<GridCel
  pub fn print_grid_flip_y<T:Display>(g: &Grid<T>, stop_after: usize) {
     for i in (0..stop_after).rev() {
         for i in &g.g[i] {
-            print!("{i} ");
+            print!("{i}");
         }
         println!("");
     }
