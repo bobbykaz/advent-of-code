@@ -1,4 +1,4 @@
-use std::{collections::{HashMap, HashSet, VecDeque}, fmt, simd::u32x4};
+use std::{collections::{HashMap, HashSet, VecDeque}, fmt};
 
 use crate::util;
 
@@ -24,7 +24,7 @@ pub fn run() {
     let mut shortest_dist_grid: Vec<Vec<u32>> = vec![];
     for n in 0..vs.av.len() {
         shortest_dist_grid.push(vec![]);
-        if non_empty_valve_idx.contains(&n) {
+        if non_empty_valve_idx.contains(&n) || vs.av[n].key == "AA" {
             for to in 0..vs.av.len() {
                 if non_empty_valve_idx.contains(&to) {
                     let dist_to = shortest_path(&vs, n, to);
@@ -39,8 +39,7 @@ pub fn run() {
     }
 
     print_valves(&vs);
-    return;
-    dfs(&vs);
+    p1_dyn(&vs, &shortest_dist_grid, &non_empty_valve_idx);
 }
 
 fn shortest_path(vs:&VS, from_i:usize, to_i:usize) -> u32 {
@@ -159,9 +158,46 @@ fn print_valves(vs: &VS) {
     }
 }
 
-fn p1_dyn(vs: &VS, sp: &Vec<Vec<u32>>) -> u32 {
+fn p1_dyn(vs: &VS, sp: &Vec<Vec<u32>>, target_valve_idxs:&Vec<usize>) -> u32 {
     let start = vs.find(&String::from("AA"));
+    let start_ps = PS{time:30, cr:0, total:0};
+
+    let max = p1_dyn_r(vs, sp, target_valve_idxs, start.idx, start_ps);
+    println!("Max pressure:{max}");
     0
+}
+
+fn p1_dyn_r(vs: &VS, sp: &Vec<Vec<u32>>, target_valve_idxs:&Vec<usize>, current_idx:usize, ps: PS) -> u32 {
+    if ps.time == 0 {
+        return ps.total;
+    }
+    let mut options: Vec<u32> = vec![];
+    //options: open current valve + travel to next valve, or wait it out until the end.
+    //open valve options
+    let this_valve = &vs.av[current_idx];
+    let mut open_ps = ps;
+    if this_valve.fr > 0 {
+       open_ps = open_ps.open_valve(this_valve.fr);
+    }
+    for ni in target_valve_idxs {
+        let dist_to_ni = sp[current_idx][*ni];
+        if dist_to_ni <= open_ps.time {
+            let new_targets:Vec<usize> = target_valve_idxs.iter().filter(|i|**i != *ni).map(|i|*i).collect();
+            let new_ps = open_ps.next(dist_to_ni);
+            let total_pressure = p1_dyn_r(vs, sp, &new_targets, *ni, new_ps);
+            options.push(total_pressure);
+        }
+    }
+    //just wait after opening current valve
+
+    let wait_it_out_ps = open_ps.next(open_ps.time).total;
+    options.push(wait_it_out_ps);
+
+    options.sort();
+    if options.len() > 3 {
+        println!("options at time {}: {options:?}",open_ps.time);
+    }
+    return *options.last().expect("must be at least one option");
 }
 
 fn dfs(vs: &VS) {
