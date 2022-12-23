@@ -3,9 +3,13 @@ use std::usize;
 use crate::util::{self, strings_to_ints};
 
 pub fn run() {
+    println!("p1:");
     p1();
+    println!("p2:");
+    p2();
 }
-
+//found 3304 9657 -8895
+//4066
 pub fn p1() {
     let lines = util::read_file_into_lines("../input/y22/d20.txt");
     let nums = strings_to_ints(&lines);
@@ -21,7 +25,7 @@ pub fn p1() {
     //println!("Start: {:?}", nums_with_i);
     for n in 0..og_nums.len() {
         let idx = index_of(n, &nums_with_i);
-        nums_with_i = mix_2(nums_with_i, idx);
+        nums_with_i = mix(nums_with_i, idx);
         //println!("{:?}", nums_with_i);
     }
 
@@ -51,11 +55,12 @@ pub fn p2() {
     }
     let og_nums = strings_to_ints(&lines);
     //println!("Start: {:?}", nums);
-    for n in 0..og_nums.len() {
-        let idx = index_of(n, &nums_with_i);
-        nums_with_i = mix(nums_with_i, idx);
-        println!("mixed {n}");
-        //println!("{:?}", nums);
+    for r in 0..10 {
+        println!("Mix round: {r}");
+        for n in 0..og_nums.len() {
+            let idx = index_of(n, &nums_with_i);
+            nums_with_i = mix_2(nums_with_i, idx);
+        }
     }
 
     let idx = index_of(zero_index, &nums_with_i);
@@ -92,7 +97,7 @@ fn mix(mut v: Vec<(i64,usize)>, idx: usize) -> Vec<(i64,usize)> {
                 to = v.len() as i32 - 1;
             }
         }
-        println!("removed {} at {}, inserted to {}", start, idx, to);
+        //println!("removed {} at {}, inserted to {}", start, idx, to);
     } else if start > 0 {
         for i in 0..(start as usize) {
             let from = (idx + i) % v.len();
@@ -101,7 +106,7 @@ fn mix(mut v: Vec<(i64,usize)>, idx: usize) -> Vec<(i64,usize)> {
             v[to] = v[from];
             v[from] = tmp;
         }
-        println!("removed {} at {}, inserted to {}", start, idx, (idx as i64 + start) % v.len() as i64);
+        //println!("removed {} at {}, inserted to {}", start, idx, (idx as i64 + start) % v.len() as i64);
     }
 
     return v;
@@ -124,18 +129,9 @@ fn swap_test(mut nums:Vec<i32>, i: usize) -> Vec<i32> {
 
 fn mix_2(mut v: Vec<(i64,usize)>, idx: usize) -> Vec<(i64,usize)> {
     let start = v[idx].0;
-    if start < 0 {
-        let delta = (idx as i64 + start).abs() % v.len() as i64; 
-        let mut to_idx = v.len() - (delta as usize) - 1;
-        let item = v.remove(idx);
-        //println!("removed {} at {}, inserted to {}", item.0, idx, to_idx);
-        v.insert(to_idx, item);
-    } else if start > 0 {
-        let to_idx = (idx as i64 + start) % v.len() as i64; 
-        let item = v.remove(idx);
-        //println!("removed {} at {}, inserted to {}", item.0, idx, to_idx);
-        v.insert(to_idx as usize, item);
-    }
+    let val = v.remove(idx);
+    let dest = (idx as i64 + start).rem_euclid(v.len() as i64) as usize;
+    v.insert(dest, val);
 
     return v;
 }
