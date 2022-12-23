@@ -112,21 +112,6 @@ fn mix(mut v: Vec<(i64,usize)>, idx: usize) -> Vec<(i64,usize)> {
     return v;
 }
 
-// [0, 1, 2, -5, 4, 5, 6, 7 ,8, 9] =>
-//        ^--- 6 goes here (2 moves left) - insert at index 3
-//                           ^----- -5 swaps to here (8 moves right?) insert at index 8?
-fn swap_test(mut nums:Vec<i32>, i: usize) -> Vec<i32> {
-    let target: i32 = nums[i];
-    let amt =  (i as i32 + target).rem_euclid(nums.len() as i32) as usize;
-    println!("========");
-    println!("{nums:?} ...");
-    nums.remove(i);
-    nums.insert(amt, target);
-    println!("swapped {i} with {amt}");
-    println!("...{nums:?}");
-    return nums;
-}
-
 fn mix_2(mut v: Vec<(i64,usize)>, idx: usize) -> Vec<(i64,usize)> {
     let start = v[idx].0;
     let val = v.remove(idx);
