@@ -1,9 +1,7 @@
 use core::panic;
 use std::collections::{HashMap, VecDeque};
 
-use crate::util::{self, strings_to_ints};
-
-use super::d7::pt1_strings;
+use crate::util;
 
 pub fn run() {
     p2();

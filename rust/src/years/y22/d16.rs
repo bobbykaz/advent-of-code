@@ -32,7 +32,7 @@ pub fn run() {
                 if non_empty_valve_idx.contains(&to) {
                     let dist_to = shortest_path(&vs, n, to);
                     shortest_dist_grid[n].push(dist_to);
-                    println!("Shortest path from {} to {} is {}", n, to, dist_to);
+                    //println!("Shortest path from {} to {} is {}", n, to, dist_to);
                 } else {
                     shortest_dist_grid[n].push(99);
                 }
@@ -41,8 +41,11 @@ pub fn run() {
 
     }
 
-    print_valves(&vs);
-    p1_dyn(&vs, &shortest_dist_grid, &non_empty_valve_idx);
+    //print_valves(&vs);
+    println!("Done preparing valves");
+
+    p2_dfs(&vs, &shortest_dist_grid,&non_empty_valve_idx);
+
 }
 
 fn shortest_path(vs:&VS, from_i:usize, to_i:usize) -> u32 {
@@ -76,7 +79,7 @@ fn shortest_path(vs:&VS, from_i:usize, to_i:usize) -> u32 {
     panic!("Could not find path from {} to {}",from_i, to_i);
 }
 
-fn print_valves(vs: &VS) {
+pub fn print_valves(vs: &VS) {
     for v in vs.av.iter() {
         if v.next.len() >0 {
             let mut kids = String::new();
@@ -88,27 +91,49 @@ fn print_valves(vs: &VS) {
     }
 }
 
-fn p1_dyn(vs: &VS, sp: &Vec<Vec<u32>>, target_valve_idxs:&Vec<usize>) -> u32 {
+pub fn p1_dfs(vs: &VS, sp: &Vec<Vec<u32>>, target_valve_idxs:&Vec<usize>) -> u32 {
     let start = vs.find(&String::from("AA"));
     let start_ps = PS{time:30, cr:0, total:0};
 
-    let max = p1_dyn_r(vs, sp, target_valve_idxs, start.idx, start_ps);
+    let max = p1_dfs_r(vs, sp, target_valve_idxs, start.idx, start_ps);
     println!("Max pressure:{max}");
     0
 }
 
-fn p2_dyn(vs: &VS, sp: &Vec<Vec<u32>>, target_valve_idxs:&Vec<usize>) -> u32 {
+fn p2_dfs(vs: &VS, sp: &Vec<Vec<u32>>, target_valve_idxs:&Vec<usize>) -> u32 {
+    let start = vs.find(&String::from("AA"));
+
     // split target valves into 2 groups, get the max of each sub group, combine them, and iterate through all permutations of them
     let mut max = 0;
-    for b in 0..(2_u32.pow(16)) {
-        
-        let start = vs.find(&String::from("AA"));
-        let start_ps = PS{time:24, cr:0, total:0};
+    for b in 1..(2_u32.pow(16) / 2) {
+        let start_ps_1 = PS{time:26, cr:0, total:0};
+        let start_ps_2 = PS{time:26, cr:0, total:0};
 
-        let max = p1_dyn_r(vs, sp, target_valve_idxs, start.idx, start_ps);
-        println!("Max pressure:{max}");
+        let indicies_to_split = index_subset_from_bits(b);
+        let (target_valves_1,target_valves_2) = split_valve_sets(target_valve_idxs,indicies_to_split);
+
+        let max_1 = p1_dfs_r(vs, sp, &target_valves_1, start.idx, start_ps_1);
+        let max_2 = p1_dfs_r(vs, sp, &target_valves_2, start.idx, start_ps_2);
+        let total_pressure = max_1 + max_2;
+        if  total_pressure > max {
+            max = total_pressure;
+
+            println!("New Max {max} from bitset {b}; {target_valves_1:?} -> {max_1} . {target_valves_2:?} -> {max_2}");
+        }
     }
+    println!("Max pressure:{max}");
     return max;
+}
+
+fn split_valve_sets(all_target_valves:&Vec<usize>, indices_to_choose:Vec<usize>) -> (Vec<usize>, Vec<usize>) {
+    let mut v1 = vec![];
+    let mut v2 = all_target_valves.clone();
+    
+    for i in indices_to_choose {
+        let valve = v2.remove(i);
+        v1.push(valve);
+    }
+    (v1, v2)
 }
 
 fn index_subset_from_bits(bits: u32) -> Vec<usize> {
@@ -160,10 +185,10 @@ fn index_subset_from_bits(bits: u32) -> Vec<usize> {
         idxs.push(14)
     }
 
-    idxs.iter().rev().collect()
+    idxs.into_iter().rev().collect()
 }
 
-fn p1_dyn_r(vs: &VS, sp: &Vec<Vec<u32>>, target_valve_idxs:&Vec<usize>, current_idx:usize, ps: PS) -> u32 {
+fn p1_dfs_r(vs: &VS, sp: &Vec<Vec<u32>>, target_valve_idxs:&Vec<usize>, current_idx:usize, ps: PS) -> u32 {
     if ps.time == 0 {
         return ps.total;
     }
@@ -180,7 +205,7 @@ fn p1_dyn_r(vs: &VS, sp: &Vec<Vec<u32>>, target_valve_idxs:&Vec<usize>, current_
         if dist_to_ni <= open_ps.time {
             let new_targets:Vec<usize> = target_valve_idxs.iter().filter(|i|**i != *ni).map(|i|*i).collect();
             let new_ps = open_ps.next(dist_to_ni);
-            let total_pressure = p1_dyn_r(vs, sp, &new_targets, *ni, new_ps);
+            let total_pressure = p1_dfs_r(vs, sp, &new_targets, *ni, new_ps);
             options.push(total_pressure);
         }
     }
