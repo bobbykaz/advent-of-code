@@ -99,12 +99,68 @@ fn p1_dyn(vs: &VS, sp: &Vec<Vec<u32>>, target_valve_idxs:&Vec<usize>) -> u32 {
 
 fn p2_dyn(vs: &VS, sp: &Vec<Vec<u32>>, target_valve_idxs:&Vec<usize>) -> u32 {
     // split target valves into 2 groups, get the max of each sub group, combine them, and iterate through all permutations of them
-    let start = vs.find(&String::from("AA"));
-    let start_ps = PS{time:30, cr:0, total:0};
+    let mut max = 0;
+    for b in 0..(2_u32.pow(16)) {
+        
+        let start = vs.find(&String::from("AA"));
+        let start_ps = PS{time:24, cr:0, total:0};
 
-    let max = p1_dyn_r(vs, sp, target_valve_idxs, start.idx, start_ps);
-    println!("Max pressure:{max}");
-    0
+        let max = p1_dyn_r(vs, sp, target_valve_idxs, start.idx, start_ps);
+        println!("Max pressure:{max}");
+    }
+    return max;
+}
+
+fn index_subset_from_bits(bits: u32) -> Vec<usize> {
+    let mut idxs = vec![];
+    if (bits & 0b0000_0000_0000_0001) > 0 {
+        idxs.push(0)
+    }
+    if (bits & 0b0000_0000_0000_0010) > 0 {
+        idxs.push(1)
+    }
+    if (bits & 0b0000_0000_0000_0100) > 0 {
+        idxs.push(2)
+    }
+    if (bits & 0b0000_0000_0000_1000) > 0 {
+        idxs.push(3)
+    }
+    if (bits & 0b0000_0000_0001_0000) > 0 {
+        idxs.push(4)
+    }
+    if (bits & 0b0000_0000_0010_0000) > 0 {
+        idxs.push(5)
+    }
+    if (bits & 0b0000_0000_0100_0000) > 0 {
+        idxs.push(6)
+    }
+    if (bits & 0b0000_0000_1000_0000) > 0 {
+        idxs.push(7)
+    }
+    //
+    if (bits & 0b0000_0001_0000_0000) > 0 {
+        idxs.push(8)
+    }
+    if (bits & 0b0000_0010_0000_0000) > 0 {
+        idxs.push(9)
+    }
+    if (bits & 0b0000_0100_0000_0000) > 0 {
+        idxs.push(10)
+    }
+    if (bits & 0b0000_1000_0000_0000) > 0 {
+        idxs.push(11)
+    }
+    if (bits & 0b0001_0000_0000_0000) > 0 {
+        idxs.push(12)
+    }
+    if (bits & 0b0010_0000_0000_0000) > 0 {
+        idxs.push(13)
+    }
+    if (bits & 0b0100_0000_0000_0000) > 0 {
+        idxs.push(14)
+    }
+
+    idxs.iter().rev().collect()
 }
 
 fn p1_dyn_r(vs: &VS, sp: &Vec<Vec<u32>>, target_valve_idxs:&Vec<usize>, current_idx:usize, ps: PS) -> u32 {
@@ -135,7 +191,7 @@ fn p1_dyn_r(vs: &VS, sp: &Vec<Vec<u32>>, target_valve_idxs:&Vec<usize>, current_
 
     options.sort();
     if options.len() > 3 {
-        println!("options at time {}: {options:?}",open_ps.time);
+        //println!("options at time {}: {options:?}",open_ps.time);
     }
     return *options.last().expect("must be at least one option");
 }
