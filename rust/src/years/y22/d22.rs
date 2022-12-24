@@ -79,17 +79,17 @@ pub fn p2() {
                 println!("Turned Left: {:?}", current_pos);
             },
             C::Go(n) => {
-                print!("Moving {n} ");
+                println!("Moving {n} ");
                 current_pos = move_forward(&grid, &current_pos, n, false);
                 println!(" to: {:?}", current_pos);
-                /* 
+                 
                 grid.g[current_pos.r as usize][current_pos.c as usize] = match current_pos.d {
                     D::U => '^',
                     D::R => '>',
                     D::L => '<',
                     D::D => 'V',
                 };
-                */
+                
             },
         }
     }
@@ -118,16 +118,16 @@ fn move_forward(g: &util::grid::Grid<char>, p:&Pos, n:u32, is_part_1: bool) -> P
                 next = wrap_pos(g, &next);
             } else {
                 println!("Not Valid: {current:?} -> {next:?} ");
-                next = wrap_pos_2(g, &current);
+                next = wrap_pos_2(&current);
                 println!("Wrapping to: {current:?} -> {next:?} ");
             }
         }
 
         if is_blocked_pos(g, &next) {
             println!(" blocked at {:?} ", next);
-            break;
+            return current;
         }
-        print!(".");
+        println!("...{next:?}");
         current = next;
     }
     current
@@ -196,19 +196,19 @@ fn wrap_pos(g: &util::grid::Grid<char>, p:&Pos) -> Pos {
 |   6|
 |____|              
 */
-fn wrap_pos_2(g: &util::grid::Grid<char>, p:&Pos) -> Pos {
+fn wrap_pos_2(p:&Pos) -> Pos {
     match p.d {
         D::U =>{
             // 1 -> 6, direction same
-            if p.r == 0 && p.c >= 100 {
+            if p.r == 0 && p.c >= 100 && p.c <=149 {
                 return Pos {r:199, c: p.c - 100, d:D::U};
             } 
             // 2 -> 6 facing E
-            else if p.r == 0 && p.c >= 50  {
+            else if p.r == 0 && p.c >= 50 && p.c <= 99  {
                 return Pos {r:(p.c - 50) + 150, c: 0, d:D::R};
             }
             // 5 -> 3 facing E
-            else if p.r == 100 && p.c < 50  {
+            else if p.r == 100 && p.c <= 49  {
                 return Pos {r:p.c + 50, c: 50, d:D::R};
             }
             // 6,4,3 OK
@@ -219,11 +219,11 @@ fn wrap_pos_2(g: &util::grid::Grid<char>, p:&Pos) -> Pos {
                 return Pos {r:0, c: p.c + 100, d:D::D};
             }
             // 1 -> 3 facing W
-            else if p.r == 49 && p.c >= 100 {
+            else if p.r == 49 && p.c >= 100 && p.c <= 149 {
                 return Pos {r: (p.c - 100) + 50, c: 99, d:D::L};
             } 
             // 4 -> 6,facing W
-            else if p.r == 149 && p.c >= 50 {
+            else if p.r == 149 && p.c >= 50 && p.c <= 99 {
                 return Pos {r: (p.c - 50) + 150, c: 49, d:D::L};
             } 
             // 2,3,5 OK
@@ -231,14 +231,14 @@ fn wrap_pos_2(g: &util::grid::Grid<char>, p:&Pos) -> Pos {
         D::R =>{
             // 1 -> 4 facing W
             if p.c == 149 {
-                return Pos {r:149 - (p.r), c: 99, d:D::D};
+                return Pos {r:149 - (p.r), c: 99, d:D::L};
             }
             // 3 -> 1 facing N
-            else if p.c == 99 && p.r >= 50 &&  p.r <= 99 {
-                return Pos {r:50, c: (p.r - 50) + 100, d:D::U};
+            else if p.c == 99 && p.r >= 50 && p.r <= 99 {
+                return Pos {r:49, c: (p.r - 50) + 100, d:D::U};
             }
             // 4 -> 1 facing W
-            else if p.c == 99 && p.r >= 100 {
+            else if p.c == 99 && p.r >= 100 && p.r <= 149 {
                 return Pos {r:49 - (p.r - 100), c: 149, d:D::L};
             }
             // 6 -> 4 facing N
@@ -249,20 +249,20 @@ fn wrap_pos_2(g: &util::grid::Grid<char>, p:&Pos) -> Pos {
         },
         D::L =>{
             // 2 -> 5 facing E
-            if p.c == 50 && p.r < 50{
+            if p.c == 50 && p.r <= 49 {
                 return Pos {r:149 - (p.r), c: 0, d:D::R};
             }
             // 3 -> 5 facing S
-            else if p.c == 50 && p.r < 100{
+            else if p.c == 50 && p.r <= 99 {
                 return Pos {r:100, c: p.r - 50, d:D::D};
             }
             // 5 -> 2 facing E
-            else if p.c == 0 && p.r < 150{
-                return Pos {r:49 - (p.r - 149), c: 50, d:D::R};
+            else if p.c == 0 && p.r <= 149 {
+                return Pos {r:49 - (p.r - 100), c: 50, d:D::R};
             }
             // 6 -> 2 facing S
-            else if p.c == 0 && p.r > 149{
-                return Pos {r:0, c: 50 + (p.r - 149), d:D::D};
+            else if p.c == 0 && p.r >= 150 {
+                return Pos {r:0, c: 50 + (p.r - 150), d:D::D};
             }
             // 1,4 OK
         },
