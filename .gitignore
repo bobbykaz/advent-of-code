@@ -16,5 +16,10 @@ input/*
 #A-o-C output
 output/*
 
-#
+#rust
 rust/target
+
+# dotnet
+dotnet/**/bin
+dotnet/**/obj
+dotnet-cache/
