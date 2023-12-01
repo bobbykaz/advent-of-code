@@ -1,3 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using y23;
+
 Console.WriteLine("Hello, World!");
-(new D6()).Run();
+(new y23.D1()).Run();
