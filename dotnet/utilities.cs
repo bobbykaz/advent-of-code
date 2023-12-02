@@ -1,3 +1,5 @@
+using System.Xml.XPath;
+
 public class Utilties {
     public static List<String> ReadFileToLines(string filename) {
          var lines = File.ReadAllLines(filename);
@@ -11,6 +13,28 @@ public class Utilties {
          }
 
          return list;
+    }
+
+    public static List<T> StringToNums<T>(string str, string separator = ",") where T: IParsable<T> {
+      var pts = str.Split(separator);
+      var result = pts.Select(s => T.Parse(s, null)).ToList();
+      return result;
+    }
+
+/// <summary>
+/// Fancy split for multiple separators, processed left to right
+/// </summary>
+    public List<String> Split(string str, List<string>pts) {
+      var result = new List<string>();
+      var current = str;
+      for(int i = 0; i < pts.Count; i++) {
+         var pivot = current.IndexOf(pts[i]);
+         var first = current.Substring(0, pivot);
+         result.Add(first);
+         current = current.Substring(pivot + pts[i].Length);
+      }
+
+      return result;
     }
 
 }
