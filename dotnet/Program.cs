@@ -1,4 +1,4 @@
 ﻿using y23;
 
 Console.WriteLine("Hello, World!");
-(new y23.D1()).Run();
+(new y23.D2()).Run();
