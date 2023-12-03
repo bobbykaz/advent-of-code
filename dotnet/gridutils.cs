@@ -42,10 +42,49 @@ public class GridUtils {
             return results;
         }
 
+        public List<Cell> DiagNeighbors(int r, int c) 
+        {
+            var results = new List<Cell>();
+            //UL
+            if (c > 0 && r > 0) {
+                var cell = new Cell {R = r-1, C = c-1, V = this.G[r-1][c-1]};
+                results.Add(cell);
+            }
+            //UR
+            if (c < (this.Width - 1) && r > 0) {
+                var cell = new Cell {R = r-1, C = c + 1, V = this.G[r-1][c+1]};
+                results.Add(cell);
+            }
+            //DL
+            if (c > 0 && r < (this.Height - 1)) {
+                var cell = new Cell {R = r + 1, C = c-1, V = this.G[r+1][c-1]};
+                results.Add(cell);
+            }
+            //DR
+            if (c < (this.Width - 1) && r < (this.Height - 1)) {
+                var cell = new Cell {R = r+1, C = c+1, V = this.G[r+1][c+1]};
+                results.Add(cell);
+            }
+
+            return results;
+        }
+
+        public List<Cell> AllNeighbors(int r, int c) 
+        {
+            return this.CardinalNeighbors(r,c).Concat(this.DiagNeighbors(r,c)).ToList();
+        }
+
         public struct Cell {
             public int R {get; set;}
             public int C {get; set;}
             public T V {get; set;}
+        }
+
+        public void Print() {
+            foreach(var r in G) {
+                r.ForEach(c => Console.Write(c));
+                Console.WriteLine("");
+            }
         }
     }
     public static Grid<char> RectangularCharGridFromLines(List<String> lines) {
@@ -63,7 +102,7 @@ public class GridUtils {
     }
 
     public static Grid<int> NGrid(int w, int h, int def) {
-        var g = new Grid<int>(w,h,0);
+        var g = new Grid<int>(w,h,def);
 
         return g;
     }
