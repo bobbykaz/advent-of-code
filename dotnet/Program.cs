@@ -1,4 +1,7 @@
-﻿using y23;
-
-Console.WriteLine("Hello, World!");
-(new y23.D3()).Run();
+﻿internal class Program
+{
+    private static void Main(string[] args)
+    {
+        new y23.D4().Run();
+    }
+}
