@@ -24,7 +24,7 @@ public class Utilties {
 /// <summary>
 /// Fancy split for multiple separators, processed left to right
 /// </summary>
-    public List<String> Split(string str, List<string>pts) {
+    public static List<String> Split(string str, List<string>pts) {
       var result = new List<string>();
       var current = str;
       for(int i = 0; i < pts.Count; i++) {
