@@ -53,11 +53,30 @@ namespace y23 {
                 blockMaps.Add(map);
             }   
 
+            blockMaps.Reverse();
             PrintLn($"blocks: {blockMaps.Count}");
 
             //transfrom the rules of one map into the destination format of the following map
-            foreach(var map in blockMaps) {
+            foreach(var sp in pairs) {
+                PrintLn($"{sp.Start} to {sp.End} ");
+            }
 
+            long n = 60200000;
+
+            while(true) {
+                long current = n;
+                foreach(var map in blockMaps) {
+                    current = map.Unmap(current);
+                }
+
+                foreach(var pair in pairs) {
+                    if(current >= pair.Start && current < pair.End)
+                        return $"{n} -> {current}";
+                }
+                n++;
+                if(n % 100000 == 0) {
+                    PrintLn($"Attempt {n}...");
+                }
             }
 
             var min = "seeds.Min()";
@@ -91,7 +110,7 @@ namespace y23 {
         public class SeedPair {
             public long Start {get; set;}
             public long Len {get; set;}
-            public long End {get {return Start + End;}}
+            public long End {get {return Start + Len;}}
         }
 
         public List<List<string>> GetInputBlocks( List<string> input) {
@@ -143,6 +162,15 @@ namespace y23 {
                     }
                 }
                 return input;
+            }
+
+            public long Unmap(long output) {
+                foreach(var rule in Rules) {
+                    if(output >= rule.DstRangeStart && output < rule.DstRangeEnd) {
+                        return (output - rule.DstRangeStart) + rule.SrcRangeStart;
+                    }
+                }
+                return output;
             }
         }
 
