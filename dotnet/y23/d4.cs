@@ -1,5 +1,3 @@
-using System.ComponentModel;
-
 namespace y23 {
     public class D4 : AoCDay
     {
@@ -30,8 +28,8 @@ namespace y23 {
         private (List<int>, List<int>) parseCard(string card) {
             var pts = card.Split(": ");
             var cards = pts[1].Split(" | ");
-            var win = cards[0].Split(" ").Where(s => s.Length > 0).Select(s => int.Parse(s)).ToList();
-            var num = cards[1].Split(" ").Where(s => s.Length > 0).Select(s => int.Parse(s)).ToList();
+            var win = cards[0].Split(" ").Where(s => s.Length > 0).Select(int.Parse).ToList();
+            var num = cards[1].Split(" ").Where(s => s.Length > 0).Select(int.Parse).ToList();
             win.Sort();
             num.Sort();
             return (win, num);
