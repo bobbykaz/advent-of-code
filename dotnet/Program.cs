@@ -2,7 +2,7 @@
 {
     private static async Task Main(string[] args)
     {
-        new y23.D5().Run();
+        new y23.D6().Run();
     }
 
     private static async Task InputTest() {

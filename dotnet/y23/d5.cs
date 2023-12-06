@@ -78,10 +78,6 @@ namespace y23 {
                     PrintLn($"Attempt {n}...");
                 }
             }
-
-            var min = "seeds.Min()";
-
-            return $" {min}";
         }
 
         // turn "current" into one or more rules with destinations matching the same destination format as "targets"
