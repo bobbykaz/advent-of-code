@@ -15,6 +15,21 @@ public class Utilties {
          return list;
     }
 
+    public static List<List<string>> GroupInputAsBlocks( List<string> input, string blockSeparator = "") {
+            var rslt = new List<List<string>>();
+            var current = new List<string>();
+            foreach(var str in input) {
+                if (str == "") {
+                    rslt.Add(current);
+                    current = new List<string>();
+                } else {
+                    current.Add(str);
+                }
+            }
+            if (current.Count > 0) rslt.Add(current);
+            return rslt;
+        }
+
     public static List<T> StringToNums<T>(string str, string separator = ",") where T: IParsable<T> {
       var pts = str.Split(separator);
       var result = pts.Select(s => T.Parse(s, null)).ToList();

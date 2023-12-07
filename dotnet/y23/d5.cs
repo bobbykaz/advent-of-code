@@ -10,7 +10,7 @@ namespace y23 {
         public override string P1()
         {
             var lines = InputAsLines();
-            var blocks = GetInputBlocks(lines);
+            var blocks = Utilties.GroupInputAsBlocks(lines);
             var seedStr = blocks[0][0].Split(": ")[1];
             var seeds = Utilties.StringToNums<long>(seedStr, " ");
             seeds.ForEach(s => Print($"{s}, "));
@@ -36,7 +36,7 @@ namespace y23 {
         {
             _DebugPrinting = true;
             var lines = InputAsLines();
-            var blocks = GetInputBlocks(lines);
+            var blocks = Utilties.GroupInputAsBlocks(lines);
             var seedStr = blocks[0][0].Split(": ")[1];
             var seedPairs = Utilties.StringToNums<long>(seedStr, " ");
             var pairs = new List<SeedPair>();
@@ -107,21 +107,6 @@ namespace y23 {
             public long Start {get; set;}
             public long Len {get; set;}
             public long End {get {return Start + Len;}}
-        }
-
-        public List<List<string>> GetInputBlocks( List<string> input) {
-            var rslt = new List<List<string>>();
-            var current = new List<string>();
-            foreach(var str in input) {
-                if (str == "") {
-                    rslt.Add(current);
-                    current = new List<string>();
-                } else {
-                    current.Add(str);
-                }
-            }
-            if (current.Count > 0) rslt.Add(current);
-            return rslt;
         }
 
         public class BlockRule {
