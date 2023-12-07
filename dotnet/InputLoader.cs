@@ -7,7 +7,7 @@ public class InputLoader {
     private static string? AocAuth;
     private static string? InputRoot;
 
-    public static void Init(string token, string inputRoot) {
+    public static void Init(string? token, string inputRoot) {
         AocAuth = token;
         InputRoot = inputRoot;
     }
@@ -19,6 +19,7 @@ public class InputLoader {
     }
 
     public async Task<String> FetchInput(int year, int day) {
+        Console.WriteLine($"Fetching input for 20{year} day {day}");
         return await Client.GetStringAsync($"20{year}/day/{day}/input");
     }
 

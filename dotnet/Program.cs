@@ -2,20 +2,10 @@
 {
     private static async Task Main(string[] args)
     {
-        new y23.D6().Run();
-    }
-
-    private static async Task InputTest() {
-        var inputRoot = System.Environment.GetEnvironmentVariable("INPUT_ROOT");
-        if(inputRoot == null) inputRoot = "../input";
         var token = System.Environment.GetEnvironmentVariable("AOC_TOKEN");
-
-        Console.WriteLine($"Token: {token}");
-        Console.WriteLine($"Input Root: {inputRoot}");
+        var inputRoot = "../input";
         InputLoader.Init(token, inputRoot);
-        var il = new InputLoader();
 
-        var input = await il.FetchInput(23, 4);
-        Console.WriteLine(input);
+        await new y23.D7().Run();
     }
 }

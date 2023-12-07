@@ -48,8 +48,5 @@ namespace y23 {
         
             return $"{a}";
         }
-
-        // turn "current" into one or more rules with destinations matching the same destination format as "targets"
-       
     }
 }
