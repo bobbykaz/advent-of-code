@@ -52,4 +52,37 @@ public class Utilties {
       return result;
     }
 
+    public static long GCD(long[] nums) {
+        if(nums.Length < 2) throw new ArgumentException("needs at least 2 nums");
+
+        if(nums.Length == 2) {
+            var a = nums[0];
+            var b = nums[1];
+            while(b!=0) {
+                var temp = b;
+                b = a % b;
+                a = temp;
+            }
+            return a;
+        } else {
+            var subGCD = GCD(nums.Skip(1).ToArray());
+            return GCD(new long[]{subGCD, nums[0]});
+        }
+    }
+
+    public static long LCM(long[] nums) {
+        if(nums.Length < 2) throw new ArgumentException("needs at least 2 nums");
+
+        if(nums.Length == 2) {
+            var a = nums[0];
+            var b = nums[1];
+            var gcd = GCD(new long[]{a, b});
+
+            return a * b / gcd;
+        } else {
+            var subLCM = LCM(nums.Skip(1).ToArray());
+            return LCM(new long[]{subLCM, nums[0]});
+        }
+    }
+
 }
