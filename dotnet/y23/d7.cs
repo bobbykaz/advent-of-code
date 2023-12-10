@@ -1,10 +1,3 @@
-using System.Data;
-using System.Data.Common;
-using System.Diagnostics;
-using System.Xml.Serialization;
-using System.Xml.XPath;
-using Microsoft.VisualBasic;
-
 namespace y23 {
     public class D7 : AoCDay
     {

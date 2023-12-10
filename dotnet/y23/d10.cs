@@ -1,36 +1,30 @@
-using System.Data;
-using System.Xml.XPath;
-
 namespace y23 {
     public class D10 : AoCDay
     {
         public D10(): base(23, 10) {
             _DebugPrinting = false;
+            g = new GridUtils.Grid<char>(1,1,'.');
+            seen = new Dictionary<string, bool>();
         }
+
+        private GridUtils.Grid<char> g;
+        private Dictionary<string, bool> seen;
         public override string P1()
         {
             var lines = InputAsLines();
-            var g = GridUtils.RectangularCharGridFromLines(lines);
+            g = GridUtils.RectangularCharGridFromLines(lines);
             
             var (sr,sc) = (0,0);
-            bool found = false;
-            for(int r = 0; r < g.G.Count; r++) {
-                for(int c = 0; c < g.G[r].Count; c++) {
-                    if(g.G[r][c] == 'S') {
-                        (sr, sc) = (r,c);
-                        found = true;
-                        break;
-                    }
-                    if(found) {
-                        break;
-                    }
+            g.ForEachRowCol((r,c,v ) => {
+                if(v == 'S') {
+                    (sr, sc) = (r,c);
                 }
-            }
+            });
 
             //row, col, dist to tile
             var bfs = new Queue<(int, int, int)>();
             bfs.Enqueue((sr, sc, 0));
-            Dictionary<string, bool> seen = new Dictionary<string, bool>();
+            
             seen[$"{sr}-{sc}"] = true;
             int maxDist = 0;
             while(bfs.Any()) {
@@ -48,51 +42,7 @@ namespace y23 {
                 }
             }
 
-            PrintLn( $"{maxDist}");
-
-            var g2 = GridUtils.RectangularCharGridFromLines(lines);
-
-            for(int r = 0; r < g2.G.Count; r++) {
-                for(int c = 0; c < g2.G[r].Count; c++) {
-                    if(!seen.ContainsKey($"{r}-{c}")) {
-                        g2.G[r][c] = '.';
-                    }
-                }
-            }
-
-            //we have just the pipes of the main loop now;
-            // expand the grid to 3x the size so the space between the pipes becomes a clear character;
-            // floodfill bfs from the corner
-            var exG = ExpandGrid(g2);
-            seen = new Dictionary<string, bool>();
-            var bfs2 = new Queue<(int,int)>();
-            bfs2.Enqueue((0,0));
-            seen[$"0-0"] = true;
-            while(bfs2.Any()){
-                var (r,c) = bfs2.Dequeue();
-                var ns = exG.CardinalNeighbors(r,c);
-                foreach(var cell in ns) {
-                    if(cell.V != '.' && !seen.ContainsKey($"{cell.R}-{cell.C}")) {
-                        seen[$"{cell.R}-{cell.C}"] = true;
-                        bfs2.Enqueue((cell.R, cell.C));
-                    }
-                }
-            }
-
-            var enclosed = 0;
-            // look at non-pipe, not seen corresponding spots of exG
-            for(int r = 0; r < g2.G.Count; r++) {
-                for(int c = 0; c < g2.G[r].Count; c++) {
-                   var (exR,exC) = (r*3 + 1, c*3 + 1); 
-                   if(g2.G[r][c] == '.') {
-                        if(!seen.ContainsKey($"{exR}-{exC}")){
-                            enclosed++;
-                        }
-                   }
-                }
-            }
-
-            return $"{enclosed}";
+            return $"{maxDist}";
         }
 
         public GridUtils.Grid<char> ExpandGrid(GridUtils.Grid<char> g2) {
@@ -162,10 +112,43 @@ namespace y23 {
 
         public override string P2()
         {
-            var lines = InputAsLines();
-            var total = 0L;
-            
-            return $"{total}";
+            var g2 = GridUtils.RectangularCharGridFromLines(InputAsLines());
+            g2.ForEachRowCol((r,c,v ) => {
+                if(!seen.ContainsKey($"{r}-{c}")) {
+                        g2.G[r][c] = '.';
+                }
+            });
+
+            //we have just the pipes of the main loop now;
+            // expand the grid to 3x the size so the space between the pipes becomes a clear character;
+            // floodfill bfs from the corner
+            var exG = ExpandGrid(g2);
+            seen = new Dictionary<string, bool>();
+            var bfs2 = new Queue<(int,int)>();
+            bfs2.Enqueue((0,0));
+            seen[$"0-0"] = true;
+            while(bfs2.Any()){
+                var (r,c) = bfs2.Dequeue();
+                var ns = exG.CardinalNeighbors(r,c);
+                foreach(var cell in ns) {
+                    if(cell.V != '.' && !seen.ContainsKey($"{cell.R}-{cell.C}")) {
+                        seen[$"{cell.R}-{cell.C}"] = true;
+                        bfs2.Enqueue((cell.R, cell.C));
+                    }
+                }
+            }
+
+            var enclosed = 0;
+            // look at non-pipe, not seen corresponding spots of exG
+            g2.ForEachRowCol((r,c,v) => {
+                var (exR,exC) = (r*3 + 1, c*3 + 1); 
+                if(g2.G[r][c] == '.') {
+                    if(!seen.ContainsKey($"{exR}-{exC}")){
+                        enclosed++;
+                    }
+                }
+            });
+            return $"{enclosed}";
         }
     }
 }

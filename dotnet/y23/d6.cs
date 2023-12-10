@@ -1,6 +1,3 @@
-using System.Data;
-using System.Xml.XPath;
-
 namespace y23 {
     public class D6 : AoCDay
     {

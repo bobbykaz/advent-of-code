@@ -74,6 +74,14 @@ public class GridUtils {
             return this.CardinalNeighbors(r,c).Concat(this.DiagNeighbors(r,c)).ToList();
         }
 
+        public void ForEachRowCol(Action<int,int,T> cellFunc) {
+            for(int r = 0; r < Height; r++){
+                for( int c = 0; c < Width; c++) {
+                    cellFunc.Invoke(r,c,G[r][c]);
+                }
+            }
+        }
+
         public struct Cell {
             public int R {get; set;}
             public int C {get; set;}
