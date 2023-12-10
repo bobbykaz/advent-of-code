@@ -1,3 +1,5 @@
+using System.Reflection;
+
 public class GridUtils {
     public class Grid<T> {
         public int Width {get; set;}
@@ -113,5 +115,15 @@ public class GridUtils {
         var g = new Grid<int>(w,h,def);
 
         return g;
+    }
+
+    public class VisitedMap {
+        private Dictionary<string, bool> SeenMap = new Dictionary<string, bool>();
+
+        private string Key(int r, int c) { return $"{r}-{c}"; }
+
+        public void Visit(int r, int c) { SeenMap[Key(r,c)] = true; }
+        public bool WasVisited(int r, int c) {return SeenMap.ContainsKey(Key(r,c));}
+        public void Reset() { SeenMap = new Dictionary<string, bool>(); }
     }
 }
