@@ -19,7 +19,6 @@ namespace y23 {
                 total += ex;
             }
 
-
             return $"{total}";
         }
 
@@ -61,12 +60,6 @@ namespace y23 {
                 total += ex;
             }
 
-
-            return $"{total}";
-
-
-            return $"{total}";
-            
             return $"{total}";
         }
     }
