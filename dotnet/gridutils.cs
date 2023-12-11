@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 public class GridUtils {
     public class Grid<T> {
         public int Width {get; set;}
@@ -14,6 +16,22 @@ public class GridUtils {
                 }
                 G.Add(row);
             }
+        }
+
+        public void AddRow(T defVal, int rowIndex) {
+            var row = new List<T>();
+            for(var i = 0; i < Width; i++) {
+                row.Add(defVal);
+            }
+            G.Insert(rowIndex,row);
+            Height += 1;
+        }
+
+        public void AddCol(T defVal, int colIndex) {
+            for(var i = 0; i < Height; i++) {
+                G[i].Insert(colIndex,defVal);
+            }
+            Width += 1;
         }
 
         public List<Cell> CardinalNeighbors(int r, int c) 
