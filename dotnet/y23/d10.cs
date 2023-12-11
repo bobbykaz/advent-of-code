@@ -4,11 +4,11 @@ namespace y23 {
         public D10(): base(23, 10) {
             _DebugPrinting = false;
             g = new GridUtils.Grid<char>(1,1,'.');
-            seen = new Dictionary<string, bool>();
+            vm = new GridUtils.VisitedMap();
         }
 
         private GridUtils.Grid<char> g;
-        private Dictionary<string, bool> seen;
+        private GridUtils.VisitedMap vm;
         public override string P1()
         {
             var lines = InputAsLines();
@@ -25,7 +25,7 @@ namespace y23 {
             var bfs = new Queue<(int, int, int)>();
             bfs.Enqueue((sr, sc, 0));
             
-            seen[$"{sr}-{sc}"] = true;
+            vm.Visit(sr,sc);
             int maxDist = 0;
             while(bfs.Any()) {
                 var (nr,nc,dist) = bfs.Dequeue();
@@ -35,8 +35,8 @@ namespace y23 {
                 var pipe = parse(g.G[nr][nc]);
                 var ns = neighbors(pipe, nr, nc);
                 foreach(var (nnr, nnc) in ns) {
-                    if(! seen.ContainsKey($"{nnr}-{nnc}")) {
-                        seen[$"{nnr}-{nnc}"] = true;
+                    if(!vm.WasVisited(nnr, nnc)) {
+                        vm.Visit(nnr,nnc);
                         bfs.Enqueue((nnr,nnc, dist+1));
                     }
                 }
@@ -114,7 +114,7 @@ namespace y23 {
         {
             var g2 = GridUtils.RectangularCharGridFromLines(InputAsLines());
             g2.ForEachRowCol((r,c,v ) => {
-                if(!seen.ContainsKey($"{r}-{c}")) {
+                if(!vm.WasVisited(r,c)) {
                         g2.G[r][c] = '.';
                 }
             });
@@ -123,16 +123,16 @@ namespace y23 {
             // expand the grid to 3x the size so the space between the pipes becomes a clear character;
             // floodfill bfs from the corner
             var exG = ExpandGrid(g2);
-            seen = new Dictionary<string, bool>();
+            vm.Reset();
             var bfs2 = new Queue<(int,int)>();
             bfs2.Enqueue((0,0));
-            seen[$"0-0"] = true;
+            vm.Visit(0,0);
             while(bfs2.Any()){
                 var (r,c) = bfs2.Dequeue();
                 var ns = exG.CardinalNeighbors(r,c);
                 foreach(var cell in ns) {
-                    if(cell.V != '.' && !seen.ContainsKey($"{cell.R}-{cell.C}")) {
-                        seen[$"{cell.R}-{cell.C}"] = true;
+                    if(cell.V != '.' && !vm.WasVisited(cell.R, cell.C)) {
+                        vm.Visit(cell.R, cell.C);
                         bfs2.Enqueue((cell.R, cell.C));
                     }
                 }
@@ -143,7 +143,7 @@ namespace y23 {
             g2.ForEachRowCol((r,c,v) => {
                 var (exR,exC) = (r*3 + 1, c*3 + 1); 
                 if(g2.G[r][c] == '.') {
-                    if(!seen.ContainsKey($"{exR}-{exC}")){
+                    if(!vm.WasVisited(exR,exC)){
                         enclosed++;
                     }
                 }

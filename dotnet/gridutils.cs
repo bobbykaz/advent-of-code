@@ -1,5 +1,3 @@
-using System.Reflection;
-
 public class GridUtils {
     public class Grid<T> {
         public int Width {get; set;}
@@ -21,6 +19,7 @@ public class GridUtils {
         public List<Cell> CardinalNeighbors(int r, int c) 
         {
             var results = new List<Cell>();
+            //L
             if (c > 0) {
                 var cell = new Cell {R = r, C = c-1, V = this.G[r][c-1]};
                 results.Add(cell);
@@ -120,7 +119,7 @@ public class GridUtils {
     public class VisitedMap {
         private Dictionary<string, bool> SeenMap = new Dictionary<string, bool>();
 
-        private string Key(int r, int c) { return $"{r}-{c}"; }
+        private static string Key(int r, int c) { return $"{r}-{c}"; }
 
         public void Visit(int r, int c) { SeenMap[Key(r,c)] = true; }
         public bool WasVisited(int r, int c) {return SeenMap.ContainsKey(Key(r,c));}
