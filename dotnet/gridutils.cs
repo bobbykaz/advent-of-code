@@ -101,6 +101,20 @@ public class GridUtils {
             }
         }
 
+        public List<List<T>> Rows() {
+            return G.ToList();
+        }
+
+        public List<List<T>> Cols() {
+            var rslt = new List<List<T>>();
+            for(int c = 0; c < Width; c++) {
+                var col = G.Select(r => r[c]).ToList();
+                rslt.Add(col);
+            }
+
+            return rslt;
+        }
+
         public struct Cell {
             public int R {get; set;}
             public int C {get; set;}
