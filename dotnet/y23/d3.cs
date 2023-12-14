@@ -1,3 +1,5 @@
+using GridUtilities;
+
 namespace y23 {
     public class D3 {
         public void Run(){
@@ -6,7 +8,7 @@ namespace y23 {
         }
         public void P1() {
             var lines = Utilties.ReadFileToLines("../input/y23/d3.txt");
-            var grid = GridUtils.RectangularCharGridFromLines(lines);
+            var grid = Utilties.RectangularCharGridFromLines(lines);
             var parts = new List<int>();
 
             for(var r = 0; r < grid.Height; r++){
@@ -26,7 +28,7 @@ namespace y23 {
         }
 
         // Returns parsed number, endCol of last number
-        private (int, int) ExtractNum(GridUtils.Grid<char> g, int r, int cStart) {
+        private (int, int) ExtractNum(Grid<char> g, int r, int cStart) {
             string n = "" + g.G[r][cStart];
             for( var c = cStart + 1; c < g.Width; c++) {
                 if (char.IsDigit(g.G[r][c])) {
@@ -39,7 +41,7 @@ namespace y23 {
             return (int.Parse(n), g.Width-1);
         }
 
-        private bool PartNextToSymbol(GridUtils.Grid<char> g, int r, int cs, int ce) {
+        private bool PartNextToSymbol(Grid<char> g, int r, int cs, int ce) {
             for(var c = cs; c <= ce; c++) {
                 var n = g.AllNeighbors(r,c);
                 if(n.Any(ch => !char.IsDigit(ch.V) && ch.V != '.')) {
@@ -51,10 +53,10 @@ namespace y23 {
 
         public void P2() {
             var lines = Utilties.ReadFileToLines("../input/y23/d3.txt");
-            var grid = GridUtils.RectangularCharGridFromLines(lines);
+            var grid = Utilties.RectangularCharGridFromLines(lines);
             var partMap = new Dictionary<int, int>();
             var partId = 1;
-            var pGrid = GridUtils.NGrid(grid.Width, grid.Height, -1);
+            var pGrid = Utilties.NGrid(grid.Width, grid.Height, -1);
             var ratios = new List<int>();
             for(var r = 0; r < grid.Height; r++){
                 var c = 0;

@@ -8,7 +8,7 @@ public class D6 {
     }
     public void P1() {
         var lines = Utilties.ReadFileToLines("../input/y15/d6.txt");
-        var grid = GridUtils.NGrid(1000,1000,0);
+        var grid = Utilties.NGrid(1000,1000,0);
         var rslt = parse(lines[0]);
         foreach(string l in lines) {
             var parsed = parse(l);
@@ -42,7 +42,7 @@ public class D6 {
 
     public void P2() {
         var lines = Utilties.ReadFileToLines("../input/y15/d6.txt");
-        var grid = GridUtils.NGrid(1000,1000,0);
+        var grid = Utilties.NGrid(1000,1000,0);
         var rslt = parse(lines[0]);
         foreach(string l in lines) {
             var parsed = parse(l);

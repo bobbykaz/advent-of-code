@@ -1,4 +1,4 @@
-using System.Xml.XPath;
+using GridUtilities;
 
 namespace y23 {
     public class D13 : AoCDay
@@ -13,7 +13,7 @@ namespace y23 {
             var blocks = Utilties.GroupInputAsBlocks(lines);
             var total = 0L;
             foreach(var block in blocks) {
-                var grid = GridUtils.RectangularCharGridFromLines(block);
+                var grid = Utilties.RectangularCharGridFromLines(block);
                 int hMir = findMirror(grid.Rows()) + 1;
                 int vMir = findMirror(grid.Cols()) + 1;
                 total += vMir;
@@ -54,7 +54,7 @@ namespace y23 {
             var blocks = Utilties.GroupInputAsBlocks(lines);
             var total = 0L;
             foreach(var block in blocks) {
-                var grid = GridUtils.RectangularCharGridFromLines(block);
+                var grid = Utilties.RectangularCharGridFromLines(block);
                 int hMir = findMirror(grid.Rows());
                 int vMir = findMirror(grid.Cols());
                 total += BFblock(grid, hMir, vMir);
@@ -72,7 +72,7 @@ namespace y23 {
             return -1;
         }
 
-        public int BFblock(GridUtils.Grid<char> grid, int origH, int origV) {
+        public int BFblock(Grid<char> grid, int origH, int origV) {
             var rslt = -1;
             grid.ForEachRowCol((row, col, v) => {
                 var orig = v;

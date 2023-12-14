@@ -1,18 +1,20 @@
+using GridUtilities;
+
 namespace y23 {
     public class D10 : AoCDay
     {
         public D10(): base(23, 10) {
             _DebugPrinting = false;
-            g = new GridUtils.Grid<char>(1,1,'.');
-            vm = new GridUtils.VisitedMap();
+            g = new Grid<char>(1,1,'.');
+            vm = new VisitedMap();
         }
 
-        private GridUtils.Grid<char> g;
-        private GridUtils.VisitedMap vm;
+        private Grid<char> g;
+        private VisitedMap vm;
         public override string P1()
         {
             var lines = InputAsLines();
-            g = GridUtils.RectangularCharGridFromLines(lines);
+            g = Utilties.RectangularCharGridFromLines(lines);
             
             var (sr,sc) = (0,0);
             g.ForEachRowCol((r,c,v ) => {
@@ -45,8 +47,8 @@ namespace y23 {
             return $"{maxDist}";
         }
 
-        public GridUtils.Grid<char> ExpandGrid(GridUtils.Grid<char> g2) {
-            var exG = new GridUtils.Grid<char>(g2.Width * 3, g2.Height * 3, ' ');
+        public Grid<char> ExpandGrid(Grid<char> g2) {
+            var exG = new Grid<char>(g2.Width * 3, g2.Height * 3, ' ');
             for(var r = 0; r < g2.Height; r++) {
                 for(var c = 0; c < g2.Width; c++) {
                     if(g2.G[r][c] != '.') {
@@ -112,7 +114,7 @@ namespace y23 {
 
         public override string P2()
         {
-            var g2 = GridUtils.RectangularCharGridFromLines(InputAsLines());
+            var g2 = Utilties.RectangularCharGridFromLines(InputAsLines());
             g2.ForEachRowCol((r,c,v ) => {
                 if(!vm.WasVisited(r,c)) {
                         g2.G[r][c] = '.';

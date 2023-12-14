@@ -1,4 +1,4 @@
-using System.Xml.XPath;
+using GridUtilities;
 
 namespace y23 {
     public class D14 : AoCDay
@@ -10,7 +10,7 @@ namespace y23 {
         public override string P1()
         {
             var lines = InputAsLines();
-            var grid = GridUtils.RectangularCharGridFromLines(lines);
+            var grid = Utilties.RectangularCharGridFromLines(lines);
             while(TiltGridOnceN(grid)) {
 
             }
@@ -20,7 +20,7 @@ namespace y23 {
             return $"{total}";
         }
 
-        public bool TiltGridOnceN(GridUtils.Grid<char> grid) {
+        public bool TiltGridOnceN(Grid<char> grid) {
             bool anyChange = false;
 
             grid.ForEachRowCol((r,c,v) => {
@@ -38,7 +38,7 @@ namespace y23 {
             return anyChange;
         }
 
-        public bool TiltGridOnceS(GridUtils.Grid<char> grid) {
+        public bool TiltGridOnceS(Grid<char> grid) {
             bool anyChange = false;
 
             grid.ForEachRowColBottomUp((r,c,v) => {
@@ -56,7 +56,7 @@ namespace y23 {
             return anyChange;
         }
 
-        public bool TiltGridOnceW(GridUtils.Grid<char> grid) {
+        public bool TiltGridOnceW(Grid<char> grid) {
             bool anyChange = false;
 
             grid.ForEachColRow((r,c,v) => {
@@ -74,7 +74,7 @@ namespace y23 {
             return anyChange;
         }
 
-        public bool TiltGridOnceE(GridUtils.Grid<char> grid) {
+        public bool TiltGridOnceE(Grid<char> grid) {
             bool anyChange = false;
 
             grid.ForEachColRowRightBack((r,c,v) => {
@@ -92,7 +92,7 @@ namespace y23 {
             return anyChange;
         }
 
-        public int evalLoad(GridUtils.Grid<char> grid) {
+        public int evalLoad(Grid<char> grid) {
             var total = 0;
             grid.ForEachRowCol((r,c,v) => {
                 if (v == 'O') {
@@ -102,7 +102,7 @@ namespace y23 {
             return total;
         }
 
-        public void spinCycle(GridUtils.Grid<char> grid) {
+        public void spinCycle(Grid<char> grid) {
             while(TiltGridOnceN(grid)){};
             while(TiltGridOnceW(grid)){};
             while(TiltGridOnceS(grid)){};
@@ -112,7 +112,7 @@ namespace y23 {
         public override string P2()
         {
             var lines = InputAsLines();
-            var grid = GridUtils.RectangularCharGridFromLines(lines);
+            var grid = Utilties.RectangularCharGridFromLines(lines);
             var count = 0L;
             var seenGrids = new Dictionary<string, long>();
             seenGrids[grid.ToString()] = 0;

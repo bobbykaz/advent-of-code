@@ -1,5 +1,4 @@
-using System.Diagnostics;
-using System.Reflection.Metadata;
+using GridUtilities;
 
 namespace y23 {
     public class D11 : AoCDay
@@ -11,7 +10,7 @@ namespace y23 {
         public override string P1()
         {
             var lines = InputAsLines();
-            var g = GridUtils.RectangularCharGridFromLines(lines);
+            var g = Utilties.RectangularCharGridFromLines(lines);
             PrintLn($"Pre expand: {g.Height},{g.Width}");
             for(var r = 0; r < g.Height; r++) {
                 var row = g.G[r];
@@ -70,7 +69,7 @@ namespace y23 {
         public override string P2()
         {
             var lines = InputAsLines();
-            var grid = GridUtils.RectangularCharGridFromLines(lines);
+            var grid = Utilties.RectangularCharGridFromLines(lines);
             //build galaxies first, just inc their coords instead;
             const int EXPAND = (100 - 1);
 

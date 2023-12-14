@@ -1,6 +1,4 @@
-using System.Runtime.InteropServices;
-
-public class GridUtils {
+namespace GridUtilities {
     public class Grid<T> {
         public int Width {get; set;}
         public int Height {get; set;}
@@ -157,10 +155,10 @@ public class GridUtils {
             public T V {get; set;}
         }
 
-        public string ToString() {
+        public override string ToString() {
             var str = "";
             ForEachRowCol((r,c,v) => {
-                str += v.ToString();
+                str += v == null ? "{null}": v.ToString();
             });
 
             return str;
@@ -171,25 +169,6 @@ public class GridUtils {
                 Console.WriteLine("");
             }
         }
-    }
-    public static Grid<char> RectangularCharGridFromLines(List<String> lines) {
-        var h = lines.Count;
-        var w = lines[0].Length;
-        var g = new Grid<char>(w,h,'.');
-        for(int r = 0; r < lines.Count; r++) {
-            var chars = lines[r].ToCharArray();
-            for(int c = 0; c < chars.Length; c++){
-                g.G[r][c] = chars[c];
-            }
-        }
-
-        return g;
-    }
-
-    public static Grid<int> NGrid(int w, int h, int def) {
-        var g = new Grid<int>(w,h,def);
-
-        return g;
     }
 
     public class VisitedMap {
