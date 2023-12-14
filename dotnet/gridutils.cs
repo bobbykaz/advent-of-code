@@ -93,9 +93,45 @@ public class GridUtils {
             return this.CardinalNeighbors(r,c).Concat(this.DiagNeighbors(r,c)).ToList();
         }
 
+        /// <summary>
+        /// Iterates Left to right, top to bottom
+        /// </summary>
         public void ForEachRowCol(Action<int,int,T> cellFunc) {
             for(int r = 0; r < Height; r++){
                 for( int c = 0; c < Width; c++) {
+                    cellFunc.Invoke(r,c,G[r][c]);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterates Left to right, bottom to top
+        /// </summary>
+        public void ForEachRowColBottomUp(Action<int,int,T> cellFunc) {
+            for(int r = Height - 1; r >= 0; r--){
+                for( int c = 0; c < Width; c++) {
+                    cellFunc.Invoke(r,c,G[r][c]);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterates Top to bottom, left to right
+        /// </summary>
+        public void ForEachColRow(Action<int,int,T> cellFunc) {
+            for( int c = 0; c < Width; c++){
+                for(int r = 0; r < Height; r++) {
+                    cellFunc.Invoke(r,c,G[r][c]);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterates Top to bottom, right to left
+        /// </summary>
+        public void ForEachColRowRightBack(Action<int,int,T> cellFunc) {
+            for( int c = Width - 1; c >=0; c--){
+                for(int r = 0; r < Height; r++) {
                     cellFunc.Invoke(r,c,G[r][c]);
                 }
             }
@@ -121,6 +157,14 @@ public class GridUtils {
             public T V {get; set;}
         }
 
+        public string ToString() {
+            var str = "";
+            ForEachRowCol((r,c,v) => {
+                str += v.ToString();
+            });
+
+            return str;
+        }
         public void Print() {
             foreach(var r in G) {
                 r.ForEach(c => Console.Write(c));
