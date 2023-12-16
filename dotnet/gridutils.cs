@@ -43,12 +43,16 @@ namespace GridUtilities {
         /// </summary>
         /// <param name="dir">'U' 'D' 'L' 'R' or 'N' 'S' 'E' 'W'</param>
         /// <returns></returns>
-        public Cell? GetNeighbor(int r, int c, char dirCh) {
+        public Cell<T>? GetNeighbor(int r, int c, char dirCh) {
             var dir = DirFromChar(dirCh);
+            return GetNeighbor(r,c,dir);
+        }
+
+        public Cell<T>? GetNeighbor(int r, int c, Dir dir) {
             if (r == 0 && dir == Dir.N)             return null;
             if (r == LastRowIndex && dir == Dir.S)  return null;
             if (c == 0 && dir == Dir.W)             return null;
-            if (r == LastColIndex && dir == Dir.E)  return null;
+            if (c == LastColIndex && dir == Dir.E)  return null;
 
             var (nr,nc) = dir switch {
                 Dir.N => (r-1,c),
@@ -58,7 +62,7 @@ namespace GridUtilities {
                 _ => throw new Exception("invalid dir enum")
             };
 
-            return new Cell(nr,nc, this.G[nr][nc]);
+            return new Cell<T>(nr,nc, this.G[nr][nc]);
 
         }
 
@@ -76,61 +80,61 @@ namespace GridUtilities {
             };
         }
 
-        public List<Cell> CardinalNeighbors(int r, int c) 
+        public List<Cell<T>> CardinalNeighbors(int r, int c) 
         {
-            var results = new List<Cell>();
+            var results = new List<Cell<T>>();
             //L
             if (c > 0) {
-                var cell = new Cell(r, c-1, this.G[r][c-1]);
+                var cell = new Cell<T>(r, c-1, this.G[r][c-1]);
                 results.Add(cell);
             }
             //U
             if (r > 0) {
-                var cell = new Cell(r-1, c, this.G[r-1][c]);
+                var cell = new Cell<T>(r-1, c, this.G[r-1][c]);
                 results.Add(cell);
             }
             //R
             if (c < LastColIndex) {
-                var cell = new Cell(r, c+1, this.G[r][c+1]);
+                var cell = new Cell<T>(r, c+1, this.G[r][c+1]);
                 results.Add(cell);
             }
             //D
             if (r < LastRowIndex) {
-                var cell = new Cell(r+1, c, this.G[r+1][c]);
+                var cell = new Cell<T>(r+1, c, this.G[r+1][c]);
                 results.Add(cell);
             }
 
             return results;
         }
 
-        public List<Cell> DiagNeighbors(int r, int c) 
+        public List<Cell<T>> DiagNeighbors(int r, int c) 
         {
-            var results = new List<Cell>();
+            var results = new List<Cell<T>>();
             //UL
             if (c > 0 && r > 0) {
-                var cell = new Cell {R = r-1, C = c-1, V = this.G[r-1][c-1]};
+                var cell = new Cell<T> {R = r-1, C = c-1, V = this.G[r-1][c-1]};
                 results.Add(cell);
             }
             //UR
             if (c < (this.Width - 1) && r > 0) {
-                var cell = new Cell {R = r-1, C = c + 1, V = this.G[r-1][c+1]};
+                var cell = new Cell<T> {R = r-1, C = c + 1, V = this.G[r-1][c+1]};
                 results.Add(cell);
             }
             //DL
             if (c > 0 && r < (this.Height - 1)) {
-                var cell = new Cell {R = r + 1, C = c-1, V = this.G[r+1][c-1]};
+                var cell = new Cell<T> {R = r + 1, C = c-1, V = this.G[r+1][c-1]};
                 results.Add(cell);
             }
             //DR
             if (c < (this.Width - 1) && r < (this.Height - 1)) {
-                var cell = new Cell {R = r+1, C = c+1, V = this.G[r+1][c+1]};
+                var cell = new Cell<T> {R = r+1, C = c+1, V = this.G[r+1][c+1]};
                 results.Add(cell);
             }
 
             return results;
         }
 
-        public List<Cell> AllNeighbors(int r, int c) 
+        public List<Cell<T>> AllNeighbors(int r, int c) 
         {
             return this.CardinalNeighbors(r,c).Concat(this.DiagNeighbors(r,c)).ToList();
         }
@@ -193,18 +197,6 @@ namespace GridUtilities {
             return rslt;
         }
 
-        public struct Cell {
-            public int R {get; set;}
-            public int C {get; set;}
-            public T V {get; set;}
-
-            public Cell(int r, int c, T v) {
-                R = r;
-                C = c;
-                V = v;
-            }
-        }
-
         public override string ToString() {
             var str = "";
             ForEachRowCol((r,c,v) => {
@@ -220,6 +212,18 @@ namespace GridUtilities {
             }
         }
     }
+
+    public struct Cell<T> {
+            public int R {get; set;}
+            public int C {get; set;}
+            public T V {get; set;}
+
+            public Cell(int r, int c, T v) {
+                R = r;
+                C = c;
+                V = v;
+            }
+        }
 
     public class VisitedMap {
         private Dictionary<string, bool> SeenMap = new Dictionary<string, bool>();
