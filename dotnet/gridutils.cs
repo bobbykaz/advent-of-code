@@ -235,5 +235,15 @@ namespace Grids {
                 _ => throw new ArgumentException($"char dir must be a cardinal dir, not {dir}")
             };
         }
+
+        public static Dir OppositeDir(Dir d) {
+            return d switch {
+                Dir.N => Dir.S,
+                Dir.S => Dir.N,
+                Dir.W => Dir.E,
+                Dir.E => Dir.W,
+                _ => throw new Exception("bad dir")
+            };
+        }
     }
 }

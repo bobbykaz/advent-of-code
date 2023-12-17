@@ -44,6 +44,20 @@ public class Utilties {
         return g;
     }
 
+    public static Grid<int> RectangularNGridFromLines(List<String> lines) {
+        var h = lines.Count;
+        var w = lines[0].Length;
+        var g = new Grid<int>(w,h,0);
+        for(int r = 0; r < lines.Count; r++) {
+            var chars = lines[r].ToCharArray();
+            for(int c = 0; c < chars.Length; c++){
+                g.G[r][c] = int.Parse($"{chars[c]}");
+            }
+        }
+
+        return g;
+    }
+
     public static Grid<int> NGrid(int w, int h, int def) {
         var g = new Grid<int>(w,h,def);
 

@@ -44,6 +44,25 @@ namespace y23 {
             });
             return total;
         }
+        public Dir[] BeamTravel(char current, Dir dir) {
+            return (current, dir) switch {
+                ('.', _) => new Dir[]{ dir },
+                ('/', Dir.S) => new Dir[]{ Dir.W },
+                ('/', Dir.W) => new Dir[]{ Dir.S },
+                ('/', Dir.N) => new Dir[]{ Dir.E },
+                ('/', Dir.E) => new Dir[]{ Dir.N },
+                ('\\', Dir.N) => new Dir[]{ Dir.W },
+                ('\\', Dir.W) => new Dir[]{ Dir.N },
+                ('\\', Dir.S) => new Dir[]{ Dir.E },
+                ('\\', Dir.E) => new Dir[]{ Dir.S },
+                ('|', Dir.E) => new Dir[]{ Dir.N, Dir.S },
+                ('|', Dir.W) => new Dir[]{ Dir.N, Dir.S },
+                ('|', _) => new Dir[]{ dir},
+                ('-', Dir.S) => new Dir[]{ Dir.E },
+                ('-', _) => new Dir[]{ dir },
+                _ => throw new Exception($"unexpected input {current}, {dir}")
+            };
+        }
 
         public List<(Cell<char>, Dir)> Next(Grid<char> grid, int cr, int cc, Dir dir) {
             var rslt = new List<(Cell<char>, Dir)>();
