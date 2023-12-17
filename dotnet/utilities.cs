@@ -1,4 +1,4 @@
-using GridUtilities;
+using Grids;
 
 public class Utilties {
     public static List<String> ReadFileToLines(string filename) {

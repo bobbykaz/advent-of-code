@@ -1,4 +1,4 @@
-namespace GridUtilities {
+namespace Grids {
     public enum Dir {
         N, S, E, W
     }
@@ -44,7 +44,7 @@ namespace GridUtilities {
         /// <param name="dir">'U' 'D' 'L' 'R' or 'N' 'S' 'E' 'W'</param>
         /// <returns></returns>
         public Cell<T>? GetNeighbor(int r, int c, char dirCh) {
-            var dir = DirFromChar(dirCh);
+            var dir = GridUtilities.DirFromChar(dirCh);
             return GetNeighbor(r,c,dir);
         }
 
@@ -64,20 +64,6 @@ namespace GridUtilities {
 
             return new Cell<T>(nr,nc, this.G[nr][nc]);
 
-        }
-
-        private Dir DirFromChar(char dir) {
-            return dir switch {
-                'U' or 'u' => Dir.N,
-                'D' or 'd' => Dir.S,
-                'L' or 'l' => Dir.W,
-                'R' or 'r' => Dir.E,
-                'N' or 'n' => Dir.N,
-                'S' or 's' => Dir.S,
-                'E' or 'e' => Dir.E,
-                'W' or 'w' => Dir.W,
-                _ => throw new ArgumentException($"char dir must be a cardinal dir, not {dir}")
-            };
         }
 
         public List<Cell<T>> CardinalNeighbors(int r, int c) 
@@ -233,5 +219,21 @@ namespace GridUtilities {
         public void Visit(int r, int c) { SeenMap[Key(r,c)] = true; }
         public bool WasVisited(int r, int c) {return SeenMap.ContainsKey(Key(r,c));}
         public void Reset() { SeenMap = new Dictionary<string, bool>(); }
+    }
+
+    public class GridUtilities {
+        public static Dir DirFromChar(char dir) {
+            return dir switch {
+                'U' or 'u' => Dir.N,
+                'D' or 'd' => Dir.S,
+                'L' or 'l' => Dir.W,
+                'R' or 'r' => Dir.E,
+                'N' or 'n' => Dir.N,
+                'S' or 's' => Dir.S,
+                'E' or 'e' => Dir.E,
+                'W' or 'w' => Dir.W,
+                _ => throw new ArgumentException($"char dir must be a cardinal dir, not {dir}")
+            };
+        }
     }
 }

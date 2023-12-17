@@ -1,4 +1,4 @@
-using GridUtilities;
+using Grids;
 
 namespace y23 {
     public class D14 : AoCDay
