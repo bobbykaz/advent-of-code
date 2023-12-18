@@ -93,6 +93,7 @@ namespace y23 {
             // should always have an even number, and the filled lines in that row is just the sum of the pairs of points(adding 1 to each pair)
             //ex : 0,3,7,8,11,13 = ####...##..###
             // 'missing rows' in the range are the same as the previous row
+            //BUT..... rows can had an odd number of points, iff there was a l/R draw!
             var rowRanges = new List<RowRange>();
 
             var (r,c) = (0L,0L);
