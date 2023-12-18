@@ -89,12 +89,103 @@ namespace y23 {
         public override string P2()
         {
             var lines = InputAsLines();
+            // each rowRange is a list of all the distinct parts of that row
+            // should always have an even number, and the filled lines in that row is just the sum of the pairs of points(adding 1 to each pair)
+            //ex : 0,3,7,8,11,13 = ####...##..###
+            // 'missing rows' in the range are the same as the previous row
+            var rowRanges = new List<RowRange>();
+
+            var (r,c) = (0L,0L);
+            var (rn,cn,rx,cx) = (0L,0L,0L,0L);
+            var count = 0;
+            var rri = 0;
+            rowRanges.Add(new RowRange(0));
+            rowRanges[0].AddC(0);
             foreach(var line in lines) {
                 var ins = new Inst2(line);
                 PrintLn($"{ins.dir} - {ins.num}");
+                
+                rri = rowRanges.FindIndex((rr) => rr.r == r);
+                if(rri == -1) throw new Exception("uh oh");
+
+                var nextRri = rri;
+
+                switch(ins.dir){
+                    case Dir.N:
+                        r += ins.num; 
+                        while(rri > -1 && rowRanges[rri].r < r){
+                            rowRanges[rri].AddC(c);
+                            rri--;
+                        }
+                        // -1 rri means new row to add at the very beginning - just need one data point
+                        // non-(-1) rri with non-equal R means we need a new row duped
+                        if(rri == -1){
+                            var newUpRow = new RowRange(r);
+                            newUpRow.AddC(c);
+                            rowRanges.Add(newUpRow);
+                            rowRanges = rowRanges.OrderByDescending(rr => rr.r).ToList();
+                        }else if (!(rowRanges[rri].r < r)) {
+                            var newUpRow = rowRanges[rri+1].DupeToRow(r);
+                            newUpRow.AddC(c);
+                            rowRanges.Add(newUpRow);
+                            rowRanges = rowRanges.OrderByDescending(rr => rr.r).ToList();
+                        }
+                        break;
+                    case Dir.S:
+                        r -= ins.num; 
+                        while(rri < rowRanges.Count && rowRanges[rri].r > r){
+                            rowRanges[rri].AddC(c);
+                            rri++;
+                        }
+                        // Count rri means new row to add at the very end - just need one data point
+                        // non-(-1) rri with non-equal R means we need a new row duped
+                        if(!(rri < rowRanges.Count)){
+                            var newDownRow = new RowRange(r);
+                            newDownRow.AddC(c);
+                            rowRanges.Add(newDownRow);
+                            rowRanges = rowRanges.OrderByDescending(rr => rr.r).ToList();
+                        }else if(!(rowRanges[rri].r > r)) {
+                            var newUpRow = rowRanges[rri-1].DupeToRow(r);
+                            newUpRow.AddC(c);
+                            rowRanges.Add(newUpRow);
+                            rowRanges = rowRanges.OrderByDescending(rr => rr.r).ToList();
+                        }
+                        break;
+                    case Dir.E:
+                        c += ins.num; 
+                        rowRanges[rri].AddC(c);
+                        break;
+                    case Dir.W: 
+                    default:
+                        c -= ins.num;
+                        rowRanges[rri].AddC(c); 
+                        break;
+                }
             }
-            
+            PrintLn($"RRs: {rowRanges.Count}");
+            rowRanges.ForEach(rr => {if (rr.colPts.Count % 2 != 0) PrintLn($"uh oh {rr.r}");});
             return $"{0}";
+        }
+
+        public class RowRange {
+            public long r;
+            public List<long> colPts = new List<long>();
+            public RowRange(long r) {
+                this.r = r;
+            }
+
+            public void AddC(long c) {
+                if(!colPts.Contains(c)){
+                    colPts.Add(c);
+                    colPts.Sort();
+                }
+            }
+
+            public RowRange DupeToRow(long r) {
+                var other = new RowRange(r);
+                other.colPts = this.colPts.ToList();
+                return other;
+            }
         }
     }
 }
