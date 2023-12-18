@@ -44,7 +44,7 @@ namespace y23 {
                             var (newMoves, validMove) = newMovesCanMove(isP1, current, d);
                             if(validMove) {
                                 var newTurn = new Turn(c.R, c.C, current.heatloss + c.V, d, newMoves, current);
-                                if(isMin(minMap, newTurn)){
+                                if(IsMin(minMap, newTurn)){
                                     Turns.Enqueue(newTurn,newTurn.heatloss);
                                 }
                             } else {
@@ -56,6 +56,11 @@ namespace y23 {
                     }
                 }
             }
+
+            if(minTurn == null){
+                throw new Exception("shouldnt have gotten here");
+            }
+
             return minTurn;
         }
 
@@ -90,7 +95,7 @@ namespace y23 {
             g.Print();
         }
 
-        public bool isMin(Dictionary<string, Turn> minMap, Turn turn) {
+        public bool IsMin(Dictionary<string, Turn> minMap, Turn turn) {
             var key = $"{turn.r}-{turn.c}-{turn.dir}-{turn.movesInDir}";
             if(!minMap.ContainsKey(key)) {
                 minMap[key] = turn;
