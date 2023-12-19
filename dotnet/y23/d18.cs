@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using Grids;
 
 namespace y23 {
@@ -90,101 +89,145 @@ namespace y23 {
         {
             var lines = InputAsLines();
             // each rowRange is a list of all the distinct parts of that row
-            // should always have an even number, and the filled lines in that row is just the sum of the pairs of points(adding 1 to each pair)
-            //ex : 0,3,7,8,11,13 = ####...##..###
-            // 'missing rows' in the range are the same as the previous row
-            //BUT..... rows can had an odd number of points, iff there was a l/R draw!
+            // completed ranges are known to be filled in - partial ranges need to figure out whether "inside" is to the left or right
+            // in between ranges also need to be figured out.
+            // 'missing rows' in the list are the same as the previous row
+            // the top row should have no incomplete ranges, and  
             var rowRanges = new List<RowRange>();
 
-            var (r,c) = (0L,0L);
+            var (extRow,extCol) = (0L,0L);
             var (rn,cn,rx,cx) = (0L,0L,0L,0L);
-            var count = 0;
             var rri = 0;
             rowRanges.Add(new RowRange(0));
-            rowRanges[0].AddC(0);
+            rowRanges[0].AddPoint(0);
             foreach(var line in lines) {
                 var ins = new Inst2(line);
                 PrintLn($"{ins.dir} - {ins.num}");
                 
-                rri = rowRanges.FindIndex((rr) => rr.r == r);
+                rri = rowRanges.FindIndex((rr) => rr.r == extRow);
                 if(rri == -1) throw new Exception("uh oh");
 
                 var nextRri = rri;
 
                 switch(ins.dir){
                     case Dir.N:
-                        r += ins.num; 
-                        while(rri > -1 && rowRanges[rri].r < r){
-                            rowRanges[rri].AddC(c);
+                        extRow += ins.num; 
+                        while(rri > -1 && rowRanges[rri].r < extRow){
+                            rowRanges[rri].AddPoint(extCol);
                             rri--;
                         }
                         // -1 rri means new row to add at the very beginning - just need one data point
                         // non-(-1) rri with non-equal R means we need a new row duped
                         if(rri == -1){
-                            var newUpRow = new RowRange(r);
-                            newUpRow.AddC(c);
+                            var newUpRow = new RowRange(extRow);
+                            newUpRow.AddPoint(extCol);
                             rowRanges.Add(newUpRow);
                             rowRanges = rowRanges.OrderByDescending(rr => rr.r).ToList();
-                        }else if (!(rowRanges[rri].r < r)) {
-                            var newUpRow = rowRanges[rri+1].DupeToRow(r);
-                            newUpRow.AddC(c);
+                        }else if (!(rowRanges[rri].r < extRow)) {
+                            var newUpRow = rowRanges[rri+1].DupeToRow(extRow);
+                            newUpRow.AddPoint(extCol);
                             rowRanges.Add(newUpRow);
                             rowRanges = rowRanges.OrderByDescending(rr => rr.r).ToList();
                         }
                         break;
                     case Dir.S:
-                        r -= ins.num; 
-                        while(rri < rowRanges.Count && rowRanges[rri].r > r){
-                            rowRanges[rri].AddC(c);
+                        extRow -= ins.num; 
+                        while(rri < rowRanges.Count && rowRanges[rri].r > extRow){
+                            rowRanges[rri].AddPoint(extCol);
                             rri++;
                         }
                         // Count rri means new row to add at the very end - just need one data point
                         // non-(-1) rri with non-equal R means we need a new row duped
                         if(!(rri < rowRanges.Count)){
-                            var newDownRow = new RowRange(r);
-                            newDownRow.AddC(c);
+                            var newDownRow = new RowRange(extRow);
+                            newDownRow.AddPoint(extCol);
                             rowRanges.Add(newDownRow);
                             rowRanges = rowRanges.OrderByDescending(rr => rr.r).ToList();
-                        }else if(!(rowRanges[rri].r > r)) {
-                            var newUpRow = rowRanges[rri-1].DupeToRow(r);
-                            newUpRow.AddC(c);
+                        }else if(!(rowRanges[rri].r > extRow)) {
+                            var newUpRow = rowRanges[rri-1].DupeToRow(extRow);
+                            newUpRow.AddPoint(extCol);
                             rowRanges.Add(newUpRow);
                             rowRanges = rowRanges.OrderByDescending(rr => rr.r).ToList();
                         }
                         break;
                     case Dir.E:
-                        c += ins.num; 
-                        rowRanges[rri].AddC(c);
+                        rowRanges[rri].Add(extCol, extCol+ins.num);
+                        extCol += ins.num; 
                         break;
                     case Dir.W: 
                     default:
-                        c -= ins.num;
-                        rowRanges[rri].AddC(c); 
+                        rowRanges[rri].Add(extCol-ins.num, extCol);
+                        extCol -= ins.num;
                         break;
                 }
             }
             PrintLn($"RRs: {rowRanges.Count}");
-            rowRanges.ForEach(rr => {if (rr.colPts.Count % 2 != 0) PrintLn($"uh oh {rr.r}");});
-            return $"{0}";
+            foreach(var rr in rowRanges){
+                foreach(var ran in rr.ranges) {
+                    Print(ran.ToString());
+                    Print(", ");
+                }
+                PrintLn("");
+            }
+            return $"{CountInterior(rowRanges)}";
+        }
+
+        public long CountInterior(List<RowRange> rowRanges) {
+            return 0L;
+        }
+
+        public class Range {
+            public long start;
+            public long? end;
+
+            public Range(long s, long? e = null) {
+                start = s;
+                end = e;
+            }
+
+            public long? Length {get {
+                if(end.HasValue){ return (end.Value - start) + 1;}
+                return null;
+                }
+            }
+
+            public bool IsPartial { get {return !end.HasValue;}}
+
+            public Range Copy() {
+                return new Range(start, end);
+            }
+
+            public override string ToString()
+            {
+                var endCh = end.HasValue? $"{end}" : "?";
+                return $"({start}, {endCh})";
+            }
         }
 
         public class RowRange {
             public long r;
-            public List<long> colPts = new List<long>();
+            public List<Range> ranges = new List<Range>();
             public RowRange(long r) {
                 this.r = r;
             }
 
-            public void AddC(long c) {
-                if(!colPts.Contains(c)){
-                    colPts.Add(c);
-                    colPts.Sort();
-                }
+            public void Add(long left, long right){
+                ranges.Add(new Range(left, right));
+                ranges = ranges
+                        .Where(r => !(r.IsPartial && (r.start == left || r.start == right)))
+                        .ToList();
+            }
+
+            public void AddPoint(long c) {
+                if(!ranges.Any(r => r.start == c || r.end == c))
+                    ranges.Add(new Range(c, null));
             }
 
             public RowRange DupeToRow(long r) {
-                var other = new RowRange(r);
-                other.colPts = this.colPts.ToList();
+                var other = new RowRange(r)
+                {
+                    ranges = this.ranges.Select(ran => ran.Copy()).ToList()
+                };
                 return other;
             }
         }
