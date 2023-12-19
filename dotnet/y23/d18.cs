@@ -163,6 +163,7 @@ namespace y23 {
             }
             PrintLn($"RRs: {rowRanges.Count}");
             foreach(var rr in rowRanges){
+                rr.ranges = rr.ranges.OrderBy(ran => ran.start).ToList();
                 foreach(var ran in rr.ranges) {
                     Print(ran.ToString());
                     Print(", ");
@@ -173,9 +174,12 @@ namespace y23 {
         }
 
         public long CountInterior(List<RowRange> rowRanges) {
+            var curRR = rowRanges[0];
+            var curRRSize = curRR.ranges[0].Length ?? throw new Exception("first row must be complete");
+
             return 0L;
         }
-
+        // (1,4) len 4 .... (4,7) len 4
         public class Range {
             public long start;
             public long? end;
@@ -192,9 +196,21 @@ namespace y23 {
             }
 
             public bool IsPartial { get {return !end.HasValue;}}
+            public bool IsWhole {get {return !IsPartial;}}
 
             public Range Copy() {
                 return new Range(start, end);
+            }
+            public bool Overlaps(Range other) {
+                if(IsPartial && other.IsPartial) {
+                    return this.start == other.start;
+                } else if (IsWhole && other.IsPartial) {
+                    return other.start <= this.end && other.start >= this.start;
+                } else if (IsPartial && other.IsWhole) {
+
+                } else { //both whole
+
+                }
             }
 
             public override string ToString()
