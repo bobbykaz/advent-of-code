@@ -102,9 +102,9 @@ namespace y23 {
             rowRanges[0].AddPoint(0);
             foreach(var line in lines) {
                 var ins = new Inst2(line);
-                PrintLn($"{ins.dir} - {ins.num}");
+                //PrintLn($"{ins.dir} - {ins.num}");
                 
-                rri = rowRanges.FindIndex((rr) => rr.r == extRow);
+                rri = rowRanges.FindIndex((rr) => rr.row == extRow);
                 if(rri == -1) throw new Exception("uh oh");
 
                 var nextRri = rri;
@@ -112,7 +112,7 @@ namespace y23 {
                 switch(ins.dir){
                     case Dir.N:
                         extRow += ins.num; 
-                        while(rri > -1 && rowRanges[rri].r < extRow){
+                        while(rri > -1 && rowRanges[rri].row < extRow){
                             rowRanges[rri].AddPoint(extCol);
                             rri--;
                         }
@@ -122,17 +122,17 @@ namespace y23 {
                             var newUpRow = new RowRange(extRow);
                             newUpRow.AddPoint(extCol);
                             rowRanges.Add(newUpRow);
-                            rowRanges = rowRanges.OrderByDescending(rr => rr.r).ToList();
-                        }else if (!(rowRanges[rri].r < extRow)) {
+                            rowRanges = rowRanges.OrderByDescending(rr => rr.row).ToList();
+                        }else if (!(rowRanges[rri].row < extRow)) {
                             var newUpRow = rowRanges[rri+1].DupeToRow(extRow);
                             newUpRow.AddPoint(extCol);
                             rowRanges.Add(newUpRow);
-                            rowRanges = rowRanges.OrderByDescending(rr => rr.r).ToList();
+                            rowRanges = rowRanges.OrderByDescending(rr => rr.row).ToList();
                         }
                         break;
                     case Dir.S:
                         extRow -= ins.num; 
-                        while(rri < rowRanges.Count && rowRanges[rri].r > extRow){
+                        while(rri < rowRanges.Count && rowRanges[rri].row > extRow){
                             rowRanges[rri].AddPoint(extCol);
                             rri++;
                         }
@@ -142,12 +142,12 @@ namespace y23 {
                             var newDownRow = new RowRange(extRow);
                             newDownRow.AddPoint(extCol);
                             rowRanges.Add(newDownRow);
-                            rowRanges = rowRanges.OrderByDescending(rr => rr.r).ToList();
-                        }else if(!(rowRanges[rri].r > extRow)) {
+                            rowRanges = rowRanges.OrderByDescending(rr => rr.row).ToList();
+                        }else if(!(rowRanges[rri].row > extRow)) {
                             var newUpRow = rowRanges[rri-1].DupeToRow(extRow);
                             newUpRow.AddPoint(extCol);
                             rowRanges.Add(newUpRow);
-                            rowRanges = rowRanges.OrderByDescending(rr => rr.r).ToList();
+                            rowRanges = rowRanges.OrderByDescending(rr => rr.row).ToList();
                         }
                         break;
                     case Dir.E:
@@ -162,6 +162,9 @@ namespace y23 {
                 }
             }
             PrintLn($"RRs: {rowRanges.Count}");
+
+            rowRanges = CleanUpRRs(rowRanges);
+
             foreach(var rr in rowRanges){
                 rr.ranges = rr.ranges.OrderBy(ran => ran.start).ToList();
                 foreach(var ran in rr.ranges) {
@@ -170,12 +173,53 @@ namespace y23 {
                 }
                 PrintLn("");
             }
+
+
             return $"{CountInterior(rowRanges)}";
+        }
+
+        public List<RowRange> CleanUpRRs(List<RowRange> rrs) {
+            return rrs.Select(CleanUp).ToList();
+        }
+
+        public RowRange CleanUp(RowRange rr){
+            //find same start / end
+            for (int i = 1; i < rr.ranges.Count; i++) {
+                var cur = rr.ranges[i];
+                var prev = rr.ranges[i-1];
+                if(prev.IsWhole && cur.start == prev.end) {
+                    PrintLn($"Merging {prev} and {cur}");
+                    prev.end = cur.end;
+                    rr.ranges.RemoveAt(i);
+                    PrintLn($"...Merged to {rr.ranges[i-1]}");
+                    i--;
+                }
+            }
+            //any dupes?
+            for (int i = 1; i < rr.ranges.Count; i++) {
+                var cur = rr.ranges[i];
+                var prev = rr.ranges[i-1];
+                if(prev.start == cur.start && prev.end == cur.end) {
+                    PrintLn($"Dupe found: {cur}");
+                    rr.ranges.RemoveAt(i);
+                    i--;
+                }
+            }
+            return rr;
         }
 
         public long CountInterior(List<RowRange> rowRanges) {
             var curRR = rowRanges[0];
             var curRRSize = curRR.ranges[0].Length ?? throw new Exception("first row must be complete");
+            var totalSize = 0L;
+            for(int i = 1; i < rowRanges.Count; i++) {
+                var next = rowRanges[i];
+                // copy the previous line all the way down to this one
+                totalSize += curRRSize * (curRR.row - next.row -1);
+                //test left and right of each range in this row to see if its inside a range in the prev row
+                // if so, merge the ranges to the left/right
+                //the goal is to have only 'completed' not connecting rows in "next" before repeating
+            }
 
             return 0L;
         }
@@ -201,15 +245,15 @@ namespace y23 {
             public Range Copy() {
                 return new Range(start, end);
             }
-            public bool Overlaps(Range other) {
+            public bool CompletelyContains(Range other) {
                 if(IsPartial && other.IsPartial) {
                     return this.start == other.start;
                 } else if (IsWhole && other.IsPartial) {
                     return other.start <= this.end && other.start >= this.start;
                 } else if (IsPartial && other.IsWhole) {
-
+                    return this.start >= other.start && this.start <= other.Length;
                 } else { //both whole
-
+                    return this.start <= other.start && this.end >= other.end;
                 }
             }
 
@@ -221,10 +265,10 @@ namespace y23 {
         }
 
         public class RowRange {
-            public long r;
+            public long row;
             public List<Range> ranges = new List<Range>();
             public RowRange(long r) {
-                this.r = r;
+                this.row = r;
             }
 
             public void Add(long left, long right){
