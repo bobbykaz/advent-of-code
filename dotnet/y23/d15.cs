@@ -1,5 +1,3 @@
-using Grids;
-
 namespace y23 {
     public class D15 : AoCDay
     {
