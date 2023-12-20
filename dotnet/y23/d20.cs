@@ -148,6 +148,8 @@ namespace y23 {
 
         KH: 0001 ; Buttons 4079
         KH: 0001 ; Buttons 8158
+
+        Then just take LCM of each part (3761, 3931, 4049, 4079);
         */
         public override string P2()
         {
