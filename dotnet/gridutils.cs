@@ -93,6 +93,46 @@ namespace Grids {
             return results;
         }
 
+        // returns the cell, the direction of the cell relative to current r,c, and whether it wrapped around the grid
+        public List<(Cell<T>,Dir,bool)> CardinalNeighborsWrapped(int r, int c) 
+        {
+            var results = new List<(Cell<T>, Dir, bool)>();
+            //L
+            if (c > 0) {
+                var cell = new Cell<T>(r, c-1, this.G[r][c-1]);
+                results.Add((cell, Dir.W, false));
+            } else {
+                var cell = new Cell<T>(r, LastColIndex, this.G[r][LastColIndex]);
+                results.Add((cell, Dir.W, true));
+            }
+            //U
+            if (r > 0) {
+                var cell = new Cell<T>(r-1, c, this.G[r-1][c]);
+                results.Add((cell, Dir.N, false));
+            } else {
+                var cell = new Cell<T>(LastRowIndex, c, this.G[LastRowIndex][c]);
+                results.Add((cell, Dir.N, true));
+            }
+            //R
+            if (c < LastColIndex) {
+                var cell = new Cell<T>(r, c+1, this.G[r][c+1]);
+                results.Add((cell, Dir.E, false));
+            } else {
+                var cell = new Cell<T>(r, 0, this.G[r][0]);
+                results.Add((cell, Dir.E, true));
+            }
+            //D
+            if (r < LastRowIndex) {
+                var cell = new Cell<T>(r+1, c, this.G[r+1][c]);
+                results.Add((cell, Dir.S, false));
+            } else {
+                var cell = new Cell<T>(0, c, this.G[0][c]);
+                results.Add((cell, Dir.S, true));
+            }
+
+            return results;
+        }
+
         public List<Cell<T>> DiagNeighbors(int r, int c) 
         {
             var results = new List<Cell<T>>();

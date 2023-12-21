@@ -6,6 +6,8 @@ public abstract class AoCDay {
     protected bool _DebugPrinting { get; set; }
     protected List<string> _InputAsLines;
 
+    protected long _ElapsedMillis {get { return _Timer.ElapsedMilliseconds; } }
+
     private Stopwatch _Timer;
 
     protected InputLoader _InputLoader;

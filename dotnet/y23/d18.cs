@@ -205,6 +205,21 @@ namespace y23 {
                     i--;
                 }
             }
+
+            
+            if(rr.ranges.Count > 1){
+                //if the first is partial it has to be merged right?
+                if(rr.ranges[0].IsPartial) {
+                    rr.ranges[1].start = rr.ranges[0].start;
+                    rr.ranges.RemoveAt(0);
+                }
+            }
+
+            if(rr.ranges.Count > 1){
+                //if the first is partial it has to be merged right?
+                
+            }
+
             return rr;
         }
 
@@ -219,6 +234,9 @@ namespace y23 {
                 //test left and right of each range in this row to see if its inside a range in the prev row
                 // if so, merge the ranges to the left/right
                 //the goal is to have only 'completed' not connecting rows in "next" before repeating
+                for(int r = 0; r < next.ranges.Count; r++) {
+                    var nextRange = next.ranges[r];
+                }
             }
 
             return 0L;
