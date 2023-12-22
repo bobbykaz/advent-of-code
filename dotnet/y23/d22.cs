@@ -1,4 +1,6 @@
 using System.ComponentModel;
+using System.Data.Common;
+using System.Drawing;
 using System.Net;
 
 namespace y23 {
@@ -24,7 +26,16 @@ namespace y23 {
                 y = int.Parse(pts[1]);
                 z = int.Parse(pts[2]);
             }
-            
+
+            public Point3D Copy() {
+                return new Point3D(x,y,z);
+            }
+
+            public override string ToString()
+            {
+                return $"({x},{y},{z})";
+            }
+
             public override bool Equals(object? obj)
             {
                 //
@@ -54,7 +65,7 @@ namespace y23 {
         class Brick {
             public static char NextId = 'A';
             public static string GetId() {
-                //return Guid.NewGuid().ToString();
+                return Guid.NewGuid().ToString();
                 var n = NextId;
                 NextId = (char) (NextId + 1);
                 return $"{n}";
@@ -68,6 +79,13 @@ namespace y23 {
                 list = list.OrderBy(p => p.z).ThenBy(p => p.x).ThenBy(p=>p.y).ToList();
                 start = list[0];
                 end = list[1];
+                //Console.WriteLine(ToString());
+            }
+
+            public Brick Copy() {
+                var b = new Brick(start.Copy(), end.Copy());
+                b.id = id;
+                return b;
             }
 
             public bool OnGround { get {return start.z == 1;} }
@@ -80,6 +98,9 @@ namespace y23 {
             public int LowestZ {get {return start.z;}}
             public int HighestZ {get {return end.z;}}
             public bool ContainsPoint(Point3D pt) {
+                return PointsInBrick().Any(p => p.Equals(pt));
+            }
+            public bool ContainsPointQuickMaybeBroken(Point3D pt) {
                 // 1,1,1 - 3,1,1
                 if (Length == 1) {
                     return pt == start;
@@ -102,7 +123,7 @@ namespace y23 {
                 for (var i = start.x; i <= end.x; i++) {
                     for (var j = start.y; j <= end.y; j++) {
                         for (var k = start.z; k <= end.z; k++) {
-                            rslt.Add(new Point3D(start.x + i, start.y + j, start.z + k));
+                            rslt.Add(new Point3D(i, j, k));
                         }
                     }
                 }
@@ -113,10 +134,15 @@ namespace y23 {
                 var rslt = new List<Point3D>();
                 for (var i = start.x; i <= end.x; i++) {
                     for (var j = start.y; j <= end.y; j++) {
-                        rslt.Add(new Point3D(start.x + i, start.y + j , start.z - 1));
+                        rslt.Add(new Point3D(i, j , start.z - 1));
                     }
                 }
                 return rslt;
+            }
+
+            public override string ToString()
+            {
+                return $"{start} ~ {end} -> {id}";
             }
         }
 
@@ -189,12 +215,22 @@ namespace y23 {
                 }
             }
 
+            public void RemoveBrick(Brick b) {
+                for (int i = b.LowestZ; i <= b.HighestZ; i++) {
+                    HeightMap[i].RemoveAll(br => br.id == b.id);
+                }
+                bricks.RemoveAll(br => br.id == b.id);
+            }
+
             public bool CanFall(Brick b, string? brickIgnoreId = null) {
                 if(b.OnGround) {
                     return false;
                 }
+                //Console.WriteLine($"Can {b} fall?");
                 var below = b.PointsBelow();
+                
                 if (!HeightMap.ContainsKey(b.LowestZ - 1)) {
+                    //Console.WriteLine($"   Nothing in HM at level {b.LowestZ - 1}, yes");
                     return true;
                 } else {
                     var bricksOnLevelBelow = HeightMap[b.LowestZ - 1];
@@ -202,10 +238,15 @@ namespace y23 {
                         bricksOnLevelBelow = bricksOnLevelBelow.Where(br => br.id != brickIgnoreId).ToList();
                     }
                     foreach(var p in below){
-                        if(bricksOnLevelBelow.Any(br => br.ContainsPoint(p))) {
-                            return false;
+                        //Console.Write($"   Checking point {p} ");
+                        foreach(var bb in bricksOnLevelBelow) {
+                            var pointInBB = bb.ContainsPoint(p);
+                            //Console.WriteLine($"      {bb} contains? {pointInBB}");
+                            if(pointInBB)
+                                return false;
                         }
                     }
+                    //Console.WriteLine(" no points collide; can fall");
                     return true;
                 }
             }
@@ -227,15 +268,18 @@ namespace y23 {
 
         public override string P1()
         {
-            var BrickMap = parseBricks();
-            BrickMap.SettleBricks();
+            var bm = parseBricks();
+            bm.SettleBricks();
+            PrintLn("Settled\n");
+            //bm.bricks.ForEach(b => PrintLn(b.ToString()));
+
             var nonLoadBearingBricks = new List<Brick>();
-            foreach(var b in BrickMap.bricks) {
+            foreach(var b in bm.bricks) {
                 int levelToCheck = b.HighestZ + 1;
                 bool anyCouldFall = false;
-                if(BrickMap.HeightMap.ContainsKey(levelToCheck)) {
-                    foreach(var other in BrickMap.HeightMap[levelToCheck]) {
-                        if(BrickMap.CanFall(other, b.id)) {
+                if(bm.HeightMap.ContainsKey(levelToCheck)) {
+                    foreach(var other in bm.HeightMap[levelToCheck]) {
+                        if(bm.CanFall(other, b.id)) {
                             anyCouldFall = true;
                             break;
                         }
@@ -243,7 +287,7 @@ namespace y23 {
                 }
                 if (!anyCouldFall) {
                     nonLoadBearingBricks.Add(b);
-                    PrintLn($"Brick {b.id} can disintegrate");
+                    //PrintLn($"Brick {b.id} can disintegrate");
                 }
             }
             
@@ -251,9 +295,29 @@ namespace y23 {
         }
         public override string P2()
         {
-            var lines = InputAsLines();
+            var bm = parseBricks();
+            bm.SettleBricks();
+            PrintLn("Settled\n");
+            long total = 0;
+            foreach(var brick in bm.bricks){
+                var cm = new BrickMap();
+                foreach(var bb in bm.bricks){
+                    cm.AddBrick(bb.Copy());
+                }
+                cm.RemoveBrick(brick);
+                cm.SettleBricks();
+                long diff = 0;
+                var ogStarts = bm.bricks.Where(b => b.id != brick.id).Select(b => b.start).ToList();
+                var newStarts = cm.bricks.Select(b => b.start).ToList();
+                for(int i = 0; i < ogStarts.Count; i++) {
+                    if (!ogStarts[i].Equals(newStarts[i])){
+                        diff++;
+                    }
+                }
+                total += diff;
+            }
             
-            return $"{0}";
+            return $"{total}";
         }
     }
 }
