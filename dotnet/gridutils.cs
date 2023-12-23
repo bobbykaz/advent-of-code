@@ -68,26 +68,32 @@ namespace Grids {
 
         public List<Cell<T>> CardinalNeighbors(int r, int c) 
         {
-            var results = new List<Cell<T>>();
+            var results = CardinalNeighborsWithDir(r,c).Select(p => p.Item1).ToList();
+            return results;
+        }
+
+        public List<(Cell<T>, Dir)> CardinalNeighborsWithDir(int r, int c) 
+        {
+            var results = new List<(Cell<T>,Dir)>();
             //L
             if (c > 0) {
                 var cell = new Cell<T>(r, c-1, this.G[r][c-1]);
-                results.Add(cell);
+                results.Add((cell, Dir.W));
             }
             //U
             if (r > 0) {
                 var cell = new Cell<T>(r-1, c, this.G[r-1][c]);
-                results.Add(cell);
+                results.Add((cell, Dir.N));
             }
             //R
             if (c < LastColIndex) {
                 var cell = new Cell<T>(r, c+1, this.G[r][c+1]);
-                results.Add(cell);
+                results.Add((cell, Dir.E));
             }
             //D
             if (r < LastRowIndex) {
                 var cell = new Cell<T>(r+1, c, this.G[r+1][c]);
-                results.Add(cell);
+                results.Add((cell,Dir.S));
             }
 
             return results;
@@ -249,7 +255,13 @@ namespace Grids {
                 C = c;
                 V = v;
             }
+
+        public string Key{get {return $"{R}-{C}";}}
+        public override string ToString()
+        {
+            return $"[({R}, {C}): {V}]";
         }
+    }
 
     public class VisitedMap {
         private Dictionary<string, bool> SeenMap = new Dictionary<string, bool>();
@@ -259,6 +271,14 @@ namespace Grids {
         public void Visit(int r, int c) { SeenMap[Key(r,c)] = true; }
         public bool WasVisited(int r, int c) {return SeenMap.ContainsKey(Key(r,c));}
         public void Reset() { SeenMap = new Dictionary<string, bool>(); }
+
+        public VisitedMap Copy() {
+            var rslt = new VisitedMap();
+            foreach(var k in SeenMap.Keys) {
+                rslt.SeenMap[k] = true;
+            }
+            return rslt;
+        }
     }
 
     public class GridUtilities {
