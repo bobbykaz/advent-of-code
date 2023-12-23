@@ -1,3 +1,4 @@
+using System.Security;
 using Grids;
 
 namespace y23 {
@@ -162,7 +163,15 @@ namespace y23 {
                 }
             }
             PrintLn($"RRs: {rowRanges.Count}");
-
+            foreach(var rr in rowRanges){
+                rr.ranges = rr.ranges.OrderBy(ran => ran.start).ToList();
+                foreach(var ran in rr.ranges) {
+                    Print(ran.ToString());
+                    Print(", ");
+                }
+                PrintLn("");
+            }
+            PrintLn("\nCleaning\n");
             rowRanges = CleanUpRRs(rowRanges);
 
             foreach(var rr in rowRanges){
@@ -174,7 +183,7 @@ namespace y23 {
                 PrintLn("");
             }
 
-
+            PrintLn("\n Counting \n");
             return $"{CountInterior(rowRanges)}";
         }
 
@@ -210,14 +219,29 @@ namespace y23 {
             if(rr.ranges.Count > 1){
                 //if the first is partial it has to be merged right?
                 if(rr.ranges[0].IsPartial) {
-                    rr.ranges[1].start = rr.ranges[0].start;
-                    rr.ranges.RemoveAt(0);
+                    if(rr.ranges[1].IsPartial) {
+                        PrintLn($"Merging partial start {rr.ranges[0]} to partial right: {rr.ranges[1]}");
+                        rr.ranges[0].end = rr.ranges[1].start;
+                        rr.ranges.RemoveAt(1);
+                        PrintLn($" Merged:{rr.ranges[0]}");
+                    } else {
+                        PrintLn($"Merging partial start {rr.ranges[0]} to whole right: {rr.ranges[1]}");
+                        rr.ranges[1].start = rr.ranges[0].start;
+                        rr.ranges.RemoveAt(0);
+                        PrintLn($" Merged:{rr.ranges[0]}");
+                    }
                 }
             }
 
             if(rr.ranges.Count > 1){
-                //if the first is partial it has to be merged right?
-                
+                //if the last is partial it has to be merged right?
+                var lastIndex = rr.ranges.Count - 1;
+                if(rr.ranges[lastIndex].IsPartial) {
+                    PrintLn($"Merging partial end {rr.ranges[lastIndex]} to the left: {rr.ranges[lastIndex - 1]}");
+                    rr.ranges[lastIndex - 1].end = rr.ranges[lastIndex].start;
+                    rr.ranges.RemoveAt(lastIndex);
+                    PrintLn($" Merged:{rr.ranges[lastIndex - 1]}");
+                }
             }
 
             return rr;
@@ -225,18 +249,65 @@ namespace y23 {
 
         public long CountInterior(List<RowRange> rowRanges) {
             var curRR = rowRanges[0];
-            var curRRSize = curRR.ranges[0].Length ?? throw new Exception("first row must be complete");
+            var curRRSize = curRR.ranges[0].Length;
             var totalSize = 0L;
+            PrintLn($"Initial row size :{curRRSize} ({curRR})");
             for(int i = 1; i < rowRanges.Count; i++) {
+                PrintLn("Row " + i);
                 var next = rowRanges[i];
+                PrintLn($"   Init: {next}");
                 // copy the previous line all the way down to this one
                 totalSize += curRRSize * (curRR.row - next.row -1);
                 //test left and right of each range in this row to see if its inside a range in the prev row
                 // if so, merge the ranges to the left/right
                 //the goal is to have only 'completed' not connecting rows in "next" before repeating
-                for(int r = 0; r < next.ranges.Count; r++) {
+
+                //clear partials - first/last row already cant be
+                for(int r = 1; r < next.ranges.Count - 1; r++) {
                     var nextRange = next.ranges[r];
+                    PrintLn($"      Testing {nextRange}");
+                    if(nextRange.IsPartial) {
+                        // should it merge left?
+                        var testLeft = nextRange.start - 1;
+                        var testRight = nextRange.start + 1;
+                        if (curRR.ranges.Any(rr => rr.ContainsPoint(testLeft))) {
+                            next.ranges[r-1].end = nextRange.start;
+                            next.ranges.RemoveAt(r);
+                            r--;
+                        } else if (curRR.ranges.Any(rr => rr.ContainsPoint(testRight))){ // should it merge right?
+                            next.ranges[r+1].start = nextRange.start;
+                            next.ranges.RemoveAt(r);
+                            r--;
+                        } else {
+                            //
+                            throw new Exception("Wasnt expecting to get here");
+                        }
+                    }
                 }
+                                
+                // There should no longer be any partial ranges
+                //check in between remaining rows
+                for(int r = 0; r < next.ranges.Count - 1; r++) {
+                    var nextRange = next.ranges[r];
+                    // should it merge left?
+                    var testRight = nextRange.end.Value + 1;
+                    if (curRR.ranges.Any(rr => rr.ContainsPoint(testRight))){ // should it merge right?
+                        next.ranges[r+1].start = nextRange.end ?? throw new Exception("partial range unexpected at end step");
+                        next.ranges.RemoveAt(r);
+                        r--;
+                    }
+                }
+
+                PrintLn($"   Custom cleaned: {next}");
+                var finalCleaned = CleanUp(next);
+
+                PrintLn($"   Final cleaned: {finalCleaned}");
+                var totalRowSize = 0L;
+                foreach(var range in finalCleaned.ranges) {
+                    totalRowSize += range.Length;
+                };
+
+
             }
 
             return 0L;
@@ -251,9 +322,9 @@ namespace y23 {
                 end = e;
             }
 
-            public long? Length {get {
+            public long Length {get {
                 if(end.HasValue){ return (end.Value - start) + 1;}
-                return null;
+                throw new Exception("Partial range cant have length");
                 }
             }
 
@@ -273,6 +344,12 @@ namespace y23 {
                 } else { //both whole
                     return this.start <= other.start && this.end >= other.end;
                 }
+            }
+
+            public bool ContainsPoint(long pt) {
+                if(IsPartial)
+                    throw new Exception("Partial range cant contain anything");
+                return start <= pt && end >= pt;
             }
 
             public override string ToString()
@@ -307,6 +384,12 @@ namespace y23 {
                     ranges = this.ranges.Select(ran => ran.Copy()).ToList()
                 };
                 return other;
+            }
+
+            public override string ToString()
+            {   
+                var pts = string.Join(',',ranges.Select(r => r.ToString()).ToList());
+                return $"{row} : [{pts}]";
             }
         }
     }

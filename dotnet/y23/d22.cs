@@ -66,9 +66,11 @@ namespace y23 {
             public static char NextId = 'A';
             public static string GetId() {
                 return Guid.NewGuid().ToString();
+                /*
                 var n = NextId;
                 NextId = (char) (NextId + 1);
                 return $"{n}";
+                */
             }
             public string id;
             public Point3D start;
