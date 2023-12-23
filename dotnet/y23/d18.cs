@@ -96,91 +96,87 @@ namespace y23 {
             // the top row should have no incomplete ranges, and  
             var rowRanges = new List<RowRange>();
 
-            var (extRow,extCol) = (0L,0L);
+            var (nextRow,nextCol) = (0L,0L);
             var (rn,cn,rx,cx) = (0L,0L,0L,0L);
             var rri = 0;
             rowRanges.Add(new RowRange(0));
             rowRanges[0].AddPoint(0);
             foreach(var line in lines) {
-                var ins = new Inst2(line);
+                var ins = new Inst(line);
                 //PrintLn($"{ins.dir} - {ins.num}");
                 
-                rri = rowRanges.FindIndex((rr) => rr.row == extRow);
+                rri = rowRanges.FindIndex((rr) => rr.row == nextRow);
                 if(rri == -1) throw new Exception("uh oh");
 
                 var nextRri = rri;
 
                 switch(ins.dir){
                     case Dir.N:
-                        extRow += ins.num; 
-                        while(rri > -1 && rowRanges[rri].row < extRow){
-                            rowRanges[rri].AddPoint(extCol);
+                        nextRow += ins.num; 
+                        while(rri > -1 && rowRanges[rri].row <= nextRow){
+                            rowRanges[rri].AddPoint(nextCol);
                             rri--;
                         }
                         // -1 rri means new row to add at the very beginning - just need one data point
-                        // non-(-1) rri with non-equal R means we need a new row duped
+                        // non-(-1) rri with non-equal R means we need a new row between others
                         if(rri == -1){
-                            var newUpRow = new RowRange(extRow);
-                            newUpRow.AddPoint(extCol);
+                            var newUpRow = new RowRange(nextRow);
+                            newUpRow.AddPoint(nextCol);
                             rowRanges.Add(newUpRow);
+                            PrintLn($"  Adding new start row {newUpRow}");
                             rowRanges = rowRanges.OrderByDescending(rr => rr.row).ToList();
-                        }else if (!(rowRanges[rri].row < extRow)) {
-                            var newUpRow = rowRanges[rri+1].DupeToRow(extRow);
-                            newUpRow.AddPoint(extCol);
+                        }else if (!(rowRanges[rri].row < nextRow)) {
+                            var newUpRow = rowRanges[rri+1].DupeToRow(nextRow);
+                            newUpRow.AddPoint(nextCol);
                             rowRanges.Add(newUpRow);
+                            PrintLn($"  Adding new up row {newUpRow}");
                             rowRanges = rowRanges.OrderByDescending(rr => rr.row).ToList();
                         }
                         break;
                     case Dir.S:
-                        extRow -= ins.num; 
-                        while(rri < rowRanges.Count && rowRanges[rri].row > extRow){
-                            rowRanges[rri].AddPoint(extCol);
+                        nextRow -= ins.num; 
+                        while(rri < rowRanges.Count && rowRanges[rri].row >= nextRow){
+                            rowRanges[rri].AddPoint(nextCol);
                             rri++;
                         }
                         // Count rri means new row to add at the very end - just need one data point
                         // non-(-1) rri with non-equal R means we need a new row duped
-                        if(!(rri < rowRanges.Count)){
-                            var newDownRow = new RowRange(extRow);
-                            newDownRow.AddPoint(extCol);
+                        if(rri >= rowRanges.Count){
+                            var newDownRow = new RowRange(nextRow);
+                            newDownRow.AddPoint(nextCol);
                             rowRanges.Add(newDownRow);
+                            PrintLn($"Adding new last row {newDownRow}");
                             rowRanges = rowRanges.OrderByDescending(rr => rr.row).ToList();
-                        }else if(!(rowRanges[rri].row > extRow)) {
-                            var newUpRow = rowRanges[rri-1].DupeToRow(extRow);
-                            newUpRow.AddPoint(extCol);
-                            rowRanges.Add(newUpRow);
+                        }else if(!(rowRanges[rri].row > nextRow)) {
+                            var newDownRow = rowRanges[rri-1].DupeToRow(nextRow);
+                            newDownRow.AddPoint(nextCol);
+                            rowRanges.Add(newDownRow);
+                            PrintLn($"Adding new last row {newDownRow}");
                             rowRanges = rowRanges.OrderByDescending(rr => rr.row).ToList();
                         }
                         break;
                     case Dir.E:
-                        rowRanges[rri].Add(extCol, extCol+ins.num);
-                        extCol += ins.num; 
+                        rowRanges[rri].Add(nextCol, nextCol+ins.num);
+                        nextCol += ins.num; 
                         break;
                     case Dir.W: 
                     default:
-                        rowRanges[rri].Add(extCol-ins.num, extCol);
-                        extCol -= ins.num;
+                        rowRanges[rri].Add(nextCol-ins.num, nextCol);
+                        nextCol -= ins.num;
                         break;
                 }
             }
             PrintLn($"RRs: {rowRanges.Count}");
             foreach(var rr in rowRanges){
                 rr.ranges = rr.ranges.OrderBy(ran => ran.start).ToList();
-                foreach(var ran in rr.ranges) {
-                    Print(ran.ToString());
-                    Print(", ");
-                }
-                PrintLn("");
+                PrintLn($"{rr}");
             }
             PrintLn("\nCleaning\n");
             rowRanges = CleanUpRRs(rowRanges);
 
             foreach(var rr in rowRanges){
                 rr.ranges = rr.ranges.OrderBy(ran => ran.start).ToList();
-                foreach(var ran in rr.ranges) {
-                    Print(ran.ToString());
-                    Print(", ");
-                }
-                PrintLn("");
+                PrintLn($"{rr}");
             }
 
             PrintLn("\n Counting \n");
@@ -266,6 +262,7 @@ namespace y23 {
                 for(int r = 1; r < next.ranges.Count - 1; r++) {
                     var nextRange = next.ranges[r];
                     PrintLn($"      Testing {nextRange}");
+                    PrintLn($"        Comp to {curRR}");
                     if(nextRange.IsPartial) {
                         // should it merge left?
                         var testLeft = nextRange.start - 1;
@@ -289,10 +286,10 @@ namespace y23 {
                 //check in between remaining rows
                 for(int r = 0; r < next.ranges.Count - 1; r++) {
                     var nextRange = next.ranges[r];
-                    // should it merge left?
+                    if(!nextRange.end.HasValue)throw new Exception("uh oh 2");
                     var testRight = nextRange.end.Value + 1;
                     if (curRR.ranges.Any(rr => rr.ContainsPoint(testRight))){ // should it merge right?
-                        next.ranges[r+1].start = nextRange.end ?? throw new Exception("partial range unexpected at end step");
+                        next.ranges[r+1].start = nextRange.start;
                         next.ranges.RemoveAt(r);
                         r--;
                     }
@@ -307,10 +304,12 @@ namespace y23 {
                     totalRowSize += range.Length;
                 };
 
-
+                totalSize += totalRowSize;
+                curRR = finalCleaned;
+                curRRSize = totalRowSize;
             }
 
-            return 0L;
+            return totalSize;
         }
         // (1,4) len 4 .... (4,7) len 4
         public class Range {
