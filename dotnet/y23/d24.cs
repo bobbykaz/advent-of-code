@@ -4,7 +4,7 @@ namespace y23 {
     public class D24 : AoCDay
     {
         public D24(): base(23, 24) {
-            _DebugPrinting = true;
+            _DebugPrinting = false;
         }
 
         public static int NextID = 0;
@@ -85,23 +85,25 @@ namespace y23 {
         }
 
         public bool P1TestArea(Hail a, Hail b) {
-            var testMin = 7.0;//200000000000000.0;
-            var testMax = 27.0;//400000000000000.0;
-            var (x,y,time) = HailsCrossXY(a,b);
-            if (time >= 1) {
-                if (x <= testMax && x >= testMin) {
-                    if (y <= testMax && y >= testMin) {
-                        PrintLn("");
+            var testMin = 200000000000000.0;
+            var testMax = 400000000000000.0;
+            var (x,y,timea,timeb) = HailsCrossXY(a,b);
+            PrintLn("");
                         PrintLn(a.ToString());
                         PrintLn(b.ToString());
-                        PrintLn($"  {x},{y}, {time}");
+                        PrintLn($"  {x},{y}, {timea}, {timeb}");
+            if(a.M_P1 == b.M_P1) {
+                PrintLn($"{a.ID}, {b.ID} are parallel");
+                return false;
+            } else if (timea >= 0 && timeb >=0) {
+                if (x <= testMax && x >= testMin) {
+                    if (y <= testMax && y >= testMin) {
+                        
                         PrintLn($"  Hails {a.ID}, {b.ID} intersect in the test area!");
-                        if(a.M_P1 == b.M_P1) {
-                            PrintLn("Same slope!!!");
-                        }
                         return true;
                     }
                 }
+                PrintLn($"  Hails {a.ID}, {b.ID} cross outside the test area ({x},{y})");
             } else {
                 PrintLn($"  Hails {a.ID}, {b.ID} intersect in past");
                 return false;
@@ -109,13 +111,14 @@ namespace y23 {
             return false;
         }
         // time, x, y
-        public (double, double, double) HailsCrossXY(Hail a, Hail b) {
+        public (double, double, double, double) HailsCrossXY(Hail a, Hail b) {
             //Max + ba = Mbx + bb
             //x (Ma - Mb) = bb - ba
             var xPt = (b.B_P1 - a.B_P1) / (a.M_P1 - b.M_P1);
             var yPt = a.M_P1 * xPt + a.B_P1;
-            var time = (xPt - a.pos.x) / a.vel.x;
-            return (xPt, yPt, time);
+            var timeA = (xPt - a.pos.x) / a.vel.x;
+            var timeB = (xPt - b.pos.x) / b.vel.x;
+            return (xPt, yPt, timeA, timeB);
         }
 
         public class Hail {
