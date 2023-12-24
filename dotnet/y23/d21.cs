@@ -1,9 +1,4 @@
-
-
-using System.Collections.Specialized;
-using System.Dynamic;
 using Grids;
-using Microsoft.VisualBasic;
 
 namespace y23 {
     public class D21 : AoCDay

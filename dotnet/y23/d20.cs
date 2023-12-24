@@ -1,5 +1,3 @@
-using System.Diagnostics.Contracts;
-
 namespace y23 {
     public class D20 : AoCDay
     {

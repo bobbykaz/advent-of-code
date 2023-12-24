@@ -1,8 +1,3 @@
-using System.ComponentModel;
-using System.Data.Common;
-using System.Drawing;
-using System.Net;
-
 namespace y23 {
     public class D22 : AoCDay
     {
