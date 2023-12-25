@@ -1,5 +1,3 @@
-using Microsoft.VisualBasic;
-
 namespace y23 {
     public class D24 : AoCDay
     {
