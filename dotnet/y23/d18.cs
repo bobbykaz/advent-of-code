@@ -4,7 +4,7 @@ namespace y23 {
     public class D18 : AoCDay
     {
         public D18(): base(23, 18) {
-            _DebugPrinting = false;
+            _DebugPrinting = true;
         }
         
         public override string P1()
@@ -85,8 +85,55 @@ namespace y23 {
             }
         }
 
+        public string Shoelace() {
+            var lines = InputAsLines();
+            var (x,y) = (0L,0L);
+            var shoelacePick = 0L;
+            var perimiter = 0L;
+            var interior = 0L;
+            foreach(var line in lines) {
+                var ins = new Inst2(line);
+
+                var (nx,ny) = (x,y);
+
+                switch(ins.dir){
+                    case Dir.N:
+                        ny += ins.num; 
+                        break;
+                    case Dir.S:
+                        ny -= ins.num; 
+                        break;
+                    case Dir.E:
+                        nx += ins.num; 
+                        break;
+                    case Dir.W: 
+                        nx -= ins.num;
+                        break;
+                    default:
+                        throw new Exception("bad dir");
+                }
+
+                shoelacePick += (y + ny) * (nx - x);
+                interior += (y + ny) * (nx - x);
+                shoelacePick += ins.num;
+                perimiter += ins.num;
+
+                (x,y) = (nx, ny);
+            }
+            shoelacePick = Math.Abs(shoelacePick) / 2L + 1;
+            interior = Math.Abs(interior)/2L;
+            PrintLn($"Perimiter: {perimiter}");
+            PrintLn($"Interior: {interior}");
+
+            return $"{shoelacePick}";
+        }
+
         public override string P2()
         {
+            return Shoelace();
+        }
+
+        public string ScanlineAttempt() {
             var lines = InputAsLines();
             // each rowRange is a list of all the distinct parts of that row
             // completed ranges are known to be filled in - partial ranges need to figure out whether "inside" is to the left or right
@@ -98,7 +145,7 @@ namespace y23 {
             rowRanges[0] = new RowRange(0);
             rowRanges[0].AddPoint(0);
             foreach(var line in lines) {
-                var ins = new Inst2(line);
+                var ins = new Inst(line);
                 //PrintLn($"{ins.dir} - {ins.num}");
 
                 switch(ins.dir){
