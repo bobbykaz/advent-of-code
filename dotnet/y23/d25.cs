@@ -41,7 +41,7 @@ namespace y23 {
                     wires.Add(nb.name);
                 }
             }
-            //PrintToViz(wm);
+            PrintToViz(wm);
             wm["zkv"].connected.Remove("zxb");
             wm["zxb"].connected.Remove("zkv");
             wm["mtl"].connected.Remove("pgl");
@@ -80,13 +80,13 @@ namespace y23 {
 
         public void PrintToViz(Dictionary<string,Node> wm) {
             //"C:\Program Files\Graphviz\bin\sfdp.exe" -x -Goverlap=scale -Tpng -o out.png ./test.dot
-            PrintLn("graph {");
+            var viz = new List<(string, string)>();
             foreach (var n in wm.Values) {
                 foreach(var next in n.connected) {
-                    PrintLn($"{n.name} [label=\"{n.name}\"] -- {next}");
+                    viz.Add((n.name, next));
                 }
             }
-            PrintLn("}");
+            Visualization.Graph.UndirectedGraphvizVisualization("2023.25", viz);
         }
 
         public List<string>? BFS(Dictionary<string,Node> wm, string from, string to) {
