@@ -29,6 +29,8 @@ public class InputLoader {
             Directory.CreateDirectory(getInputFileDir(year));
             var input = await FetchInput(year, day);
             await File.WriteAllTextAsync(filename, input);
+        } else {
+            Console.WriteLine($" Input y{year} d{day} already exists at {filename}");
         }
 
         return Utilties.ReadFileToLines(filename);
