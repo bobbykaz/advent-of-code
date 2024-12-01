@@ -21,9 +21,8 @@ namespace y24 {
             l1.Sort();
             l2.Sort();
 
-            for(int i = 0; i < l1.Count; i++) {
-                var d = Math.Abs(l1[i] - l2[i]);
-                total += d;
+            foreach(var (l,i) in l1.ForEachIndex()) {
+                total += Math.Abs(l - l2[i]);
             }
 
             return $"{total}";
@@ -44,8 +43,7 @@ namespace y24 {
             l1.Sort();
             l2.Sort();
 
-            for(int i = 0; i < l1.Count; i++) {
-                var t = l1[i];
+            foreach(var t in l1) {
                 var oc = l2.FindAll( n => n == t ).Count;
                 total += (t*oc);
             }

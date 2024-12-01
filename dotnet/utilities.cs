@@ -122,5 +122,11 @@ public class Utilties {
             return LCM(new long[]{subLCM, nums[0]});
         }
     }
+}
 
+public static class UtilityExtensions {
+    public static IEnumerable<(T item, int index)> ForEachIndex<T>(this IEnumerable<T> source)
+    {
+        return source.Select((item, index) => (item, index));
+    }
 }
