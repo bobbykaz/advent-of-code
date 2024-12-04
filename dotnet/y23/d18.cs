@@ -59,7 +59,7 @@ namespace y23 {
             public string color;
             public Inst( string line) {
                 var pts = line.Split(' ');
-                dir = GridUtilities.DirFromChar(pts[0][0]);
+                dir = GridUtilities.CardinalDirFromChar(pts[0][0]);
                 num = int.Parse(pts[1]);
                 color = pts[2];
             }
@@ -70,7 +70,7 @@ namespace y23 {
             public long num;
             public Inst2( string line) {
                 var pts = line.Split(' ');
-                dir = GridUtilities.DirFromChar(pts[0][0]);
+                dir = GridUtilities.CardinalDirFromChar(pts[0][0]);
                 num = int.Parse(pts[1]);
                 //(#70c710)
                 var color = pts[2].Substring(2,6);

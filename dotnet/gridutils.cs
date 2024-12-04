@@ -1,6 +1,6 @@
 namespace Grids {
     public enum Dir {
-        N, S, E, W
+        N, S, E, W, NE, NW, SE, SW
     }
 
     public class Grid<T> {
@@ -41,28 +41,28 @@ namespace Grids {
         /// <summary>
         /// Gets adjacent cell, or null if it would be O.O.B.
         /// </summary>
-        /// <param name="dir">'U' 'D' 'L' 'R' or 'N' 'S' 'E' 'W'</param>
+        /// <param name="dir">'U' 'D' 'L' 'R' or 'N' 'S' 'E' 'W' for cardinal dirs. UL/UR/DL/DR, NW/NE/SW/SE for diagonals.</param>
         /// <returns></returns>
-        public Cell<T>? GetNeighbor(int r, int c, char dirCh) {
-            var dir = GridUtilities.DirFromChar(dirCh);
+        public Cell<T>? GetNeighbor(int r, int c, string dirStr) {
+            var dir = GridUtilities.DirFromStr(dirStr);
             return GetNeighbor(r,c,dir);
         }
 
         public Cell<T>? GetNeighbor(int r, int c, Dir dir) {
-            if (r == 0 && dir == Dir.N)             return null;
-            if (r == LastRowIndex && dir == Dir.S)  return null;
-            if (c == 0 && dir == Dir.W)             return null;
-            if (c == LastColIndex && dir == Dir.E)  return null;
-
             var (nr,nc) = dir switch {
                 Dir.N => (r-1,c),
                 Dir.S => (r+1,c),
                 Dir.E => (r,c+1),
                 Dir.W => (r,c-1),
+
+                Dir.NE => (r-1,c+1),
+                Dir.SW => (r+1,c-1),
+                Dir.SE => (r+1,c+1),
+                Dir.NW => (r-1,c-1),
                 _ => throw new Exception("invalid dir enum")
             };
 
-            return new Cell<T>(nr,nc, this.G[nr][nc]);
+            return GetCellIfValid(nr,nc);
 
         }
 
@@ -292,7 +292,7 @@ namespace Grids {
     }
 
     public class GridUtilities {
-        public static Dir DirFromChar(char dir) {
+        public static Dir CardinalDirFromChar(char dir) {
             return dir switch {
                 'U' or 'u' => Dir.N,
                 'D' or 'd' => Dir.S,
@@ -306,12 +306,41 @@ namespace Grids {
             };
         }
 
+        public static Dir DirFromStr(string dir) {
+            return dir.ToLowerInvariant() switch {
+                "u" => Dir.N,
+                "d" => Dir.S,
+                "l" => Dir.W,
+                "r" => Dir.E,
+
+                "n" => Dir.N,
+                "s" => Dir.S,
+                "e" => Dir.E,
+                "w" => Dir.W,
+
+                "ul" => Dir.NW,
+                "dl" => Dir.SW,
+                "ur" => Dir.NE,
+                "dr" => Dir.SE,
+
+                "nw" => Dir.NW,
+                "ne" => Dir.NE,
+                "sw" => Dir.SW,
+                "se" => Dir.SE,
+                _ => throw new ArgumentException($"char dir must be a cardinal dir, not {dir}")
+            };
+        }
+
         public static Dir OppositeDir(Dir d) {
             return d switch {
                 Dir.N => Dir.S,
                 Dir.S => Dir.N,
                 Dir.W => Dir.E,
                 Dir.E => Dir.W,
+                Dir.NE => Dir.SW,
+                Dir.SE => Dir.NW,
+                Dir.NW => Dir.SE,
+                Dir.SW => Dir.NE,
                 _ => throw new Exception("bad dir")
             };
         }
