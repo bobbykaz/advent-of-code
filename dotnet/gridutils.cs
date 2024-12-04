@@ -66,6 +66,16 @@ namespace Grids {
 
         }
 
+        public Cell<T>? GetCellIfValid(int r, int c) {
+            if (r < 0 || c < 0)
+                return null;
+            
+            if (r > LastRowIndex || c > LastColIndex)
+                return null;
+            
+            return new Cell<T>(r, c, G[r][c]);
+        }
+
         public List<Cell<T>> CardinalNeighbors(int r, int c) 
         {
             var results = CardinalNeighborsWithDir(r,c).Select(p => p.Item1).ToList();
