@@ -1,3 +1,5 @@
+using System.Data;
+
 namespace Grids {
     public enum Dir {
         N, S, E, W, NE, NW, SE, SW
@@ -281,6 +283,8 @@ namespace Grids {
         public void Visit(int r, int c) { SeenMap[Key(r,c)] = true; }
         public bool WasVisited(int r, int c) {return SeenMap.ContainsKey(Key(r,c));}
         public void Reset() { SeenMap = new Dictionary<string, bool>(); }
+
+        public int VisitedCount() { return SeenMap.Keys.Count;} 
 
         public VisitedMap Copy() {
             var rslt = new VisitedMap();
