@@ -53,20 +53,16 @@ namespace y24 {
             };
         }
 
-    
-        private string key(int r, int c, Dir d) {
-            return $"{r}-{c}-{d}";
-        }
 
         private bool Loops(Grid<char> g, int rp, int cp) {
-            var seenMap = new Dictionary<string, bool>();
+            var seenMap = new VisitedMapWithDir();
             var dir = Dir.N;
             
-            seenMap[key(rp, cp, dir)] = true;
+            seenMap.Visit(rp, cp, dir);
 
             var next = g.GetNeighbor(rp, cp, dir);
             while(next.HasValue) {
-                if (seenMap.ContainsKey(key(next.Value.R, next.Value.C, dir))) {
+                if (seenMap.WasVisited(next.Value.R, next.Value.C, dir)) {
                     return true;
                 }
 
@@ -75,7 +71,7 @@ namespace y24 {
                 } else {
                     rp =  next.Value.R;
                     cp =  next.Value.C;
-                    seenMap[key(rp, cp, dir)] = true;
+                    seenMap.Visit(rp, cp, dir);
                 }
                 next = g.GetNeighbor(rp, cp, dir);
             }
@@ -89,26 +85,39 @@ namespace y24 {
             var (rp,cp) = (-1,-1);
             g.ForEachRowCol((r,c,v) => {
                 if(v == '^'){
-                    (rp,cp) = (r,c);
+                   (rp,cp) = (r,c);
                 }
             });
+            var (ir,ic) = (rp,cp);
+            var seenMap = new VisitedMap();
+            seenMap.Visit(rp, cp);
+
+            var dir = Dir.N;
+
+            var next = g.GetNeighbor(rp, cp, dir);
+            PrintLn($"Start: {rp},{cp} => {next}");
+            while(next.HasValue) {
+                if(next.Value.V == '#') {
+                    dir = turn(dir);
+                } else {
+                    rp =  next.Value.R;
+                    cp =  next.Value.C;
+                    seenMap.Visit(rp, cp);
+                }
+                next = g.GetNeighbor(rp, cp, dir);
+            }
+
             var total = 0;
-            PrintLn($"Dim: {g.Width} x {g.Height}");
-            var count = 0;
-            // should just try all the possibilities of the original visited path, but this is easier
-            g.ForEachRowCol((r,c,v) => {
-                if(v == '.'){
+
+            foreach(var p in seenMap.VisitedPositions()) {
+                if ((p.R, p.C) != (ir,ic)){
                     var ng = Utilties.RectangularCharGridFromLines(lines);
-                    ng.G[r][c] = '#';
-                    if (Loops(ng,rp, cp)) {
+                    ng.G[p.R][p.C] = '#';
+                    if (Loops(ng,ir, ic)) {
                         total++;
                     }
                 }
-                count++;
-                if(count % 500 == 0){
-                    PrintLn($"{count}: {total}");
-                }
-            }); 
+            }
 
             return $"{total}";
         }

@@ -258,15 +258,15 @@ namespace Grids {
     }
 
     public struct Cell<T> {
-            public int R {get; set;}
-            public int C {get; set;}
-            public T V {get; set;}
+        public int R {get; set;}
+        public int C {get; set;}
+        public T V {get; set;}
 
-            public Cell(int r, int c, T v) {
-                R = r;
-                C = c;
-                V = v;
-            }
+        public Cell(int r, int c, T v) {
+            R = r;
+            C = c;
+            V = v;
+        }
 
         public string Key{get {return $"{R}-{C}";}}
         public override string ToString()
@@ -275,21 +275,94 @@ namespace Grids {
         }
     }
 
+    public struct Pos {
+        public int R {get; set;}
+        public int C {get; set;}
+
+        public Pos(int r, int c) {
+            R = r;
+            C = c;
+        }
+
+        public string Key{get {return $"{R}-{C}";}}
+        public override string ToString()
+        {
+            return $"({R}, {C})";
+        }
+    }
+
     public class VisitedMap {
-        private Dictionary<string, bool> SeenMap = new Dictionary<string, bool>();
+        private Dictionary<string, Pos> SeenMap = new Dictionary<string, Pos>();
 
         private static string Key(int r, int c) { return $"{r}-{c}"; }
 
-        public void Visit(int r, int c) { SeenMap[Key(r,c)] = true; }
+        public void Visit(int r, int c) { 
+            var k = Key(r,c);
+            if(!SeenMap.ContainsKey(k)) {
+                SeenMap[k] = new Pos(r,c);
+            } 
+        }
+
         public bool WasVisited(int r, int c) {return SeenMap.ContainsKey(Key(r,c));}
-        public void Reset() { SeenMap = new Dictionary<string, bool>(); }
+        public void Reset() { SeenMap = new Dictionary<string, Pos>(); }
 
         public int VisitedCount() { return SeenMap.Keys.Count;} 
+        
+        public List<Pos> VisitedPositions() {
+            return SeenMap.Values.ToList();
+        }
 
         public VisitedMap Copy() {
             var rslt = new VisitedMap();
-            foreach(var k in SeenMap.Keys) {
-                rslt.SeenMap[k] = true;
+            foreach(var (k,v) in SeenMap) {
+                rslt.SeenMap[k] = new Pos(v.R, v.C);
+            }
+            return rslt;
+        }
+    }
+
+    public struct PosWithDir {
+        public int R {get; set;}
+        public int C {get; set;}
+        public Dir Dir {get; set;}
+
+        public PosWithDir(int r, int c, Dir d) {
+            R = r;
+            C = c;
+            Dir = d;
+        }
+
+        public string Key{get {return $"{R}-{C}-{Dir}";}}
+        public override string ToString()
+        {
+            return $"({R}, {C}): {Dir}";
+        }
+    }
+    public class VisitedMapWithDir {
+        private Dictionary<string, PosWithDir> SeenMap = new Dictionary<string, PosWithDir>();
+
+        private static string Key(int r, int c, Dir d) { return $"{r}-{c}-{d}"; }
+
+        public void Visit(int r, int c, Dir d) { 
+            var k = Key(r,c,d);
+            if(!SeenMap.ContainsKey(k)) {
+                SeenMap[k] = new PosWithDir(r,c,d);
+            } 
+        }
+
+        public bool WasVisited(int r, int c, Dir d) {return SeenMap.ContainsKey(Key(r,c,d));}
+        public void Reset() { SeenMap = new Dictionary<string, PosWithDir>(); }
+
+        public int VisitedCount() { return SeenMap.Keys.Count;} 
+        
+        public List<PosWithDir> VisitedPositions() {
+            return SeenMap.Values.ToList();
+        }
+
+        public VisitedMapWithDir Copy() {
+            var rslt = new VisitedMapWithDir();
+            foreach(var (k,v) in SeenMap) {
+                rslt.SeenMap[k] = new PosWithDir(v.R, v.C, v.Dir);
             }
             return rslt;
         }
