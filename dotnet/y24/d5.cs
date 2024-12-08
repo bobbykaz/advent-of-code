@@ -1,8 +1,3 @@
-using System.Diagnostics;
-using System.Globalization;
-using System.Numerics;
-using Grids;
-
 namespace y24 {
     public class D5: AoCDay {
 

@@ -1,5 +1,3 @@
-using System.Numerics;
-
 namespace y24 {
     public class D1: AoCDay {
 

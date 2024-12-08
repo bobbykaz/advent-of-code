@@ -1,4 +1,5 @@
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Grids {
     public enum Dir {
@@ -288,6 +289,22 @@ namespace Grids {
         public override string ToString()
         {
             return $"({R}, {C})";
+        }
+        public override bool Equals(object obj)
+        {            
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+            
+            var objAsPos = (Pos) obj;
+            return this.R == objAsPos.R && this.C == objAsPos.C;
+            
+        }
+        
+        public override int GetHashCode()
+        {
+            return this.Key.GetHashCode();
         }
     }
 

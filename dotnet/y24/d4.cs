@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using System.Numerics;
 using Grids;
 
 namespace y24 {

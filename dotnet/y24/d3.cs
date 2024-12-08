@@ -1,6 +1,3 @@
-using System.Diagnostics;
-using System.Numerics;
-
 namespace y24 {
     public class D3: AoCDay {
 
