@@ -78,7 +78,6 @@ namespace y24 {
         {
             var lines = InputAsLines();
             var inputGrid = Utilties.RectangularCharGridFromLines(lines);
-            long total = 0;
 
             var grid = new Grid<Node>(inputGrid.Width, inputGrid.Height, new Node());
             var antMap = new Dictionary<char, List<Pos>>();
