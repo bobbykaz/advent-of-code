@@ -355,6 +355,7 @@ namespace Grids {
             return $"({R}, {C}): {Dir}";
         }
     }
+    
     public class VisitedMapWithDir {
         private Dictionary<string, PosWithDir> SeenMap = new Dictionary<string, PosWithDir>();
 
