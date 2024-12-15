@@ -389,10 +389,10 @@ namespace Grids {
     public class GridUtilities {
         public static Dir CardinalDirFromChar(char dir) {
             return dir switch {
-                'U' or 'u' => Dir.N,
-                'D' or 'd' => Dir.S,
-                'L' or 'l' => Dir.W,
-                'R' or 'r' => Dir.E,
+                'U' or 'u' or '^' => Dir.N,
+                'D' or 'd' or 'v' => Dir.S,
+                'L' or 'l' or '<' => Dir.W,
+                'R' or 'r' or '>' => Dir.E,
                 'N' or 'n' => Dir.N,
                 'S' or 's' => Dir.S,
                 'E' or 'e' => Dir.E,
