@@ -1,8 +1,4 @@
-using System.ComponentModel;
 using System.Data;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
 using Grids;
 using Vec;
 
@@ -129,15 +125,28 @@ namespace y24 {
             public Dictionary<long, HashSet<long>> Boxes = [];
             public Vec2 Bot = new Vec2(0,0);
 
-
-            public bool SpotContainsWall(Vec2 next) {
-                var (r,c) = (next.X, next.Y);
-                return Walls[r].Contains(c) || Walls[r].Contains(c-1);
+            public enum Thing {
+                Box, Wall, Empty
             }
 
-            public bool SpotContainsBox(Vec2 next) {
+
+            public (Thing, Vec2) ThingAt(Vec2 next) {
                 var (r,c) = (next.X, next.Y);
-                return Boxes[r].Contains(c) || Boxes[r].Contains(c-1);
+                if(Walls[r].Contains(c)) {
+                    return (Thing.Wall, new Vec2(r,c));
+                }
+                if(Walls[r].Contains(c-1)) {
+                    return (Thing.Wall, new Vec2(r,c-1));
+                }
+
+                if(Boxes[r].Contains(c)) {
+                    return (Thing.Box, new Vec2(r,c));
+                }
+                if(Boxes[r].Contains(c-1)) {
+                    return (Thing.Box, new Vec2(r,c-1));
+                }
+
+                return (Thing.Empty, next);
             }
 
             public List<Vec2> GetBoxesAboveOrBelow(long r, long c, bool isAbove) {
@@ -185,16 +194,22 @@ namespace y24 {
                 else if(d != Dir.E) throw new Exception();
 
                 var next = Bot + dir;
-                if(SpotContainsWall(next)) {
-                    //Do nothing
-                } else if (SpotContainsBox(next)) {
-                    //find all neighboring boxes in chain
-                   
-                    //Move self and all boxes
-                    
-                } else {
-                    //its clear!
+                var (nextThing, nextThingAt) = ThingAt(next);
+                if(nextThing == Thing.Empty) {
                     Bot = next;
+                } else if(nextThing == Thing.Wall) {
+
+                } else if(nextThing == Thing.Box) {
+                    var toMove = new List<Vec2>() {nextThingAt};
+                    var nnPos = nextThingAt + dir;
+                    var (nn, nnAt) = ThingAt(nnPos);
+                    while(nn == Thing.Box) {
+                        toMove.Add(nnAt);
+                        nnPos = nnAt + dir;
+                        
+                    }
+                    
+                    
                 }
             }
 
