@@ -1,12 +1,14 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace y24 {
     public class D17: AoCDay {
 
-        private int RegA;
-        private int RegB;
-        private int RegC;
-        private int InsP = 0;
-        private List<int> Input = [];
-        private List<int> Output = [];
+        private long RegA;
+        private long RegB;
+        private long RegC;
+        private long InsP = 0;
+        private List<long> Input = [];
+        private List<long> Output = [];
 
         private enum OpCode {
             Adv = 0,  //A Div
@@ -19,7 +21,7 @@ namespace y24 {
             Cdv = 7
         }
 
-        private int ComboOperand(int n) {
+        private long ComboOperand(long n) {
             if(n <= 3) {return n;}
             switch(n) {
                 case 4: return RegA;
@@ -29,17 +31,17 @@ namespace y24 {
             }
         }
 
-        private int GetInput() {
+        private long GetInput() {
             if(InsP + 1 >= Input.Count) {
                 PrintLn($"Halting;");
                 PrintLn($"Output : {string.Join(",", Output)}");
                 throw new Exception();
             }
-            return Input[InsP + 1];
+            return Input[(int)InsP + 1];
         }
 
-        private int IntPow(int baseN, int exp) {
-            var start = 1;
+        private long IntPow(long baseN, long exp) {
+            var start = 1L;
             for(int i = 0; i < exp; i++) {
                 start *= baseN;
             }
@@ -47,7 +49,7 @@ namespace y24 {
             return start;
         }
 
-        private int Div(int numerator, int op) {
+        private long Div(long numerator, long op) {
             var opN = ComboOperand(op);
             var upTwo = IntPow(2, opN);
             return numerator / upTwo;
@@ -104,7 +106,7 @@ namespace y24 {
             if(InsP >= Input.Count()) {
                 return false;
             }
-            var op = (OpCode) Input[InsP];
+            var op = (OpCode) Input[(int)InsP];
             //PrintLn($"{op} - {InsP}; {RegA}, {RegB}, {RegC}");
             switch(op) {
                 case OpCode.Adv:
@@ -147,7 +149,7 @@ namespace y24 {
             RegB = int.Parse(lines[1].Split(": ")[1]);
             RegC = int.Parse(lines[2].Split(": ")[1]);
 
-            Input = Utilties.StringToNums<int>(lines[4].Split(": ")[1]);
+            Input = Utilties.StringToNums<long>(lines[4].Split(": ")[1]);
 
             try {
                 while(DoOp()) {
@@ -170,7 +172,8 @@ namespace y24 {
             RegB = int.Parse(lines[1].Split(": ")[1]);
             RegC = int.Parse(lines[2].Split(": ")[1]);
 
-            Input = Utilties.StringToNums<int>(lines[4].Split(": ")[1]);
+            Input = Utilties.StringToNums<long>(lines[4].Split(": ")[1]);
+            InsP = 0;
             Output = [];
         }
 
@@ -178,34 +181,56 @@ namespace y24 {
         {
             var lines = InputAsLines();
             Reset();
-            var target = new List<int>(Input);
-            var attempt = 239800000;
-            var keepGoing = true;
-            while (keepGoing) {
-                if(attempt % 100000 == 0) {
-                    PrintLn($"{attempt}");
-                }
-                RegA = attempt;
-                try {
-                    while(DoOp()) {
+            var target = new List<long>(Input);
+            //var attempt = 239800000;
+            var desired = new List<int>();
+            foreach(var n in target) {
+                desired.Add(1);
+            }
 
+            // digits in RegA in base 8 correspond to number of outputs
+            // first digit of RegA seems to correspond to last output (likely because we're %= and /=)
+            // Brute Force through all options, solving 1 digit at a time
+            for(int i = 0; i < desired.Count(); i++) {
+                for(int n = 0; n < 8; n++) {
+                    desired[i] = n;
+                    Reset();
+                    RegA = ToBase8Int(desired);
+                    Compute();
+                    if(Output.Count() == target.Count() && Output[target.Count() - i - 1] == target[target.Count() - i - 1]) {
+                        PrintLn($"Digit {i} B8 value")
+                        break;
                     }
                 }
-                catch(Exception e) {
-                    //PrintLn($"Caught {e}");
-                }
-                if(Output.SequenceEqual(target)){
-                    return $"{attempt}";
-                }
-                attempt++;
-                Reset();
             }
-            
+            var final = ToBase8Int(desired);
+            Reset();
+            RegA = final;
+            Compute();
+            if(Output.SequenceEqual(target)){
+                    return $"{final}";
+            }
 
             var total = 0L;
             PrintLn($"Output : {string.Join(",", Output)}");
            
             return $"{total}";
+        }
+
+        private void Compute() {
+            try 
+            {
+                while(DoOp()) {}
+            }
+            catch(Exception e) {
+                //PrintLn($"Caught {e}");
+            }
+        }
+
+        private long ToBase8Int(List<int> digitsBase8) {
+            var asStr = string.Join("", digitsBase8);
+            var num = Convert.ToInt64(asStr, 8);
+            return num;
         }
 
     }
