@@ -177,46 +177,61 @@ namespace y24 {
             Output = [];
         }
 
+        private List<Search> RecurseDigits(Search current, List<int> target) {
+            var rslt = new List<Search>();
+            var i = current.indexToModify;
+            if(i >= 16) {
+                return rslt;
+            }
+            for(int n = 0; n < 8; n++) {
+                    current.digits[i] = n;
+                    Reset();
+                    var ab8 = ToBase8Int(current.digits);
+                    RegA = ab8;
+                    Compute();
+                    if(Output.Count() == target.Count() && Output[target.Count() - i - 1] == target[target.Count() - i - 1]) {
+                        if(Output.SequenceEqual(target.Select(i => (long) i).ToList())){
+                            PrintLn($"Digit {i}: {n}; B8 value {ab8} ({Convert.ToString(ab8, 8)})");
+                            //PrintLn($" - rslt: {string.Join(",",Output)}");
+                            //PrintLn($" target: {string.Join(",",target)}");
+                        }
+                        
+
+                        rslt.Add(new Search(new List<int>(current.digits), i + 1));
+                    }
+            }
+
+            return rslt;
+        }
+
+        private record struct Search(List<int> digits, int indexToModify);
+
         public override string P2()
         {
             var lines = InputAsLines();
             Reset();
-            var target = new List<long>(Input);
+            var target = new List<long>(Input).Select(i => (int) i ).ToList();
             //var attempt = 239800000;
             var desired = new List<int>();
             foreach(var n in target) {
-                desired.Add(1);
+                desired.Add(0);
             }
 
             // digits in RegA in base 8 correspond to number of outputs
             // first digit of RegA seems to correspond to last output (likely because we're %= and /=)
             // Brute Force through all options, solving 1 digit at a time
             PrintLn($"Target: {string.Join(",",target)} [length: {target.Count()}]");
-            for(int i = 0; i < desired.Count(); i++) {
-                for(int n = 0; n < 8; n++) {
-                    desired[i] = n;
-                    Reset();
-                    var ab8 = ToBase8Int(desired);
-                    RegA = ab8;
-                    Compute();
-                    if(Output.Count() == target.Count() && Output[target.Count() - i - 1] == target[target.Count() - i - 1]) {
-                        PrintLn($"Digit {i} B8 value {ab8} ({Convert.ToString(ab8, 8)}) - rslt: {string.Join(",",Output)}");
-                        break;
-                    }
+            var queue = new Queue<Search>();
+            queue.Enqueue(new Search(desired, 0));
+            while(queue.Any()) {
+                var next = queue.Dequeue();
+                var nextSet = RecurseDigits(next, target);
+                foreach (var s in nextSet) {
+                    queue.Enqueue(s);
                 }
             }
-            var final = ToBase8Int(desired);
-            PrintLn($"Final result: {final} ({Convert.ToString(final, 8)})");
-            var close = 5600644674024111;
-            while(true){
-                Reset();
-                RegA = close;
-                Compute();
-                if(Output.SequenceEqual(target)){
-                        return $"{final}";
-                }
-                close++;
-            }
+            
+            return "Check above prints";
         }
 
         private void Compute() {
