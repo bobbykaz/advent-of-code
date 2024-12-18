@@ -130,7 +130,7 @@ namespace y24 {
             }
 
 
-            public (Thing, Vec2) ThingAt(Vec2 next) {
+            public (Thing, Vec2) GetThingAt(Vec2 next) {
                 var (r,c) = (next.X, next.Y);
                 if(Walls[r].Contains(c)) {
                     return (Thing.Wall, new Vec2(r,c));
@@ -171,21 +171,18 @@ namespace y24 {
                 return possible;
             }
 
-            public List<Vec2> GetBoxesAt(Vec2 next) {
-                var result = new List<Vec2>();
-                var (r,c) = (next.X, next.Y);
-                if(Boxes[r].Contains(c)) {
-                    result.Add(new Vec2(r, c));
+            public List<(Thing, Vec2)> GetMoveableBoxesInLRChain(Vec2 start, Vec2 dir) {
+                var toMove = new List<(Thing, Vec2)>();
+                var n = GetThingAt(start);
+                while(n.Item1 == Thing.Box) {
+                    var (currentThing, currentThingAt) = n;
+                    toMove.Add(n);
+                    n = GetThingAt(currentThingAt + dir);
                 }
-                if(Boxes[r].Contains(c-1)) {
-                    result.Add(new Vec2(r, c-1));
-                }
-                
-
-                // For L/R - can only be one box to the side.
-                // For N/S, Can be possibly two boxes
-
-                throw new Exception($"no box at {next}");
+                if (n.Item1 == Thing.Empty)
+                    return toMove;
+                else
+                 return new List<(Thing, Vec2)>();
             }
             public void MoveLR(Dir d) {
                 var dir = new Vec2(0,1);
@@ -194,68 +191,67 @@ namespace y24 {
                 else if(d != Dir.E) throw new Exception();
 
                 var next = Bot + dir;
-                var (nextThing, nextThingAt) = ThingAt(next);
+                var (nextThing, nextThingAt) = GetThingAt(next);
                 if(nextThing == Thing.Empty) {
                     Bot = next;
                 } else if(nextThing == Thing.Wall) {
 
                 } else if(nextThing == Thing.Box) {
-                    var toMove = new List<Vec2>() {nextThingAt};
-                    var nnPos = nextThingAt + dir;
-                    var (nn, nnAt) = ThingAt(nnPos);
-                    while(nn == Thing.Box) {
-                        toMove.Add(nnAt);
-                        nnPos = nnAt + dir;
-                        
+                    var toMove = GetMoveableBoxesInLRChain(nextThingAt, dir);
+                    if(toMove.Any()) {
+                        //move everything
+                        // move bot
+                    } else {
+                        //do nothing
                     }
-                    
-                    
                 }
             }
 
-        //     public void Move(Vec2 dir) {
-        //         var next = Bot + dir;
-        //         if(SpotContainsWall(next)) {
-        //             //Do nothing
-        //         } else if (SpotContainsBox(next)) {
-        //             //find all neighboring boxes in chain
-        //             var toMove = new HashSet<Vec2>();
-        //             var stack = new Stack<Vec2>();
-        //             var init = GetBoxAt(next);
-        //             toMove.Add(init);
-        //             stack.Push(init);
-        //             bool wallInChain = false;
-        //             while(stack.Any()) {
-        //                 var nextBox = stack.Pop();
-        //                 var nextCheck = nextBox + dir;
-        //                 if(SpotContainsWall(nextCheck)){
-        //                     wallInChain = true;
-        //                     stack.Clear();
-        //                     break;
-        //                 }
-        //                 if(SpotContainsBox(nextCheck)){
-        //                     var nextToMove = GetBoxAt(nextCheck);
-        //                     toMove.Add(nextToMove);
-        //                     stack.Push(nextToMove);
-        //                 }
-        //             }
-        //             //Move self and all boxes
-        //             if(!wallInChain){
-        //                 Bot = next;
-        //                 foreach(var moved in toMove){
-        //                     Boxes[moved.X].Remove(moved.Y);
-        //                 }
-        //                 foreach(var moved in toMove){
-        //                     var nb = moved + dir;
-        //                     Boxes[nb.X].Add(nb.Y);
-        //                 }
-        //             }
-        //         } else {
-        //             //its clear!
-        //             Bot = next;
-        //         }
-        //     }
-        // }
+            // putting on hold - doing a separate MoveLR and MoveUD above first, then this should just call those
+            // public void Move(Vec2 dir) {
+            //     var next = Bot + dir;
+            //     var (nextThing, nextThingPos) = GetThingAt(next);
+            //     if(nextThing == Thing.Wall) {
+            //         //Do nothing
+            //     } else if (nextThing == Thing.Box) {
+            //         //find all neighboring boxes in chain
+            //         var toMove = new HashSet<Vec2>();
+            //         var stack = new Stack<Vec2>();
+            //         var init = GetBoxAt(next);
+            //         toMove.Add(init);
+            //         stack.Push(init);
+            //         bool wallInChain = false;
+            //         while(stack.Any()) {
+            //             var nextBox = stack.Pop();
+            //             var nextCheck = nextBox + dir;
+            //             if(SpotContainsWall(nextCheck)){
+            //                 wallInChain = true;
+            //                 stack.Clear();
+            //                 break;
+            //             }
+            //             if(SpotContainsBox(nextCheck)){
+            //                 var nextToMove = GetBoxAt(nextCheck);
+            //                 toMove.Add(nextToMove);
+            //                 stack.Push(nextToMove);
+            //             }
+            //         }
+            //         //Move self and all boxes
+            //         if(!wallInChain){
+            //             Bot = next;
+            //             foreach(var moved in toMove){
+            //                 Boxes[moved.X].Remove(moved.Y);
+            //             }
+            //             foreach(var moved in toMove){
+            //                 var nb = moved + dir;
+            //                 Boxes[nb.X].Add(nb.Y);
+            //             }
+            //         }
+            //     } else {
+            //         //its clear!
+            //         Bot = next;
+            //     }
+            // }
+        }
         private Boxmap DoubleGrid(Grid<char> source) {
             var result = new Boxmap();
             source.ForEachColRow((r,c,v)=>{
