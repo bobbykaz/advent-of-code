@@ -191,30 +191,32 @@ namespace y24 {
             // digits in RegA in base 8 correspond to number of outputs
             // first digit of RegA seems to correspond to last output (likely because we're %= and /=)
             // Brute Force through all options, solving 1 digit at a time
+            PrintLn($"Target: {string.Join(",",target)} [length: {target.Count()}]");
             for(int i = 0; i < desired.Count(); i++) {
                 for(int n = 0; n < 8; n++) {
                     desired[i] = n;
                     Reset();
-                    RegA = ToBase8Int(desired);
+                    var ab8 = ToBase8Int(desired);
+                    RegA = ab8;
                     Compute();
                     if(Output.Count() == target.Count() && Output[target.Count() - i - 1] == target[target.Count() - i - 1]) {
-                        PrintLn($"Digit {i} B8 value")
+                        PrintLn($"Digit {i} B8 value {ab8} ({Convert.ToString(ab8, 8)}) - rslt: {string.Join(",",Output)}");
                         break;
                     }
                 }
             }
             var final = ToBase8Int(desired);
-            Reset();
-            RegA = final;
-            Compute();
-            if(Output.SequenceEqual(target)){
-                    return $"{final}";
+            PrintLn($"Final result: {final} ({Convert.ToString(final, 8)})");
+            var close = 5600644674024111;
+            while(true){
+                Reset();
+                RegA = close;
+                Compute();
+                if(Output.SequenceEqual(target)){
+                        return $"{final}";
+                }
+                close++;
             }
-
-            var total = 0L;
-            PrintLn($"Output : {string.Join(",", Output)}");
-           
-            return $"{total}";
         }
 
         private void Compute() {
@@ -222,7 +224,7 @@ namespace y24 {
             {
                 while(DoOp()) {}
             }
-            catch(Exception e) {
+            catch(Exception) {
                 //PrintLn($"Caught {e}");
             }
         }

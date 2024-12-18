@@ -76,7 +76,11 @@ namespace y24 {
                     return aFirst.Value;
                 } else if(!aFirst.HasValue && bFirst.HasValue) {
                     return bFirst.Value;
-                } else return long.Min(aFirst.Value, bFirst.Value);
+                } 
+                if(!aFirst.HasValue || !bFirst.HasValue){
+                    throw new Exception();
+                }
+                return long.Min(aFirst.Value, bFirst.Value);
             }
 
             public long? Optimize(Coord main, Coord alt, int mc, int ac) {

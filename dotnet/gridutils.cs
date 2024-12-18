@@ -276,35 +276,12 @@ namespace Grids {
         }
     }
 
-    public struct Pos {
-        public int R {get; set;}
-        public int C {get; set;}
+    public record struct Pos(int R, int C) {
 
-        public Pos(int r, int c) {
-            R = r;
-            C = c;
-        }
-
-        public string Key{get {return $"{R}-{C}";}}
-        public override string ToString()
+        public readonly string Key{get {return $"{R}-{C}";}}
+        public override readonly string ToString()
         {
             return $"({R}, {C})";
-        }
-        public override bool Equals(object obj)
-        {            
-            if (obj == null || GetType() != obj.GetType())
-            {
-                return false;
-            }
-            
-            var objAsPos = (Pos) obj;
-            return this.R == objAsPos.R && this.C == objAsPos.C;
-            
-        }
-        
-        public override int GetHashCode()
-        {
-            return this.Key.GetHashCode();
         }
     }
 
@@ -318,6 +295,14 @@ namespace Grids {
             if(!SeenMap.ContainsKey(k)) {
                 SeenMap[k] = new Pos(r,c);
             } 
+        }
+
+        public void Visit(Pos pos) { 
+            Visit(pos.R, pos.C);
+        }
+
+        public void Visit<T>(Cell<T> cell) { 
+            Visit(cell.R, cell.C);
         }
 
         public bool WasVisited(int r, int c) {return SeenMap.ContainsKey(Key(r,c));}
@@ -338,19 +323,9 @@ namespace Grids {
         }
     }
 
-    public struct PosWithDir {
-        public int R {get; set;}
-        public int C {get; set;}
-        public Dir Dir {get; set;}
-
-        public PosWithDir(int r, int c, Dir d) {
-            R = r;
-            C = c;
-            Dir = d;
-        }
-
-        public string Key{get {return $"{R}-{C}-{Dir}";}}
-        public override string ToString()
+    public record struct PosWithDir(int R, int C, Dir Dir) {
+        public readonly string Key{get {return $"{R}-{C}-{Dir}";}}
+        public override readonly string ToString()
         {
             return $"({R}, {C}): {Dir}";
         }
