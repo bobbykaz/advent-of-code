@@ -275,6 +275,4 @@ namespace y24 {
             return result;
         }
     }
-
-    }
 }
