@@ -279,6 +279,12 @@ namespace Grids {
     public record struct Pos(int R, int C) {
 
         public readonly string Key{get {return $"{R}-{C}";}}
+
+        public readonly int ManhattenDistance(Pos other) {
+            var rdiff = Math.Abs(other.R - this.R);
+            var cdiff = Math.Abs(other.C - this.C);
+            return rdiff + cdiff;
+        }
         public override readonly string ToString()
         {
             return $"({R}, {C})";
