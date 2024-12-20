@@ -71,6 +71,7 @@ namespace y24 {
 
         public override string P2()
         {
+            _DebugPrinting = false;
             var lines = InputAsLines();
             var groups = Utilties.GroupInputAsBlocks(lines);
             var grid = Utilties.RectangularCharGridFromLines(groups[0]);
@@ -79,48 +80,27 @@ namespace y24 {
             var dirIns = string.Join("", instructions).ToCharArray().Select(c => GridUtilities.CardinalDirFromChar(c)).ToList();
 
             var current = new Pos(-1,-1);
-            grid.ForEachRowCol((r,c,v) => {
-                if(v == '@') {
-                    current = new Pos(r,c);
-                }
-            });
+            //grid.Print();
+            var boxmap = DoubleGrid(grid);
+            boxmap.Print(_DebugPrinting);
+            boxmap.debug = _DebugPrinting;
+
 
             foreach(var dir in dirIns){
                 PrintLn($"Move: {dir}");
-                var nextCell = grid.GetNeighbor(current.R, current.C, dir);
-                if(!nextCell.HasValue) {throw new Exception();}
-
-                if(nextCell.Value.V == '#') {
-                    // do nothing
-                } else if (nextCell.Value.V == '.') {
-                    grid.G[current.R][current.C] = '.';
-                    grid.G[nextCell.Value.R][nextCell.Value.C] = '@';
-                    current = new Pos(nextCell.Value.R,nextCell.Value.C);
-                } else if (nextCell.Value.V == 'O') {
-                    var final = grid.GetNeighbor(nextCell.Value.R,nextCell.Value.C, dir);
-                    while(final.HasValue && final.Value.V == 'O') {
-                        final = grid.GetNeighbor(final.Value.R,final.Value.C, dir);
-                    }
-                    if(final.HasValue && final.Value.V == '.') {
-                        grid.G[current.R][current.C] = '.';
-                        grid.G[nextCell.Value.R][nextCell.Value.C] = '@';
-                        grid.G[final.Value.R][final.Value.C] = 'O';
-                        current = new Pos(nextCell.Value.R,nextCell.Value.C);
-                    }
-                }
-                //grid.Print();
-                PrintLn("=====");
+                boxmap.Move(dir);
+                //boxmap.Print(_DebugPrinting);
+                //PrintLn("=====");
             }
 
-
-            var total = scoreGrid(grid);
-
-            //grid.Print();
-           
-            return $"{total}";
+            boxmap.Print(true);
+            return $"{boxmap.Score()}";
         }
 
         private class Boxmap {
+            public int Width;
+            public int Height;
+            public bool debug = false;
             public Dictionary<long, HashSet<long>> Walls = [];
             public Dictionary<long, HashSet<long>> Boxes = [];
             public Vec2 Bot = new Vec2(0,0);
@@ -189,6 +169,7 @@ namespace y24 {
                 toEval.Enqueue((Thing.Box, startingBox));
                 while(toEval.Any()){
                     var (currentThing, currentThingAt) = toEval.Dequeue();
+                    toMove.Add((currentThing, currentThingAt));
                     var nextLevelPos = currentThingAt + dir;
                     var thingsAtNextLevel = GetThingsUD(nextLevelPos);
                     if(thingsAtNextLevel.Any(t => t.Item1 == Thing.Wall)) {
@@ -196,7 +177,6 @@ namespace y24 {
                         return [];
                     }
                     foreach(var t in thingsAtNextLevel){
-                        toMove.Add(t);
                         toEval.Enqueue(t);
                     }
                 }
@@ -212,28 +192,46 @@ namespace y24 {
                 var next = Bot + dir;
                 var (nextThing, nextThingAt) = GetThingAt(next);
                 if(nextThing == Thing.Empty) {
+                    if(debug) {
+                        Console.WriteLine($"Moving to empty space at {next}");
+                    }
                     Bot = next;
                 } else if(nextThing == Thing.Wall) {
-
+                    if(debug) {
+                        Console.WriteLine($"Wall at {next}; do nothing");
+                    }
                 } else if(nextThing == Thing.Box) {
+                    if(debug) {
+                        Console.WriteLine($"Box at {next}, calculating...");
+                    }
                     var toMove = GetMoveableBoxesInUDChain(nextThingAt, dir);
                     if(toMove.Any()) {
+                        if(debug) {
+                            Console.WriteLine($"Found boxes to move: {string.Join(",", toMove)}");
+                        }
                         foreach (var (b, pos) in toMove){
                             if(b != Thing.Box) throw new Exception();
                             Boxes[pos.X].Remove(pos.Y);
                         }
                         foreach (var (b, pos) in toMove){
                             var newPos = pos + dir;
-                            Boxes[pos.X].Add(newPos.Y);
+                            Boxes[newPos.X].Add(newPos.Y);
                         }
                         Bot = next;
                     } else {
-                        //do nothing
+                        if(debug) {
+                            Console.WriteLine($"Wall at in chain; do nothing");
+                        }
                     }
                 }
             }
 
-            public List<(Thing, Vec2)> GetMoveableBoxesInLRChain(Vec2 start, Vec2 dir) {
+            public List<(Thing, Vec2)> GetMoveableBoxesInLRChain(Vec2 start, Dir d) {
+                var dir = new Vec2(0,-1);
+                if(d == Dir.E){
+                    // when moving right, from the position of a box, you always have to skip one spot
+                    dir = new Vec2(0,2);
+                }
                 var toMove = new List<(Thing, Vec2)>();
                 var n = GetThingAt(start);
                 while(n.Item1 == Thing.Box) {
@@ -255,11 +253,22 @@ namespace y24 {
                 var next = Bot + dir;
                 var (nextThing, nextThingAt) = GetThingAt(next);
                 if(nextThing == Thing.Empty) {
+                    if(debug){
+                        Console.WriteLine($"Moving to empty space at {next}");
+                    }
                     Bot = next;
                 } else if(nextThing == Thing.Wall) {
-
+                    if(debug){
+                        Console.WriteLine($"Wall at {next}; do nothing");
+                    }
                 } else if(nextThing == Thing.Box) {
-                    var toMove = GetMoveableBoxesInLRChain(nextThingAt, dir);
+                    if(debug){
+                        Console.WriteLine($"Box at {next}, calculating...");
+                    }
+                    var toMove = GetMoveableBoxesInLRChain(nextThingAt, d);
+                    if(debug){
+                            Console.WriteLine($"Found boxes to move: {string.Join(",", toMove)}");
+                        }
                     if(toMove.Any()) {
                         foreach (var (b, pos) in toMove){
                             if(b != Thing.Box) throw new Exception();
@@ -271,21 +280,70 @@ namespace y24 {
                         }
                         Bot = next;
                     } else {
+                        if(debug){
+                            Console.WriteLine($"No move, wall in chain");
+                        }
                         //do nothing
                     }
                 }
             }
+
+            public void Move(Dir d){
+                switch(d) {
+                    case Dir.N:
+                    case Dir.S:
+                        MoveUD(d);
+                        break;
+                    case Dir.E:
+                    case Dir.W:
+                        MoveLR(d);
+                        break;
+                    default:
+                        throw new Exception();
+                }
+            }
+
+            public long Score() {
+                var total = 0L;
+                foreach(var r in Boxes.Keys) {
+                    foreach(var c in Boxes[r]){
+                            total += (100 * r) + c;
+                        }
+                }
+
+                return total;
+            }
+            public void Print(bool debug){
+                if(debug){
+                    var g = new Grid<char>(Width, Height, '.');
+                    foreach(var r in Walls.Keys) {
+                        foreach(var c in Walls[r]){
+                            g.G[(int)r][(int)c] = '#';
+                            g.G[(int)r][(int)c+1] = '#';
+                        }
+                    }
+
+                    foreach(var r in Boxes.Keys) {
+                        foreach(var c in Boxes[r]){
+                            g.G[(int)r][(int)c] = '[';
+                            g.G[(int)r][(int)c+1] = ']';
+                        }
+                    }
+                    g.G[(int)Bot.X][(int)Bot.Y] = '@';
+                    g.Print();
+                }
+            }
         }
         private Boxmap DoubleGrid(Grid<char> source) {
-            var result = new Boxmap();
+            var result = new Boxmap(){Width = source.Width * 2, Height = source.Height};
             source.ForEachColRow((r,c,v)=>{
+                if(!result.Boxes.ContainsKey(r)) { result.Boxes[r] = new HashSet<long>();}
+                if(!result.Walls.ContainsKey(r)) { result.Walls[r] = new HashSet<long>();}
                 switch(v) {
                     case 'O': 
-                        if(!result.Boxes.ContainsKey(r)) { result.Walls[r] = new HashSet<long>();}
                         result.Boxes[r].Add(2*c);
                         break;
                     case '#': 
-                        if(!result.Walls.ContainsKey(r)) { result.Walls[r] = new HashSet<long>();}
                         result.Walls[r].Add(2*c);
                         break;
                     case '@': 
