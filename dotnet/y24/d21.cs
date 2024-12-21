@@ -13,24 +13,24 @@ namespace y24 {
             foreach(var code in lines){
                 PrintLn($"{code}");
                 var np = new Numpad();
-                var npPath = np.PathForCode(code);
-                PrintLn($"n  {npPath}");
-
-                var dp1 = new DirPad();
-                var dp1Path = dp1.PathForCode(npPath);
-                PrintLn($"1  {dp1Path}");
-
-                var dp2 = new DirPad();
-                var dp2Path = dp2.PathForCode(dp1Path);
-                PrintLn($"2  {dp2Path}");
-
-                //var dp3 = new DirPad();
-                //var dp3Path = dp3.PathForCode(dp2Path);
-                //PrintLn($"  {dp3Path}");
-
+                var dirPads = new List<DirPad>();
+                dirPads.Add(new DirPad());
+                dirPads.Add(new DirPad());
+                var result = "";
+                foreach(var c in code.ToCharArray()) {
+                    var numPadPath = string.Join("",np.PathToTarget(c));
+                    PrintLn($"  n  {numPadPath}");
+                    var next = numPadPath;
+                    for(int i = 0; i < dirPads.Count(); i++) {
+                        next = dirPads[i].PathForCode(next);
+                        PrintLn($"  {i}  {next}");
+                    }
+                    result += next;
+                }
+                
                 var codeScore = NumValOfCode(code);
-                var score = dp2Path.Length * codeScore;
-                PrintLn($"   {dp2Path.Length} * {codeScore} = {score}");
+                var score = result.Length * codeScore;
+                PrintLn($"   {result.Length} * {codeScore} = {score}");
                 total += score;
             }
            
@@ -45,7 +45,7 @@ namespace y24 {
             public Grid<char> G;
             public Pos Ptr;
 
-            public string PathForCode(string code) {
+            public virtual string PathForCode(string code) {
                 var result = new List<char>();
                 foreach(var c in code.ToCharArray()){
                     var path = PathToTarget(c);
@@ -116,6 +116,20 @@ namespace y24 {
                 var lines = new List<string>() {".^A", "<v>"};
                 G = Utilties.RectangularCharGridFromLines(lines);
                 Ptr = new Pos(0,2);
+            }
+
+            public override string PathForCode(string code) {
+                var option1 = base.PathForCode(code);
+                //wrong - needs to be split on A, not just reversed
+                var swappedCode = new string(code.Substring(0,code.Length - 1).Reverse().ToArray()) + 'A';
+                var option2 = base.PathForCode(swappedCode);
+
+                Console.WriteLine($"    {code}/{swappedCode}");
+                Console.WriteLine($"    {option1} / {option2}");
+                if(option1.Length < option2.Length) {
+                    return option1;
+                }
+                return option2;
             }
         }
 
