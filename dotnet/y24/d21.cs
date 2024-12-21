@@ -131,6 +131,24 @@ namespace y24 {
                 }
                 return option2;
             }
+
+            private List<string> SubPaths(string path) {
+                List<string> rslt = [];
+                var next = "";
+                foreach( var c in path.ToCharArray()) {
+                    if(c!= 'A') {
+                        next += c;
+                    } else {
+                        next += c;
+                        rslt.Add(next);
+                        next = "";
+                    }
+                }
+                if(next != "") {
+                    rslt.Add(next);
+                }
+                return rslt;
+            }
         }
 
         
