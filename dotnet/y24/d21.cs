@@ -160,7 +160,7 @@ namespace y24 {
             }
 
             private string OptimizeSinglePressPath(string path) {
-
+                throw new Exception();
             }
 
             private List<string> SubPaths(string path) {
