@@ -280,6 +280,14 @@ namespace Grids {
 
         public readonly string Key{get {return $"{R}-{C}";}}
 
+        public static Pos operator +(Pos a, Pos b) {
+            return new Pos(a.R + b.R, a.C + b.C);
+        }
+
+        public static Pos operator -(Pos a, Pos b) {
+            return new Pos(a.R - b.R, a.C - b.C);
+        }
+
         public readonly int ManhattenDistance(Pos other) {
             var rdiff = Math.Abs(other.R - this.R);
             var cdiff = Math.Abs(other.C - this.C);

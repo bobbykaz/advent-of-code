@@ -18,11 +18,11 @@ namespace y24 {
                 dirPads.Add(new DirPad());
                 var result = "";
                 foreach(var c in code.ToCharArray()) {
-                    var numPadPath = string.Join("",np.PathToTarget(c));
+                    var numPadPath = string.Join("",np.UnoptimizedPathToTarget(c));
                     PrintLn($"  n  {numPadPath}");
                     var next = numPadPath;
                     for(int i = 0; i < dirPads.Count(); i++) {
-                        next = dirPads[i].PathForCode(next);
+                        next = dirPads[i].DoPathForCode(next);
                         PrintLn($"  {i}  {next}");
                     }
                     result += next;
@@ -45,18 +45,41 @@ namespace y24 {
             public Grid<char> G;
             public Pos Ptr;
 
-            public virtual string PathForCode(string code) {
+            public virtual string DoPathForCode(string code) {
                 var result = new List<char>();
                 foreach(var c in code.ToCharArray()){
-                    var path = PathToTarget(c);
+                    var path = UnoptimizedPathToTarget(c);
                     foreach(var p in path){
                         result.Add(p);
                     }
+                    var end = FindTarget(c);
+                    Ptr = end;
+
                 }
                 return string.Join("",result);
             }
 
-            public List<char> PathToTarget(char t){
+            public bool PathIsSafe(string path, Pos start) {
+                var current = start;
+                foreach(var c in path) {
+                    var diff = c switch {
+                        'v' => new Pos(1,0),
+                        '<' => new Pos(0,-1),
+                        '>' => new Pos(0,1),
+                        '^' => new Pos(-1,0),
+                        'A' => new Pos(0,0),
+                        _ => throw new Exception()
+                    };
+                    current += diff;
+                    var cell = G.GetCellIfValid(current.R, current.C);
+                    if(!cell.HasValue || cell.Value.V == '#') {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            public List<char> UnoptimizedPathToTarget(char t){
                 var result = new List<char>();
                 var end = FindTarget(t);
                 var rDiff = Ptr.R - end.R;
@@ -83,7 +106,6 @@ namespace y24 {
                     }
                 }
                 result.Add('A');
-                Ptr = end;
 
                 return result;
             }
@@ -105,7 +127,7 @@ namespace y24 {
 
         private class Numpad: Pad {
             public Numpad() {
-                var lines = new List<string>() {"789", "456", "123", ".0A"};
+                var lines = new List<string>() {"789", "456", "123", "#0A"};
                 G = Utilties.RectangularCharGridFromLines(lines);
                 Ptr = new Pos(3,2);
             }
@@ -113,16 +135,21 @@ namespace y24 {
 
         private class DirPad: Pad {
             public DirPad() {
-                var lines = new List<string>() {".^A", "<v>"};
+                var lines = new List<string>() {"#^A", "<v>"};
                 G = Utilties.RectangularCharGridFromLines(lines);
                 Ptr = new Pos(0,2);
             }
 
-            public override string PathForCode(string code) {
-                var option1 = base.PathForCode(code);
+            public override string DoPathForCode(string code) {
+                var subPaths = SubPaths(code);
+                var result = "";
+                foreach(var path in subPaths) {
+
+                }
+                var option1 = base.DoPathForCode(code);
                 //wrong - needs to be split on A, not just reversed
                 var swappedCode = new string(code.Substring(0,code.Length - 1).Reverse().ToArray()) + 'A';
-                var option2 = base.PathForCode(swappedCode);
+                var option2 = base.DoPathForCode(swappedCode);
 
                 Console.WriteLine($"    {code}/{swappedCode}");
                 Console.WriteLine($"    {option1} / {option2}");
@@ -130,6 +157,10 @@ namespace y24 {
                     return option1;
                 }
                 return option2;
+            }
+
+            private string OptimizeSinglePressPath(string path) {
+
             }
 
             private List<string> SubPaths(string path) {
