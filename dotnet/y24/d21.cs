@@ -11,7 +11,7 @@ namespace y24 {
             var lines = InputAsLines();
             var total = 0L;
             foreach(var code in lines){
-                PrintLn($"{code}");
+                PrintLn($"processing {code}");
                 var np = new Numpad();
                 var dirPads = new List<DirPad>();
                 dirPads.Add(new DirPad());
@@ -20,18 +20,24 @@ namespace y24 {
                 foreach(var c in code.ToCharArray()) {
                     var numPadPaths = np.GetPossiblePaths(c);
 
-                    var best = "";
+                    var firstDirResults = new List<string>();
                     var currentDpPos = dirPads[0].Ptr;
                     foreach(var option in numPadPaths) {
-                        
+                        dirPads[0].Ptr = currentDpPos;
+                        firstDirResults.Add(dirPads[0].OptimizeFullPath(option));
                     }
 
-                    for(int i = 0; i < dirPads.Count(); i++) {
-                        next = dirPads[i].DoPathForCode(next);
+                    var next = firstDirResults.OrderBy(s => s.Length).First();
+                    PrintLn($"  0  {next}");
+
+                    for(int i = 1; i < dirPads.Count(); i++) {
+                        next = dirPads[i].OptimizeFullPath(next);
                         PrintLn($"  {i}  {next}");
                     }
+
                     result += next;
                 }
+                PrintLn($"Code {code} result: {result}");
                 
                 var codeScore = NumValOfCode(code);
                 var score = result.Length * codeScore;
@@ -170,14 +176,14 @@ namespace y24 {
         private record struct MemoResult(Pos End, string Result);
 
         private class DirPad: Pad {
-            public static Dictionary<Memo, MemoResult> Cache = [];
+            public Dictionary<Memo, MemoResult> Cache = [];
             public DirPad() {
                 var lines = new List<string>() {"#^A", "<v>"};
                 G = Utilties.RectangularCharGridFromLines(lines);
                 Ptr = new Pos(0,2);
             }
 
-            private string OptimizeFullPath(string path) {
+            public string OptimizeFullPath(string path) {
                 var pathsSplitOnA = SubPaths(path);
                 var result = "";
                 var cacheKey = new Memo(Ptr, path);
@@ -201,20 +207,43 @@ namespace y24 {
                 var current = Ptr;
                 
                 var result = "";
-                var cacheKey = new Memo(Ptr, path);
-                if(Cache.ContainsKey(cacheKey)) {
-                    var mr = Cache[cacheKey];
-                    Ptr = mr.End;
-                    return mr.Result;
-                }
+                // var cacheKey = new Memo(Ptr, path);
+                // if(Cache.ContainsKey(cacheKey)) {
+                //     var mr = Cache[cacheKey];
+                //     Ptr = mr.End;
+                //     return mr.Result;
+                // }
 
                 // Try current version of Path
+                var option1 = "";
+                var reversedPath = ReverseRowColSinglePressPath(path);
+                Console.WriteLine($"...evaluating {path} and reverse {reversedPath}");
+                foreach(var c in path.ToCharArray()) {
+                    var possible = GetPossiblePaths(c);
+                    if (possible.Count == 0) throw new Exception($"there was no path to {path}: {c}");
+                    var best = possible.OrderBy(s => s.Length).First();
+                    option1 += best;
+                }
                 // Try Row/Col reversed version of Path
+                Ptr = current;
+                var option2 = "";
+                foreach(var c in reversedPath.ToCharArray()) {
+                    var possible = GetPossiblePaths(c);
+                    if (possible.Count == 0) throw new Exception($"there was no path to {reversedPath}: {c}");
+                    var best = possible.OrderBy(s => s.Length).First();
+                    option2 += best;
+                }
+                Console.WriteLine($"...results\n   {option1}\n   {option2}");
+                if(option1.Length < option2.Length) {
+                    result = option1;
+                } else {
+                    result = option2;
+                }
 
-                var end = Ptr;
-                Cache[cacheKey] = new MemoResult(end, result);
+                // var end = Ptr;
+                // Cache[cacheKey] = new MemoResult(end, result);
 
-                throw new Exception();
+                return result;
             }
 
             private List<string> SubPaths(string path) {
@@ -244,7 +273,9 @@ namespace y24 {
                     throw new Exception($"last char is not A \n {path}");
                 }
                 
-
+                var pressWithoutA = path.Substring(0,path.Length-1);
+                var rev = string.Join("", pressWithoutA.Reverse());
+                return rev + 'A';
             }
         }
 
