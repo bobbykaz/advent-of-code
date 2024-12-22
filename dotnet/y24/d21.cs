@@ -23,7 +23,7 @@ namespace y24 {
                     var best = "";
                     var currentDpPos = dirPads[0].Ptr;
                     foreach(var option in numPadPaths) {
-
+                        
                     }
 
                     for(int i = 0; i < dirPads.Count(); i++) {
@@ -166,33 +166,54 @@ namespace y24 {
             }
         }
 
+        private record struct Memo(Pos Start, string Path);
+        private record struct MemoResult(Pos End, string Result);
+
         private class DirPad: Pad {
+            public static Dictionary<Memo, MemoResult> Cache = [];
             public DirPad() {
                 var lines = new List<string>() {"#^A", "<v>"};
                 G = Utilties.RectangularCharGridFromLines(lines);
                 Ptr = new Pos(0,2);
             }
 
-            public override string DoPathForCode(string code) {
-                var subPaths = SubPaths(code);
+            private string OptimizeFullPath(string path) {
+                var pathsSplitOnA = SubPaths(path);
                 var result = "";
-                foreach(var path in subPaths) {
-
+                var cacheKey = new Memo(Ptr, path);
+                if(Cache.ContainsKey(cacheKey)) {
+                    var mr = Cache[cacheKey];
+                    Ptr = mr.End;
+                    return mr.Result;
                 }
-                var option1 = base.DoPathForCode(code);
-                //wrong - needs to be split on A, not just reversed
-                var swappedCode = new string(code.Substring(0,code.Length - 1).Reverse().ToArray()) + 'A';
-                var option2 = base.DoPathForCode(swappedCode);
 
-                Console.WriteLine($"    {code}/{swappedCode}");
-                Console.WriteLine($"    {option1} / {option2}");
-                if(option1.Length < option2.Length) {
-                    return option1;
+                foreach(var p in pathsSplitOnA){
+                    result += OptimizeSinglePressPath(p);
                 }
-                return option2;
+
+                var end = Ptr;
+                Cache[cacheKey] = new MemoResult(end, result);
+
+                return result;
             }
 
             private string OptimizeSinglePressPath(string path) {
+                var current = Ptr;
+                
+                var result = "";
+                var cacheKey = new Memo(Ptr, path);
+                if(Cache.ContainsKey(cacheKey)) {
+                    var mr = Cache[cacheKey];
+                    Ptr = mr.End;
+                    return mr.Result;
+                }
+
+                // Try current version of Path
+                // Try Row/Col reversed version of Path
+
+                var end = Ptr;
+                Cache[cacheKey] = new MemoResult(end, result);
+
                 throw new Exception();
             }
 
@@ -209,9 +230,21 @@ namespace y24 {
                     }
                 }
                 if(next != "") {
-                    rslt.Add(next);
+                    throw new Exception($"part of path ends without A!\n full: {path}\n end: {next}");
                 }
                 return rslt;
+            }
+
+            private string ReverseRowColSinglePressPath(string path) {
+                if (path.Count(c => c == 'A') != 1) {
+                    throw new Exception($"Encountered more than 1 A in single press reversal \n {path}");
+                }
+
+                if (path[path.Length - 1] != 'A') {
+                    throw new Exception($"last char is not A \n {path}");
+                }
+                
+
             }
         }
 
