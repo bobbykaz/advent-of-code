@@ -18,9 +18,14 @@ namespace y24 {
                 dirPads.Add(new DirPad());
                 var result = "";
                 foreach(var c in code.ToCharArray()) {
-                    var numPadPath = string.Join("",np.UnoptimizedPathToTarget(c));
-                    PrintLn($"  n  {numPadPath}");
-                    var next = numPadPath;
+                    var numPadPaths = np.GetPossiblePaths(c);
+
+                    var best = "";
+                    var currentDpPos = dirPads[0].Ptr;
+                    foreach(var option in numPadPaths) {
+
+                    }
+
                     for(int i = 0; i < dirPads.Count(); i++) {
                         next = dirPads[i].DoPathForCode(next);
                         PrintLn($"  {i}  {next}");
@@ -45,18 +50,14 @@ namespace y24 {
             public Grid<char> G;
             public Pos Ptr;
 
-            public virtual string DoPathForCode(string code) {
-                var result = new List<char>();
-                foreach(var c in code.ToCharArray()){
-                    var path = UnoptimizedPathToTarget(c);
-                    foreach(var p in path){
-                        result.Add(p);
-                    }
-                    var end = FindTarget(c);
-                    Ptr = end;
-
-                }
-                return string.Join("",result);
+            public List<string> GetPossiblePaths(char t) { 
+                var rowFirst = RowFirstPathToTarget(t);
+                var colFirst = ColFirstPathToTarget(t);
+                var rslt = new List<string>();
+                if(PathIsSafe(rowFirst, Ptr)) rslt.Add(rowFirst);
+                if(PathIsSafe(colFirst, Ptr)) rslt.Add(colFirst);
+                Ptr = FindTarget(t);
+                return rslt;
             }
 
             public bool PathIsSafe(string path, Pos start) {
@@ -79,7 +80,8 @@ namespace y24 {
                 return true;
             }
 
-            public List<char> UnoptimizedPathToTarget(char t){
+            // might end up over illegal gap #, or otherwise may be inefficient
+            public string RowFirstPathToTarget(char t){
                 var result = new List<char>();
                 var end = FindTarget(t);
                 var rDiff = Ptr.R - end.R;
@@ -87,8 +89,7 @@ namespace y24 {
                     for(int i = 0; i < Math.Abs(rDiff); i++) {
                         result.Add('v');
                     }
-                }
-                if(rDiff > 0) {
+                }else if(rDiff > 0) {
                     for(int i = 0; i < Math.Abs(rDiff); i++) {
                         result.Add('^');
                     }
@@ -99,15 +100,47 @@ namespace y24 {
                     for(int i = 0; i < Math.Abs(cDiff); i++) {
                         result.Add('>');
                     }
-                }
-                if(cDiff > 0) {
+                }else if(cDiff > 0) {
                     for(int i = 0; i < Math.Abs(cDiff); i++) {
                         result.Add('<');
                     }
                 }
+
                 result.Add('A');
 
-                return result;
+                return string.Join("", result);
+            }
+
+            // might end up over illegal gap #, or otherwise may be inefficient
+            public string ColFirstPathToTarget(char t){
+                var result = new List<char>();
+                var end = FindTarget(t);
+
+                var cDiff = Ptr.C - end.C;
+                if(cDiff < 0) {
+                    for(int i = 0; i < Math.Abs(cDiff); i++) {
+                        result.Add('>');
+                    }
+                }else if(cDiff > 0) {
+                    for(int i = 0; i < Math.Abs(cDiff); i++) {
+                        result.Add('<');
+                    }
+                }
+
+                var rDiff = Ptr.R - end.R;
+                if(rDiff < 0) {
+                    for(int i = 0; i < Math.Abs(rDiff); i++) {
+                        result.Add('v');
+                    }
+                }else if(rDiff > 0) {
+                    for(int i = 0; i < Math.Abs(rDiff); i++) {
+                        result.Add('^');
+                    }
+                }
+
+                result.Add('A');
+
+                return string.Join("", result);
             }
 
             private Pos FindTarget(char t) {
