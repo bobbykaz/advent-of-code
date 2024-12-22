@@ -22,65 +22,65 @@ namespace y24 {
                 PrintLn($"Code {code} result: {result}");
                 
                 var codeScore = NumValOfCode(code);
-                var score = result.Length * codeScore;
-                PrintLn($"   {result.Length} * {codeScore} = {score}");
+                var score = result * codeScore;
+                PrintLn($"   {result} * {codeScore} = {score}");
                 total += score;
             }
            
             return $"{total}";
         }
 
-        private int NumValOfCode(string code) {
-            return int.Parse(code.Substring(0, 3));
+        private long NumValOfCode(string code) {
+            return long.Parse(code.Substring(0, 3));
         }
 
         private abstract class Pad {
             public string Name = "";
             public Grid<char> G;
             public Pad? NextPad;
-            public Dictionary<Memo, string> Cache = [];
-            public string PressPath(string path){
-                var result = "";
+            public Dictionary<Memo, long> Cache = [];
+            public long PressPath(string path){
+                var result = 0L;
                 // Always starts at A
                 var currentChar = 'A';
                 foreach(var c in path.ToCharArray()){
-                    var nextPath = PressKey(currentChar, c);
-                    result += nextPath;
+                    var nextPathLength = PressKey(currentChar, c);
+                    result += nextPathLength;
                     currentChar = c;
                 }
 
                 return result;
             }
-            public string PressKey(char from, char to) {
+            public long PressKey(char from, char to) {
                 if (from == '#' || to == '#') {
                     throw new Exception("Somehow we ended up on the gap key?!?!");
                 }
 
                 var cacheKey = new Memo(from, to);
                 if(Cache.ContainsKey(cacheKey)) {
-                    Console.WriteLine($"{Name} - cached result for {from} => {to} {Cache[cacheKey]}");
+                    // Console.WriteLine($"{Name} - cached result for {from} => {to} {Cache[cacheKey]}");
                     return Cache[cacheKey];
                 }
                 var paths = GetPossiblePaths(from, to);
-                var results = new List<string>();
+                var results = new List<long>();
                 foreach(var p in paths){
                     results.Add(PressPathOnNextPad(p));
                 }
-                results = results.OrderBy(r => r.Length).ToList();
-                foreach(var r in results){
-                    Console.WriteLine($"{Name} - possible result {r}");
-                }
+                results = results.OrderBy(r => r).ToList();
+                // foreach(var r in results){
+                //     Console.WriteLine($"{Name} - possible result {r}");
+                // }
 
                 var best = results.First();
                 Cache[cacheKey] = best;
                 return best;
             }
 
-            private string PressPathOnNextPad(string path) {
+            private long PressPathOnNextPad(string path) {
                 if(NextPad != null) {
                     return NextPad.PressPath(path);
                 } else {
-                    return path;
+                    return path.Length;
                 }
             }
 
@@ -232,8 +232,8 @@ namespace y24 {
                 PrintLn($"Code {code} result: {result}");
                 
                 var codeScore = NumValOfCode(code);
-                var score = result.Length * codeScore;
-                PrintLn($"   {result.Length} * {codeScore} = {score}");
+                var score = result * codeScore;
+                PrintLn($"   {result} * {codeScore} = {score}");
                 total += score;
             }
            
