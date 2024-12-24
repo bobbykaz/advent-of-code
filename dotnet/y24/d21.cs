@@ -36,7 +36,7 @@ namespace y24 {
 
         private abstract class Pad {
             public string Name = "";
-            public Grid<char> G;
+            public Grid<char> G = new Grid<char>(1,1, '.');
             public Pad? NextPad;
             public Dictionary<Memo, long> Cache = [];
             public long PressPath(string path){
