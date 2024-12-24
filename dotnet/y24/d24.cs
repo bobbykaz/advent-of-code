@@ -283,7 +283,7 @@ namespace y24 {
                 PrintLn($"\n===\nThey match!\n===\n");
             }
             int count = 0;
-            for(int i = 0; i < 50000; i++) {
+            for(int i = 0; i < 1; i++) {
                 if (RandomNumberAdd()) {
                     count++;
                 }
@@ -306,17 +306,17 @@ namespace y24 {
             }
 
             //Figure out z27
-            // PrintLn($"z26");
-            // PrintRelatedGates(groups[1], FindSomeGatesFromOutput(gates, "z26", "z25"));
+            PrintLn($"z26");
+            PrintRelatedGates(groups[1], FindSomeGatesFromOutput(gates, "z26", "z25"));
 
-            // PrintLn($"z27");
-            // PrintRelatedGates(groups[1], FindSomeGatesFromOutput(gates, "z27", "z25"));
+            PrintLn($"z27");
+            PrintRelatedGates(groups[1], FindSomeGatesFromOutput(gates, "z27", "z26"));
 
             // z09 - kfp, hbs
             // z18 - dhq, z18
             // z22 - pdg, z22
-            // z27 - bqj, z27
-            var final = new List<string>(){"kfp", "hbs", "dhq", "z18", "pdg", "z22", "bqj", "z27"};
+            // z27 - jcp, z27
+            var final = new List<string>(){"kfp", "hbs", "dhq", "z18", "pdg", "z22", "jcp", "z27"};
             final.Sort();
 
             return $"{string.Join(",", final)}";
