@@ -226,7 +226,8 @@ namespace y24 {
             var rand = new Random();
             foreach(var k in gates.Keys) {
                 var val = rand.Next() % 2;
-                (gates[k] as InputGate).InternalNum = val;
+                var gAsInput = (gates[k] as InputGate) ?? throw new Exception();
+                gAsInput.InternalNum = val;
             }
 
             parseLogic(groups[1], gates);
