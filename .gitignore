@@ -23,3 +23,6 @@ rust/target
 dotnet/**/bin
 dotnet/**/obj
 dotnet-cache/
+
+# rider
+.idea/*
