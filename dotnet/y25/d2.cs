@@ -24,21 +24,21 @@ namespace y25 {
                 }
                 else
                 {
-                    total += allBadIdsInRange(range.Item1, range.Item2, 2);
+                    total += allBadIdsInRange(range.Item1, range.Item2);
                 }
             }
             
             return $"total= {total}";
         }
 
-        private long allBadIdsInRange(long lower, long upper, long dupeAmount)
+        private long allBadIdsInRange(long lower, long upper)
         {
             var total = 0L;
             var ld = Utilties.CountDigits(lower);
             var ud = Utilties.CountDigits(upper);
             {
-                var start = findStart(lower, dupeAmount);
-                var next = duplicate(start, dupeAmount);
+                var start = findStart(lower, 2);
+                var next = duplicate(start, 2);
                 PrintLn($"..Starting at {start}: ID {next}");
                 while (next <= upper)
                 {
@@ -49,14 +49,14 @@ namespace y25 {
                     }
 
                     start++;
-                    next = duplicate(start, dupeAmount);
+                    next = duplicate(start, 2);
                 }
             }
 
             if (ud != ld)
             {
                 var start = findStart(baseOfDigits(ud));
-                var next = duplicate(start, dupeAmount);
+                var next = duplicate(start, 2);
                 PrintLn($"..Re-Starting at {start}: ID {next}");
                 while (next <= upper)
                 {
@@ -67,7 +67,7 @@ namespace y25 {
                     }
 
                     start++;
-                    next = duplicate(start, dupeAmount);
+                    next = duplicate(start, 2);
                 }
             }
 
@@ -117,6 +117,32 @@ namespace y25 {
             return total;
         }
 
+        private long findAllBadIdsOfDigitLength(long lower, long upper, long maxDigits, long digitsToRepeat)
+        {
+            if (maxDigits % digitsToRepeat != 0 && maxDigits != digitsToRepeat)
+                return 0L;
+
+            PrintLn($"..Checking all numbers with {digitsToRepeat} repeating up to {maxDigits} digits ({lower} - {upper})");
+            var repeatTimes = maxDigits / digitsToRepeat;
+            var start = baseOfDigits(digitsToRepeat);
+            var max = baseOfDigits(digitsToRepeat + 1);
+            var next = duplicate(start, repeatTimes);
+            var total = 0L;
+            PrintLn($"....start seq = {start}; max seq = {max}; repeat times = {repeatTimes}; init next = {next} ");
+            while (next <= upper && start < max)
+            {
+                if (next >= lower)
+                {
+                    PrintLn($"......ID {next} is in range");
+                    total += next;
+                }
+                start++;
+                next = duplicate(start, 2);
+            }
+
+            return total;
+        }
+        
         public override string P2()
         {
             _DebugPrinting = true;
@@ -131,9 +157,27 @@ namespace y25 {
                 var ud = Utilties.CountDigits(range.Item2);
                 PrintLn($"Starting range {range} ( digits: {ld}, {ud} )");
 
-                for (var d = ld; d <= ud; d++)
+                if (ud != ld)
                 {
-                    total += allBadIdsInRange(range.Item1, range.Item2, d);
+                    var middle = baseOfDigits(ud);
+                    var middleMinusOne = middle - 1;
+                    
+                    for (var d = 1; d <= ld; d++)
+                    {
+                        total += findAllBadIdsOfDigitLength(range.Item1, middleMinusOne, ld, d);
+                    }  
+                    
+                    for (var d = 1; d <= ud; d++)
+                    {
+                        total += findAllBadIdsOfDigitLength(middle, range.Item2, ud, d);
+                    }   
+                }
+                else
+                {
+                    for (var d = 1; d <= ud; d++)
+                    {
+                        total += findAllBadIdsOfDigitLength(range.Item1, range.Item2, ud, d);
+                    }   
                 }
             }
             
