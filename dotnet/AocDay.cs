@@ -4,6 +4,7 @@ public abstract class AoCDay {
     private int _year;
     private int _day;
     protected bool _DebugPrinting { get; set; }
+    protected bool _UseSample { get; set; } = false;
     protected List<string> _InputAsLines;
 
     protected long _ElapsedMillis {get { return _Timer.ElapsedMilliseconds; } }
@@ -21,7 +22,7 @@ public abstract class AoCDay {
     }
 
     public async Task Run(){
-            _InputAsLines = await _InputLoader.GetInput(_year, _day);
+            _InputAsLines = await _InputLoader.GetInput(_year, _day, _UseSample);
             _Timer.Restart();
             var p1 = P1();
             _Timer.Stop();

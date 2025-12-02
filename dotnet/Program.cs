@@ -6,6 +6,6 @@
         var inputRoot = "../input";
         InputLoader.Init(token, inputRoot);
 
-        await new y25.D1().Run();
+        await new y25.D2().Run();
     }
 }

@@ -23,8 +23,8 @@ public class InputLoader {
         return await Client.GetStringAsync($"20{year}/day/{day}/input");
     }
 
-    public async Task<List<string>> GetInput(int year, int day) {
-        var filename = getInputFilePath(year, day);
+    public async Task<List<string>> GetInput(int year, int day, bool isSample = false) {
+        var filename = getInputFilePath(year, day, isSample);
         if(!System.IO.File.Exists(filename)) {
             Directory.CreateDirectory(getInputFileDir(year));
             var input = await FetchInput(year, day);
@@ -39,7 +39,9 @@ public class InputLoader {
     private string getInputFileDir(int year) {
         return $"{InputRoot}/y{year}/";
     }
-    private string getInputFilePath(int year, int day) {
+    private string getInputFilePath(int year, int day, bool isSample) {
+        if (isSample)
+            return $"{InputRoot}/y{year}/d{day}-sample.txt";
         return $"{InputRoot}/y{year}/d{day}.txt";
     }
 }

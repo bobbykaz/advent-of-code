@@ -4,12 +4,12 @@ public class Utilties {
     public static List<String> ReadFileToLines(string filename) {
         var lines = File.ReadAllLines(filename);
         if (lines == null) {
-        throw new Exception("no input read");
+            throw new Exception("no input read");
         }
 
         var list = lines.ToList();
         if (String.IsNullOrWhiteSpace(list.Last())) {
-        list.RemoveAt(lines.Count() - 1);
+            list.RemoveAt(lines.Count() - 1);
         }
 
         return list;
@@ -70,7 +70,39 @@ public class Utilties {
         return result;
     }
 
-/// <summary>
+
+    public static long CountDigits(long number)
+    {
+        if (number == 0) return 1;
+        
+        var count = 0L;
+        var current = number;
+        while (current > 0)
+        {
+            current /= 10;
+            count++;
+        }
+
+        return count;
+    }
+    public static long FindLeadingDigits(long number, long digits)
+    {
+        var numDigits = CountDigits(number);
+        if(digits <= 0)
+            throw new ArgumentException($"cant take {digits} digits out of {number}");
+        
+        if(digits > numDigits)
+            throw new ArgumentException($"{number} has fewer digits than requested {digits}");
+
+        var temp = number;
+        for (var i = 0; i < digits; i++)
+        {
+            temp /= 10;
+        }
+        return temp;
+    }
+    
+    /// <summary>
 /// Fancy split for multiple separators, processed left to right
 /// </summary>
     public static List<string> Split(string str, List<string>pts) {
