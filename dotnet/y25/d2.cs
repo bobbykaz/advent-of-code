@@ -3,7 +3,7 @@ namespace y25 {
 
         public D2(): base(25, 2) {
             _DebugPrinting = false;
-            _UseSample = true;
+            _UseSample = false;
         }
         public override string P1()
         {
@@ -100,88 +100,134 @@ namespace y25 {
 
         private long duplicate(long n, long numTimes)
         {
-            var digits = Utilties.CountDigits(n);
-            var mod = 1;
-            for (int i = 0; i < digits; i++)
+            var asStr = $"{n}";
+            for (var i = 1; i < numTimes; i++)
             {
-                mod *= 10;
+                asStr += $"{n}";
             }
-
-            var total = n;
-            for (int i = 1; i < numTimes; i++)
-            {
-                total *= mod;
-                total += n;
-            }
-            
-            return total;
-        }
-
-        private long findAllBadIdsOfDigitLength(long lower, long upper, long maxDigits, long digitsToRepeat)
-        {
-            if (maxDigits % digitsToRepeat != 0 && maxDigits != digitsToRepeat)
-                return 0L;
-
-            PrintLn($"..Checking all numbers with {digitsToRepeat} repeating up to {maxDigits} digits ({lower} - {upper})");
-            var repeatTimes = maxDigits / digitsToRepeat;
-            var start = baseOfDigits(digitsToRepeat);
-            var max = baseOfDigits(digitsToRepeat + 1);
-            var next = duplicate(start, repeatTimes);
-            var total = 0L;
-            PrintLn($"....start seq = {start}; max seq = {max}; repeat times = {repeatTimes}; init next = {next} ");
-            while (next <= upper && start < max)
-            {
-                if (next >= lower)
-                {
-                    PrintLn($"......ID {next} is in range");
-                    total += next;
-                }
-                start++;
-                next = duplicate(start, 2);
-            }
-
-            return total;
+            return long.Parse(asStr);
         }
         
         public override string P2()
         {
             _DebugPrinting = true;
             var lines = InputAsLines();
-            var ranges = lines[0].Split(",").Select(s => parseRange(s));
+            var initranges = lines[0].Split(",")
+                .Select(s => parseRange(s))
+                .OrderBy(r => r.Item1)
+                .ThenBy(r => r.Item2);
             
-            var total = 0L;
+            var rangeDict = new Dictionary<long, List<(long, long)>>();
+            for (var i = 1L; i <= 10L; i++)
+            {
+                rangeDict[i] = [];
+            }
 
-            foreach (var range in ranges)
+            foreach (var range in initranges)
             {
                 var ld = Utilties.CountDigits(range.Item1);
                 var ud = Utilties.CountDigits(range.Item2);
-                PrintLn($"Starting range {range} ( digits: {ld}, {ud} )");
-
-                if (ud != ld)
+                if (ud == ld)
                 {
-                    var middle = baseOfDigits(ud);
-                    var middleMinusOne = middle - 1;
-                    
-                    for (var d = 1; d <= ld; d++)
-                    {
-                        total += findAllBadIdsOfDigitLength(range.Item1, middleMinusOne, ld, d);
-                    }  
-                    
-                    for (var d = 1; d <= ud; d++)
-                    {
-                        total += findAllBadIdsOfDigitLength(middle, range.Item2, ud, d);
-                    }   
+                    PrintLn($"Adding range {range} to map of {ud}");
+                    rangeDict[ud].Add(range);
                 }
                 else
                 {
-                    for (var d = 1; d <= ud; d++)
+                    var middle = baseOfDigits(ud);
+                    var middleMinusOne = middle - 1;
+                    var lowerRange = (range.Item1, middleMinusOne);
+                    var upperRange = (middle, range.Item2);
+                    PrintLn($"Splitting range {range} to {lowerRange} | {upperRange}");
+                    rangeDict[ld].Add(lowerRange);
+                    rangeDict[ud].Add(upperRange);
+                }
+            }
+
+            PrintLn($"...............");
+            
+            var total = 0L;
+            // single digit ids ignored
+            var seen = new HashSet<long>();
+            for (var n = 2L; n <= 10L; n++)
+            {
+                var rangesOfnDigits = rangeDict[n];
+                
+                // number of digits in sequence, time to repeat sequence
+                PrintLn($"Checking all ranges of digit length {n} ( {rangesOfnDigits.Count} )");
+                var rstr = fmtRanges(rangesOfnDigits);
+                PrintLn($"  {rstr}");
+                var howManyDigitsHowManyTimes = new List<(long, long)>();
+                howManyDigitsHowManyTimes.Add((1, n));
+                PrintLn($"  (will use 1 digit {n} times)");
+                for (var i = 1L; i <= 10L; i++)
+                {
+                    // longest 10 digit sequence is 2 digits, repeated 5 times
+                    for (var j = 2L; j <= 5L; j++)
                     {
-                        total += findAllBadIdsOfDigitLength(range.Item1, range.Item2, ud, d);
-                    }   
+                        if ((i * j) == n)
+                        {
+                            PrintLn($"  (will use {i} digits {j} times)");
+                            howManyDigitsHowManyTimes.Add((i, j));
+                        }
+                    }
+                }
+                
+                
+                foreach (var seqsToRepeat in howManyDigitsHowManyTimes)
+                {
+                    total += findAllBadIds(rangesOfnDigits, seqsToRepeat.Item1, seqsToRepeat.Item2, seen);
                 }
             }
             
             return $"p2= {total}";
+        }
+
+        private long findAllBadIds(List<(long, long)> ranges, long digitsInSequence, long sequenceRepeats, HashSet<long> seen)
+        {
+            PrintLn($"..Checking all numbers with {digitsInSequence} in sequence repeating {sequenceRepeats} times");
+            var seqStart = baseOfDigits(digitsInSequence);
+            var seqEnd = baseOfDigits(digitsInSequence + 1);
+            PrintLn($"..sequences are from {seqStart} to {seqEnd}");
+            var total = 0L;
+
+            for (var i = seqStart; i < seqEnd; i++)
+            {
+                var targetId = duplicate(i, sequenceRepeats);
+                if (idIsInAnyRange(targetId, ranges))
+                {
+                    if (!seen.Contains(targetId))
+                    {
+                        PrintLn($"....ID {targetId} is in a range");
+                        seen.Add(targetId);
+                        total += targetId;
+                    }
+                }
+            }
+
+            return total;
+        }
+        
+        private bool idIsInAnyRange(long id, List<(long, long)> ranges)
+        {
+            foreach (var r in ranges)
+            {
+                if (id >= r.Item1 && id <= r.Item2)
+                    return true;
+            }
+
+            return false;
+        }
+
+        private string fmtRanges(List<(long, long)> ranges)
+        {
+            var str = "";
+            foreach (var r in ranges)
+            {
+                str += $"({r.Item1} - {r.Item2}),";
+            }
+
+            return str;
         }
 
     }
