@@ -1,5 +1,5 @@
 namespace Vec {
-    public record class Vec2(long X, long Y) {
+    public record Vec2(long X, long Y) {
         public static Vec2 operator +(Vec2 a, Vec2 b) {
             return new Vec2(a.X + b.X, a.Y + b.Y);
         }
