@@ -25,6 +25,17 @@ namespace Grids {
             }
         }
 
+        public List<Cell<T>> AllCells()
+        {
+            var cells = new List<Cell<T>>();
+            ForEachRowCol((r, c, v) =>
+            {
+             cells.Add(new Cell<T>(r,c,v));   
+            });
+
+            return cells;
+        }
+        
         public void AddRow(T defVal, int rowIndex) {
             var row = new List<T>();
             for(var i = 0; i < Width; i++) {
