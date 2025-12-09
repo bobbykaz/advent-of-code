@@ -117,22 +117,23 @@ namespace y25 {
         
         private bool CheckRectangle(Vec2 a, Vec2 b)
         {
-            PrintLn($"Checking rectangle {a}, {b}");
             var xMin = long.Min(a.X, b.X);
             var xMax = long.Max(a.X, b.X);
             var yMin = long.Min(a.Y, b.Y);
             var yMax = long.Max(a.Y, b.Y);
 
-            var r1 = new Vec2(xMin, yMin); //DL
-            var r2 = new Vec2(xMax, yMin); //DR
-            var r3 = new Vec2(xMax, yMax); //UR
-            var r4 = new Vec2(xMin, yMax); //UL
-
-            throw new NotImplementedException("Shrink rectangle inward by 0.5 to eliminate rectangle edges overlapping with polygon edges");
+            //"Shrink doubled rectangle inward by 1 to eliminate rectangle edges overlapping with polygon edges"
+            var r1 = new Vec2(xMin + 1, yMin + 1); //DL
+            var r2 = new Vec2(xMax - 1, yMin + 1); //DR
+            var r3 = new Vec2(xMax - 1, yMax - 1); //UR
+            var r4 = new Vec2(xMin + 1, yMax - 1); //UL
             
             var key = $"{r1}-{r2}-{r3}-{r4}";
             if (SeenRectIntersects.ContainsKey(key))
+            {
+                PrintLn($"Checking rectangle {a}, {b}...already seen!");
                 return SeenRectIntersects[key];
+            }
             
             var rectEdges = new List<Edge>();
             rectEdges.Add(new Edge(r1, r2));
@@ -146,7 +147,7 @@ namespace y25 {
                 {
                     if (rEdge.Intersects(pEdge))
                     {
-                        PrintLn($"...Edge {rEdge} intersects {pEdge}");
+                        //PrintLn($"Checking rectangle {a}, {b}...Edge {rEdge} intersects {pEdge}");
                         anyEdgesIntersectShape = true;
                         break;
                     }
@@ -156,6 +157,11 @@ namespace y25 {
             }
             
             SeenRectIntersects[key] = anyEdgesIntersectShape;
+
+            if (!anyEdgesIntersectShape)
+            {
+                PrintLn($"Checking rectangle {a}, {b}......clear!");
+            }
             
             return anyEdgesIntersectShape;
         }
@@ -170,13 +176,15 @@ namespace y25 {
             _DebugPrinting = true;
             var lines = InputAsLines();
             var vecs = lines.Select(l => Vec2.Parse(l)).ToList();
-            PrintSvg(vecs);
-            return "";
+            //PrintSvg(vecs);
+            
+            var doubledVecs = vecs.Select(v => new Vec2(v.X * 2, v.Y * 2)).ToList();
+            
             var max = 0L;
             for (int i = 0; i < vecs.Count - 1; i++)
             {
-                var a = vecs[i];
-                var b = vecs[i + 1];
+                var a = doubledVecs[i];
+                var b = doubledVecs[i + 1];
                 _polygonEdges.Add(new Edge(a,b));
             }
             _polygonEdges.Add(new Edge(vecs.Last(), vecs[0]));
@@ -194,7 +202,7 @@ namespace y25 {
                     {
                         var a = vecs[i];
                         var b = vecs[j];
-                        if (!CheckRectangle(a,b))
+                        if (!CheckRectangle(doubledVecs[i],doubledVecs[j]))
                         {
                             var width = long.Abs(a.X - b.X) + 1;
                             var height = long.Abs(a.Y - b.Y) + 1;
@@ -208,9 +216,8 @@ namespace y25 {
                     }
                 }
             }
-
-            var total = 0L;
-            return $"total {total}";
+            
+            return $"max {max}";
         }
         
         public void PrintSvg(List<Vec2> points)
