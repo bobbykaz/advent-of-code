@@ -1,5 +1,13 @@
 namespace Vec {
     public record Vec2(long X, long Y) {
+        public static Vec2 Parse(string s, string separator = ",")
+        {
+            var pts = s.Split(separator);
+            if(pts.Length != 2) 
+                throw new ArgumentException($"{s} when split by {separator} is not 2 parts");
+            return new Vec2(long.Parse(pts[0]), long.Parse(pts[1]));
+        }
+        
         public static Vec2 operator +(Vec2 a, Vec2 b) {
             return new Vec2(a.X + b.X, a.Y + b.Y);
         }
@@ -26,6 +34,11 @@ namespace Vec {
 
         public static Vec2 operator %(Vec2 a, Vec2 b) {
             return new Vec2(a.X % b.X, a.Y % b.Y);
+        }
+        
+        public override string ToString()
+        {
+            return $"({X}, {Y})";
         }
     }
     
