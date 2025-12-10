@@ -45,7 +45,6 @@ namespace y25 {
         // https://www.xjavascript.com/blog/check-if-polygon-is-inside-a-polygon/
         public record Edge(Vec2 A, Vec2 B)
         {
-
             public bool IsVertical()
             {
                 return A.X == B.X && A.Y != B.Y;
