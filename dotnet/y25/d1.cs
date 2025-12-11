@@ -44,8 +44,6 @@ namespace y25 {
         public override string P2()
         {
             var lines = InputAsLines();
-            long total = 0;
-
             var dial = 50;
             var zerosHit = 0;
             _DebugPrinting = true;

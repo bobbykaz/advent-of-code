@@ -59,6 +59,9 @@ namespace y25 {
             else if (existingCircuitA != null || existingCircuitB != null)
             {
                 var existingCircuit = existingCircuitA ?? existingCircuitB;
+                if (existingCircuit == null)
+                    throw new Exception("impossible");
+                
                 existingCircuit.points.Add(dist.a);
                 existingCircuit.points.Add(dist.b);
                 vecMap[dist.a] = existingCircuit;

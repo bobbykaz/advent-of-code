@@ -62,8 +62,8 @@ namespace y25 {
 
         private class BeamNode(int row, int col)
         {
-            public int R = row;
-            public int C = col;
+            public int R => row;
+            public int C => col;
             public long Value = 0;
             public bool Calculated = false;
             public List<BeamNode> Children = [];

@@ -4,7 +4,7 @@ namespace y25 {
     public class D10: AoCDay {
 
         public D10(): base(25, 10) {
-            _DebugPrinting = true;
+            _DebugPrinting = false;
             _UseSample = false;
         }
         public override string P1()
@@ -35,61 +35,34 @@ namespace y25 {
         private long Solve(string target, List<ButtonResult> oneButtons)
         {
             Dictionary<string, ButtonResult> seen = [];
-            foreach (var b in oneButtons)
+            var queue = new Queue<ButtonResult>();
+            var emptyButton = new ButtonResult(target.Length, new HashSet<int>(), 0);
+            queue.Enqueue(emptyButton);
+            seen[emptyButton.LightStr()] = emptyButton;
+            while (queue.Any())
             {
-                seen[b.LightStr()] = b;
-                if (b.LightStr() == target)
+                var next = queue.Dequeue();
+                foreach (var pressedButton in oneButtons)
                 {
-                    PrintLn($"found at {b} (one shot!)");
-                    return b.Presses;
-                }
-            }
-
-            var pressLevel = 1;
-            var newButtonsThisRound = oneButtons.ToList();
-            while (true)
-            {
-                var iterButtons = new List<ButtonResult>();
-                foreach (var b in newButtonsThisRound)
-                {
-                 iterButtons.Add(b);   
-                }
-                newButtonsThisRound.Clear();
-                
-                pressLevel++;
-                PrintLn($".. checking all {pressLevel} press combos");
-                var allPrevButtons = seen.Values.ToList().OrderBy(b => b.Presses);
-                var found = false;
-                foreach (var b in iterButtons.OrderBy(b => b.Presses))
-                {
-                    foreach (var prevButton in allPrevButtons)
+                    var resultButton = next.Combine(pressedButton);
+                    var existingButton = seen.ContainsKey(resultButton.LightStr()) ? seen[resultButton.LightStr()] : null;
+                    if ( existingButton == null || existingButton.Presses > resultButton.Presses)
                     {
-                        if (b != prevButton)
-                        {
-                            var resultButton = b.Combine(prevButton);
-                            var existingButton = seen.ContainsKey(resultButton.LightStr()) ? seen[resultButton.LightStr()] : null;
-                            if ( existingButton == null || existingButton.Presses > resultButton.Presses)
-                            {
-                                PrintLn($"  Combining \n   {b} with \n   {prevButton}");
-                                PrintLn($" = {resultButton}");
-                                seen[resultButton.LightStr()] = resultButton;
-                                newButtonsThisRound.Add(resultButton);
+                        PrintLn($"  Combining \n   {next} with \n   {pressedButton}");
+                        PrintLn($" = {resultButton}");
+                        seen[resultButton.LightStr()] = resultButton;
+                        queue.Enqueue(resultButton);
 
-                                if (resultButton.LightStr() == target)
-                                {
-                                    PrintLn($"found at {resultButton}");
-                                    return resultButton.Presses;
-                                }
-                            }
+                        if (resultButton.LightStr() == target)
+                        {
+                            PrintLn($"found at {resultButton}");
+                            return resultButton.Presses;
                         }
                     }
                 }
-
-                if (pressLevel >= 10)
-                {
-                    throw new Exception();
-                }
             }
+            
+            throw new Exception("Unreachable");
         }
 
         private record ButtonResult(int TotalLights, HashSet<int> Indices, long Presses)
@@ -146,8 +119,53 @@ namespace y25 {
             _DebugPrinting = true;
             var lines = InputAsLines();
             var total = 0L;
+            foreach (var line in lines)
+            {
+                total += solveMachineP2(line);
+            }
 
             return $"total {total}";
+        }
+        
+        private long solveMachineP2(string line)
+        {
+            PrintLn($"raw: {line}");
+            var pts = Utilties.Split(line, ["] ", " {"]);
+            var target = pts[0].Substring(1);// skip leading '['
+            var totalLights = target.Length;
+            
+            var buttons = ButtonResult.Parse(pts[1],totalLights);
+            var joltage = pts[2].Trim('}').Split(",").Select(s => long.Parse(s)).ToList();
+            if (joltage.Count != totalLights)
+                throw new Exception("Joltage count mismatch");
+
+            return 0L;
+        }
+
+        private long solve(List<ButtonResult> buttons, List<long> joltages)
+        {
+            // each button is a variable
+            // a   b     c   d      e    f
+            //(3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}
+            // e + f = 3
+            // b + f = 5
+            // c + d = 4
+            // a + b + d = 7
+            for (int n = 0; n < joltages.Count; n++)
+            {
+                var joltageCount = joltages[n];
+                var variablesContributing = new List<char>();
+                for (int buttonIndex = 0; buttonIndex < buttons.Count; buttonIndex++)
+                {
+                    if (buttons[buttonIndex].Indices.Contains(n))
+                    {
+                        char buttonVariable = (char) ('a' + buttonIndex);
+                        variablesContributing.Add(buttonVariable);
+                    }
+                }
+            }
+
+            return 0L;
         }
     }
 }
