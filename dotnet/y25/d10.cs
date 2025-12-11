@@ -1,4 +1,5 @@
-using System.Security.AccessControl;
+
+using Microsoft.Z3;
 
 namespace y25 {
     public class D10: AoCDay {
@@ -139,7 +140,7 @@ namespace y25 {
             if (joltage.Count != totalLights)
                 throw new Exception("Joltage count mismatch");
 
-            return 0L;
+            return solve(buttons, joltage);
         }
 
         private long solve(List<ButtonResult> buttons, List<long> joltages)
@@ -151,21 +152,140 @@ namespace y25 {
             // b + f = 5
             // c + d = 4
             // a + b + d = 7
-            for (int n = 0; n < joltages.Count; n++)
+
+            using (Context ctx = new Context())
             {
-                var joltageCount = joltages[n];
-                var variablesContributing = new List<char>();
-                for (int buttonIndex = 0; buttonIndex < buttons.Count; buttonIndex++)
+                Optimize opt = ctx.MkOptimize();
+                var buttonExprs = new List<IntExpr>();
+                for (int b = 0; b < buttons.Count; b++)
                 {
-                    if (buttons[buttonIndex].Indices.Contains(n))
+                    char buttonVariable = (char)('a' + b);
+                    buttonExprs.Add(ctx.MkIntConst($"{buttonVariable}"));
+                }
+                
+                var presses = ctx.MkIntConst("presses");
+                
+                opt.Add(
+                    ctx.MkEq(
+                        presses,
+                        ctx.MkAdd(buttonExprs)
+                    )
+                );
+                
+                for (int n = 0; n < joltages.Count; n++)
+                {
+                    var joltageCount = joltages[n];
+                    
+                    var buttonsContributing = new List<int>();
+                    for (int buttonIndex = 0; buttonIndex < buttons.Count; buttonIndex++)
                     {
-                        char buttonVariable = (char) ('a' + buttonIndex);
-                        variablesContributing.Add(buttonVariable);
+                        if (buttons[buttonIndex].Indices.Contains(n))
+                            buttonsContributing.Add(buttonIndex);
                     }
+
+                    var contributingExprs = buttonsContributing.Select(i => buttonExprs[i]);
+                    
+                    opt.Add(
+                        ctx.MkEq(
+                            ctx.MkAdd(contributingExprs),
+                            ctx.MkInt(joltageCount)
+                            )
+                        );
+                }
+                
+                opt.MkMinimize(presses);
+
+                // Check for a solution
+                if (opt.Check() == Status.SATISFIABLE)
+                {
+                    Model model = opt.Model;
+                    var rslt = $"{model.Eval(presses)}";
+                    PrintLn($"  Min Presses: {model.Eval(presses)}");
+                    for (int i = 0; i < buttonExprs.Count; i++)
+                    {
+                        PrintLn($"  Button {buttons[i]}: {model.Eval(buttonExprs[i])}");
+                    }
+
+                    return 0;
+                }
+                else
+                {
+                    PrintLn("  No solution found, or problem is unsatisfiable.");
+                    throw new Exception();
                 }
             }
+        }
 
-            return 0L;
+        private void Z3Solve()
+        {
+            using (Context ctx = new Context())
+            {
+                Optimize opt = ctx.MkOptimize();
+                // Define integer variables
+                IntExpr a = ctx.MkIntConst("a");
+                IntExpr b = ctx.MkIntConst("b");
+                IntExpr c = ctx.MkIntConst("c");
+                IntExpr d = ctx.MkIntConst("d");
+                IntExpr e = ctx.MkIntConst("e");
+                IntExpr f = ctx.MkIntConst("f");
+                IntExpr presses = ctx.MkIntConst("presses");
+
+                // Add constraints
+                // e + f = 3
+                // b + f = 5
+                // c + d = 4
+                // a + b + d = 7
+                // we're trying to minimize presses = a+b+c+d+e+f
+                opt.Add(
+                    ctx.MkEq(
+                        ctx.MkAdd(e,f), 
+                        ctx.MkInt(3)
+                    )
+                );
+                
+                opt.Add(
+                    ctx.MkEq(
+                        ctx.MkAdd(b,f), 
+                        ctx.MkInt(5)
+                    )
+                );
+                opt.Add(
+                    ctx.MkEq(
+                        ctx.MkAdd(c,d), 
+                        ctx.MkInt(4)
+                    )
+                );
+                opt.Add(
+                    ctx.MkEq(
+                        ctx.MkAdd(c,d), 
+                        ctx.MkInt(4)
+                    )
+                );
+                opt.Add(
+                    ctx.MkEq(
+                        ctx.MkAdd(a,b,c,d,e,f), 
+                        presses
+                    )
+                );
+                opt.MkMinimize(presses);
+
+                // Check for a solution
+                if (opt.Check() == Status.SATISFIABLE)
+                {
+                    Model model = opt.Model;
+                    Console.WriteLine($"Min presses: {model.Eval(presses)}");
+                    Console.WriteLine($"a: {model.Eval(a)}");
+                    Console.WriteLine($"b: {model.Eval(b)}");
+                    Console.WriteLine($"c: {model.Eval(c)}");
+                    Console.WriteLine($"d: {model.Eval(d)}");
+                    Console.WriteLine($"e: {model.Eval(e)}");
+                    Console.WriteLine($"f: {model.Eval(f)}");
+                }
+                else
+                {
+                    Console.WriteLine("No solution found, or problem is unsatisfiable.");
+                }
+            }
         }
     }
 }

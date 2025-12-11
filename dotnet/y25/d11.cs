@@ -20,8 +20,6 @@ namespace y25 {
             if(!_Lookup.ContainsKey("out"))
                 _Lookup["out"] = new Node("out");
             
-            return "Skipping p1";
-            
             var start = _Lookup["you"];
             var queue = new Queue<(string, string)>();
             queue.Enqueue((start.Name, ""));
