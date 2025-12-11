@@ -1,4 +1,5 @@
 
+using System.Linq.Expressions;
 using Microsoft.Z3;
 
 namespace y25 {
@@ -160,7 +161,11 @@ namespace y25 {
                 for (int b = 0; b < buttons.Count; b++)
                 {
                     char buttonVariable = (char)('a' + b);
-                    buttonExprs.Add(ctx.MkIntConst($"{buttonVariable}"));
+                    var expr = ctx.MkIntConst($"{buttonVariable}");
+                    buttonExprs.Add(expr);
+                    opt.Assert(
+                        ctx.MkGe(expr, ctx.MkInt(0))
+                    );
                 }
                 
                 var presses = ctx.MkIntConst("presses");
@@ -206,7 +211,7 @@ namespace y25 {
                         PrintLn($"  Button {buttons[i]}: {model.Eval(buttonExprs[i])}");
                     }
 
-                    return 0;
+                    return long.Parse(rslt);
                 }
                 else
                 {
