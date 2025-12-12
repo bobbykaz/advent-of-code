@@ -261,6 +261,18 @@ namespace Grids {
 
             return str;
         }
+        
+        public string ToStringLines() {
+            var str = "";
+            ForEachRowCol((r,c,v) => {
+                if (c == 0)
+                    str += "\n";
+                
+                str += v == null ? "{null}": v.ToString();
+            });
+
+            return str;
+        }
         public void Print() {
             foreach(var r in G) {
                 r.ForEach(c => Console.Write(c));
